@@ -1,0 +1,272 @@
+# 消息系统优化配置
+# Enterprise Customer Service System - Message Configuration
+# 版本: 2.0
+# 更新时间: 2024年
+
+[message_processor]
+# 批量处理配置
+batch_size = 100                    # 批量处理大小
+batch_timeout_ms = 50               # 批量超时时间（毫秒）
+max_queue_size = 10000              # 最大队列大小
+compression_threshold_bytes = 1024   # 压缩阈值（字节）
+retry_delay_ms = 100                # 重试延迟（毫秒）
+stats_interval_seconds = 30         # 统计间隔（秒）
+
+# 优先级权重配置
+[priority_weights]
+Low = 1
+Normal = 4
+High = 16
+Critical = 64
+
+# 消息过滤器配置
+[filters]
+# 聊天消息过滤器
+[filters.chat_filter]
+categories = ["Chat"]
+priorities = ["Normal", "High", "Critical"]
+max_content_length = 10000
+enable_content_validation = true
+enable_spam_detection = true
+
+# 系统消息过滤器
+[filters.system_filter]
+categories = ["System"]
+priorities = ["High", "Critical"]
+max_retention_hours = 24
+enable_performance_logs = true
+
+# 状态消息过滤器
+[filters.status_filter]
+categories = ["Status"]
+priorities = ["Low", "Normal"]
+max_retention_minutes = 60
+enable_heartbeat_logs = false
+
+# 控制消息过滤器
+[filters.control_filter]
+categories = ["Control"]
+priorities = ["High", "Critical"]
+require_admin_permission = true
+
+# 分析消息过滤器
+[filters.analytics_filter]
+categories = ["Analytics"]
+priorities = ["Low"]
+enable_data_aggregation = true
+max_batch_size = 1000
+
+# 系统消息分类配置
+[system_messages]
+# 用户操作消息
+[system_messages.user_action]
+priority = "Normal"
+retention_hours = 72
+enable_notification = true
+notification_channels = ["websocket", "log"]
+
+# 服务状态消息
+[system_messages.service_status]
+priority = "High"
+retention_hours = 168  # 7天
+enable_notification = true
+notification_channels = ["websocket", "email", "log"]
+enable_auto_recovery = true
+
+# 安全相关消息
+[system_messages.security]
+priority = "Critical"
+retention_hours = 720  # 30天
+enable_notification = true
+notification_channels = ["websocket", "email", "sms", "log"]
+require_immediate_action = true
+enable_audit_log = true
+
+# 性能监控消息
+[system_messages.performance]
+priority = "Normal"
+retention_hours = 24
+enable_notification = false
+notification_channels = ["log"]
+enable_metrics_collection = true
+metrics_interval_seconds = 60
+
+# 配置变更消息
+[system_messages.configuration]
+priority = "High"
+retention_hours = 168  # 7天
+enable_notification = true
+notification_channels = ["websocket", "log"]
+require_admin_approval = true
+
+# 错误消息
+[system_messages.error]
+priority = "Critical"
+retention_hours = 168  # 7天
+enable_notification = true
+notification_channels = ["websocket", "email", "log"]
+enable_auto_retry = true
+max_retry_count = 3
+
+# 通知消息
+[system_messages.notification]
+priority = "Normal"
+retention_hours = 48
+enable_notification = true
+notification_channels = ["websocket"]
+enable_user_preferences = true
+
+# 消息路由配置
+[routing]
+# 默认路由规则
+default_broadcast = false
+max_recipients = 100
+enable_room_routing = true
+enable_user_groups = true
+
+# 广播消息配置
+[routing.broadcast]
+max_concurrent_broadcasts = 10
+broadcast_delay_ms = 10
+enable_broadcast_throttling = true
+
+# 私聊消息配置
+[routing.private]
+enable_message_encryption = false
+enable_read_receipts = true
+enable_typing_indicators = true
+
+# 群组消息配置
+[routing.group]
+max_group_size = 50
+enable_group_permissions = true
+enable_message_history = true
+
+# 压缩配置
+[compression]
+enable_compression = true
+compression_algorithm = "gzip"
+compression_level = 6
+min_compression_size_bytes = 1024
+enable_batch_compression = true
+
+# 压缩策略
+[compression.strategies]
+text_messages = "gzip"
+image_messages = "lz4"
+file_messages = "zstd"
+batch_messages = "gzip"
+
+# 性能优化配置
+[performance]
+# 连接池配置
+max_connections = 1000
+connection_timeout_ms = 5000
+idle_timeout_ms = 30000
+keepalive_interval_ms = 60000
+
+# 缓存配置
+enable_message_cache = true
+cache_size_mb = 256
+cache_ttl_seconds = 3600
+enable_distributed_cache = false
+
+# 队列配置
+enable_priority_queue = true
+queue_buffer_size = 10000
+queue_flush_interval_ms = 100
+enable_queue_persistence = true
+
+# 监控和日志配置
+[monitoring]
+# 指标收集
+enable_metrics = true
+metrics_port = 9090
+metrics_path = "/metrics"
+enable_custom_metrics = true
+
+# 日志配置
+log_level = "info"
+enable_structured_logging = true
+log_format = "json"
+max_log_file_size_mb = 100
+max_log_files = 10
+
+# 告警配置
+[monitoring.alerts]
+# 性能告警
+enable_performance_alerts = true
+cpu_threshold_percent = 80
+memory_threshold_percent = 85
+queue_size_threshold = 8000
+response_time_threshold_ms = 200
+
+# 错误告警
+enable_error_alerts = true
+error_rate_threshold_percent = 5
+consecutive_errors_threshold = 10
+
+# 连接告警
+enable_connection_alerts = true
+connection_drop_threshold = 100
+connection_timeout_threshold = 50
+
+# 安全配置
+[security]
+# 消息验证
+enable_message_validation = true
+enable_content_filtering = true
+enable_spam_detection = true
+enable_malware_scanning = false
+
+# 访问控制
+enable_user_permissions = true
+enable_role_based_access = true
+enable_message_encryption = false
+enable_audit_logging = true
+
+# 速率限制
+[security.rate_limiting]
+enable_rate_limiting = true
+messages_per_minute = 60
+burst_limit = 10
+enable_adaptive_limiting = true
+
+# 内容过滤
+[security.content_filtering]
+max_message_length = 10000
+forbidden_words = []
+enable_profanity_filter = false
+enable_url_validation = true
+
+# 实验性功能
+[experimental]
+# AI增强
+enable_ai_message_analysis = false
+enable_sentiment_analysis = false
+enable_auto_translation = false
+
+# 高级路由
+enable_smart_routing = false
+enable_message_prioritization = true
+enable_adaptive_batching = true
+
+# 分布式功能
+enable_message_sharding = false
+enable_cross_region_sync = false
+enable_message_replication = false
+
+# 开发和调试
+[development]
+enable_debug_mode = false
+enable_message_tracing = false
+debug_log_level = "debug"
+enable_performance_profiling = false
+enable_memory_debugging = false
+
+# 测试配置
+[testing]
+enable_test_mode = false
+simulate_network_delay = false
+simulate_message_loss = false
+test_message_generation_rate = 100 
