@@ -1,0 +1,17 @@
+{
+  "id": "97b72ab7-3610-493b-a451-d5bbd6c40566",
+  "from": "test_user_123",
+  "to": "customer_456",
+  "file_id": "00675557-2c0b-4652-9fc7-03e9b280bb64",
+  "original_filename": "test_audio.mp3",
+  "file_size": 27,
+  "duration": 5,
+  "format": "mp3",
+  "sample_rate": null,
+  "bit_rate": null,
+  "upload_time": "2025-07-13T09:01:41.269647800Z",
+  "access_url": "/api/voice/download/00675557-2c0b-4652-9fc7-03e9b280bb64",
+  "transcription": null,
+  "is_read": false,
+  "checksum": "35876ea6d89a9aa95324a6a60f4d894b4965db3a74b2fd5955512304a2bcbb76"
+}
