@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发指南 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">开发指南</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#environment" class="nav-link active">开发环境</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#coding-standards" class="nav-link">编码规范</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#testing" class="nav-link">测试指南</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#contributing" class="nav-link">贡献指南</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#debugging" class="nav-link">调试技巧</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tools" class="nav-link">开发工具</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">其他文档</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link">项目概述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="api.html" class="nav-link">API 参考</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="architecture.html" class="nav-link">系统架构</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deployment.html" class="nav-link">部署指南</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">开发指南</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                    <button class="btn btn-primary print-btn">打印</button>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <nav class="breadcrumb">
+                    <a href="../index.html" class="breadcrumb-item">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">开发指南</span>
+                </nav>
+
+                <div class="doc-content">
+                    <h1 class="doc-title">开发指南</h1>
+                    <p class="doc-subtitle">企业级客服系统开发环境设置、编码规范和最佳实践</p>
+
+                    <div class="toc">
+                        <h3 class="toc-title">本页目录</h3>
+                        <ul class="toc-list">
+                            <li class="toc-item"><a href="#environment" class="toc-link">开发环境</a></li>
+                            <li class="toc-item"><a href="#coding-standards" class="toc-link">编码规范</a></li>
+                            <li class="toc-item"><a href="#testing" class="toc-link">测试指南</a></li>
+                            <li class="toc-item"><a href="#contributing" class="toc-link">贡献指南</a></li>
+                            <li class="toc-item"><a href="#debugging" class="toc-link">调试技巧</a></li>
+                            <li class="toc-item"><a href="#tools" class="toc-link">开发工具</a></li>
+                        </ul>
+                    </div>
+
+                    <section id="environment">
+                        <h2>开发环境</h2>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🛠️ 环境要求</div>
+                            <p>确保您的开发环境满足以下要求，以获得最佳的开发体验。</p>
+                        </div>
+
+                        <h3>系统要求</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>组件</th>
+                                    <th>版本要求</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Rust</strong></td>
+                                    <td>1.70+</td>
+                                    <td>系统编程语言</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Node.js</strong></td>
+                                    <td>18.0+</td>
+                                    <td>前端开发环境</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Redis</strong></td>
+                                    <td>6.0+</td>
+                                    <td>缓存和消息队列</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Git</strong></td>
+                                    <td>2.30+</td>
+                                    <td>版本控制</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Docker</strong></td>
+                                    <td>20.10+</td>
+                                    <td>容器化部署</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>环境搭建</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">1. 安装Rust</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 安装Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 配置环境变量
+source ~/.cargo/env
+
+# 验证安装
+rustc --version
+cargo --version</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4 class="card-title">2. 安装Node.js</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 使用nvm安装Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# 安装最新LTS版本
+nvm install --lts
+nvm use --lts
+
+# 验证安装
+node --version
+npm --version</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4 class="card-title">3. 安装Redis</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># Ubuntu/Debian
+sudo apt update
+sudo apt install redis-server
+
+# macOS
+brew install redis
+
+# 启动Redis服务
+sudo systemctl start redis-server  # Linux
+brew services start redis          # macOS</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>项目初始化</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">克隆项目</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 克隆项目
+git clone https://github.com/your-org/customer-service-system.git
+cd customer-service-system
+
+# 安装后端依赖
+cargo build
+
+# 安装前端依赖
+cd frontend
+npm install
+
+# 启动开发服务器
+npm run dev</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="coding-standards">
+                        <h2>编码规范</h2>
+                        
+                        <div class="alert alert-success">
+                            <div class="alert-title">📝 编码规范</div>
+                            <p>遵循统一的编码规范，确保代码质量和可维护性。</p>
+                        </div>
+
+                        <h3>Rust编码规范</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">命名规范</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 变量和函数使用snake_case
+let user_name = "admin";
+fn get_user_info() -> UserInfo { }
+
+// 常量使用SCREAMING_SNAKE_CASE
+const MAX_CONNECTIONS: usize = 100;
+
+// 类型和trait使用PascalCase
+struct UserManager { }
+trait MessageHandler { }
+
+// 模块使用snake_case
+mod auth_handler;
+mod message_processor;</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>代码格式化</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">使用rustfmt</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 格式化代码
+cargo fmt
+
+# 检查代码风格
+cargo clippy
+
+# 运行测试
+cargo test</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>错误处理</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Result和Option使用</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 使用Result处理错误
+pub async fn process_message(msg: Message) -> Result<(), Error> {
+    let validated_msg = validate_message(msg)?;
+    let processed_msg = process_content(validated_msg)?;
+    save_message(processed_msg).await?;
+    Ok(())
+}
+
+// 使用Option处理可选值
+pub fn get_user_by_id(id: u64) -> Option<User> {
+    if let Some(user) = USERS.get(&id) {
+        Some(user.clone())
+    } else {
+        None
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>文档注释</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">文档注释规范</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">/// 用户认证服务
+/// 
+/// 提供用户登录、注册、权限验证等功能
+/// 
+/// # Examples
+/// 
+/// ```rust
+/// let auth_service = AuthService::new();
+/// let result = auth_service.login("user", "password").await;
+/// ```
+pub struct AuthService {
+    // 实现细节
+}
+
+/// 处理用户登录请求
+/// 
+/// # Arguments
+/// 
+/// * `username` - 用户名
+/// * `password` - 密码
+/// 
+/// # Returns
+/// 
+/// 返回登录结果，包含用户信息和token
+/// 
+/// # Errors
+/// 
+/// 当用户名或密码错误时返回认证错误
+pub async fn login(username: &str, password: &str) -> Result<LoginResult, AuthError> {
+    // 实现代码
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="testing">
+                        <h2>测试指南</h2>
+                        
+                        <h3>单元测试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">测试结构</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_user_creation() {
+        let user = User::new("test_user", "test@example.com");
+        assert_eq!(user.username, "test_user");
+        assert_eq!(user.email, "test@example.com");
+    }
+
+    #[tokio::test]
+    async fn test_async_function() {
+        let result = async_function().await;
+        assert!(result.is_ok());
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>集成测试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">API测试</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">#[cfg(test)]
+mod integration_tests {
+    use actix_web::{test, App};
+    use crate::handlers::auth;
+
+    #[actix_web::test]
+    async fn test_login_endpoint() {
+        let app = test::init_service(
+            App::new().service(auth::login)
+        ).await;
+
+        let req = test::TestRequest::post()
+            .uri("/api/auth/login")
+            .set_json(serde_json::json!({
+                "username": "test_user",
+                "password": "test_password"
+            }))
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+        assert!(resp.status().is_success());
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>性能测试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">基准测试</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">#[cfg(test)]
+mod benches {
+    use criterion::{criterion_group, criterion_main, Criterion};
+    use crate::message_processor::process_message;
+
+    fn benchmark_message_processing(c: &mut Criterion) {
+        let message = create_test_message();
+        
+        c.bench_function("process_message", |b| {
+            b.iter(|| {
+                process_message(message.clone());
+            });
+        });
+    }
+
+    criterion_group!(benches, benchmark_message_processing);
+    criterion_main!(benches);
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>测试覆盖率</h3>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">📊 覆盖率要求</div>
+                            <ul>
+                                <li><strong>单元测试覆盖率</strong>：≥ 80%</li>
+                                <li><strong>集成测试覆盖率</strong>：≥ 60%</li>
+                                <li><strong>关键路径覆盖率</strong>：100%</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section id="contributing">
+                        <h2>贡献指南</h2>
+                        
+                        <div class="alert alert-warning">
+                            <div class="alert-title">🤝 贡献流程</div>
+                            <p>欢迎贡献代码！请遵循以下流程确保代码质量。</p>
+                        </div>
+
+                        <h3>开发流程</h3>
+                        
+                        <ol>
+                            <li><strong>Fork项目</strong>：在GitHub上fork项目到自己的账户</li>
+                            <li><strong>创建分支</strong>：为每个功能创建独立的分支</li>
+                            <li><strong>开发功能</strong>：按照编码规范开发新功能</li>
+                            <li><strong>编写测试</strong>：为新功能编写相应的测试</li>
+                            <li><strong>代码审查</strong>：提交Pull Request进行代码审查</li>
+                            <li><strong>合并代码</strong>：通过审查后合并到主分支</li>
+                        </ol>
+
+                        <h3>提交规范</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Git提交信息格式</h4>
+                            <div class="card-content">
+                                <pre><code class="language-text">type(scope): description
+
+[optional body]
+
+[optional footer]
+
+# 示例
+feat(auth): add JWT token validation
+fix(api): resolve CORS issue in login endpoint
+docs(readme): update installation instructions
+style(handler): format code according to rustfmt
+refactor(message): simplify message processing logic
+test(auth): add unit tests for login function
+chore(deps): update actix-web to 4.3.0</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>Pull Request模板</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">PR描述模板</h4>
+                            <div class="card-content">
+                                <pre><code class="language-markdown">## 描述
+简要描述此PR的变更内容
+
+## 变更类型
+- [ ] Bug修复
+- [ ] 新功能
+- [ ] 文档更新
+- [ ] 性能优化
+- [ ] 重构
+
+## 测试
+- [ ] 单元测试已通过
+- [ ] 集成测试已通过
+- [ ] 手动测试已完成
+
+## 检查清单
+- [ ] 代码符合项目编码规范
+- [ ] 添加了必要的文档注释
+- [ ] 更新了相关文档
+- [ ] 提交信息符合规范
+
+## 相关Issue
+Closes #123</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="debugging">
+                        <h2>调试技巧</h2>
+                        
+                        <h3>日志调试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">使用tracing</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">use tracing::{info, warn, error, debug};
+
+pub async fn process_message(msg: Message) -> Result<(), Error> {
+    debug!("开始处理消息: {:?}", msg);
+    
+    let result = validate_message(msg).await;
+    match result {
+        Ok(validated_msg) => {
+            info!("消息验证成功: {}", validated_msg.id);
+            // 处理逻辑
+        }
+        Err(e) => {
+            error!("消息验证失败: {}", e);
+            return Err(e);
+        }
+    }
+    
+    Ok(())
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>性能分析</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">使用criterion进行基准测试</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+fn fibonacci(n: u64) -> u64 {
+    match n {
+        0 => 1,
+        1 => 1,
+        n => fibonacci(n-1) + fibonacci(n-2),
+    }
+}
+
+fn criterion_benchmark(c: &mut Criterion) {
+    c.bench_function("fib 20", |b| b.iter(|| fibonacci(black_box(20))));
+}
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>内存分析</h3>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🔍 内存调试工具</div>
+                            <ul>
+                                <li><strong>valgrind</strong>：内存泄漏检测</li>
+                                <li><strong>heaptrack</strong>：堆内存分析</li>
+                                <li><strong>perf</strong>：性能分析</li>
+                                <li><strong>strace</strong>：系统调用跟踪</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section id="tools">
+                        <h2>开发工具</h2>
+                        
+                        <h3>IDE配置</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">VS Code配置</h4>
+                            <div class="card-content">
+                                <pre><code class="language-json">{
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.cargo.buildScripts.enable": true,
+    "rust-analyzer.procMacro.enable": true,
+    "rust-analyzer.lens.enable": true,
+    "rust-analyzer.lens.implementations.enable": true,
+    "rust-analyzer.lens.references.enable": true,
+    "rust-analyzer.lens.references.adt.enable": true,
+    "rust-analyzer.lens.references.trait.enable": true,
+    "rust-analyzer.lens.references.enumVariant.enable": true,
+    "rust-analyzer.lens.references.method.enable": true
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>有用的工具</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>工具</th>
+                                    <th>用途</th>
+                                    <th>安装命令</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>cargo-watch</strong></td>
+                                    <td>文件变化时自动重新编译</td>
+                                    <td><code>cargo install cargo-watch</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>cargo-expand</strong></td>
+                                    <td>宏展开调试</td>
+                                    <td><code>cargo install cargo-expand</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>cargo-audit</strong></td>
+                                    <td>安全漏洞检查</td>
+                                    <td><code>cargo install cargo-audit</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>cargo-tarpaulin</strong></td>
+                                    <td>代码覆盖率分析</td>
+                                    <td><code>cargo install cargo-tarpaulin</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>调试配置</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">launch.json配置</h4>
+                            <div class="card-content">
+                                <pre><code class="language-json">{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Rust App",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/customer-service",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "RUST_LOG": "debug"
+            }
+        }
+    ]
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html>
