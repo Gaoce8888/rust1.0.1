@@ -145,11 +145,11 @@ impl KefuAuthManager {
         // 保存到Redis
         let key = format!("kefu:online:{}", kefu_auth.kefu_id);
         let status_json = serde_json::to_string(&online_status)?;
-                conn.set_ex(key.clone(), status_json, 3600).await?; // 1小时过期
+                let _: () = conn.set_ex(key.clone(), status_json, 3600).await?; // 1小时过期
 
         // 添加到在线列表
         let online_list_key = "kefu:online:list".to_string();
-        conn.sadd(online_list_key, kefu_auth.kefu_id.clone()).await?;
+        let _: () = conn.sadd(online_list_key, kefu_auth.kefu_id.clone()).await?;
         
         info!("✅ 客服上线成功: {}", kefu_auth.kefu_id);
         Ok(true)
@@ -163,11 +163,11 @@ impl KefuAuthManager {
         
         // 删除在线状态
         let key = format!("kefu:online:{}", kefu_id);
-                conn.del(&key).await?;
+                let _: () = conn.del(&key).await?;
 
         // 从在线列表移除
         let online_list_key = "kefu:online:list".to_string();
-        conn.srem(online_list_key, kefu_id.to_string()).await?;
+        let _: () = conn.srem(online_list_key, kefu_id.to_string()).await?;
         
         info!("✅ 客服下线完成: {}", kefu_id);
         Ok(())
@@ -188,7 +188,7 @@ impl KefuAuthManager {
             if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&json) {
                 status.last_heartbeat = chrono::Utc::now();
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex(key.clone(), updated_json, 3600).await?;
+                let _: () = conn.set_ex(key.clone(), updated_json, 3600).await?;
             }
         }
         
@@ -242,7 +242,7 @@ impl KefuAuthManager {
             // 记录客户-客服关系
             let mut conn = self.redis_pool.get_connection().await?;
             let customer_key = format!("customer:kefu:{}", customer_id);
-            conn.set_ex(customer_key.clone(), kefu.kefu_id.clone(), 3600).await?;
+            let _: () = conn.set_ex(customer_key.clone(), kefu.kefu_id.clone(), 3600).await?;
             
             return Ok(Some(kefu.kefu_id.clone()));
         }
@@ -266,7 +266,7 @@ impl KefuAuthManager {
                 }
                 
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex(key.clone(), updated_json, 3600).await?;
+                let _: () = conn.set_ex(key.clone(), updated_json, 3600).await?;
                 }
             }
             Err(_) => {
@@ -285,7 +285,7 @@ impl KefuAuthManager {
         match conn.get::<_, String>(&customer_key).await {
             Ok(kefu_id) => {
                 self.increment_kefu_customers(&kefu_id, -1).await?;
-                conn.del(&customer_key).await?;
+                let _: () = conn.del(&customer_key).await?;
                 info!("✅ 为客户 {} 释放客服: {}", customer_id, kefu_id);
             }
             Err(_) => {

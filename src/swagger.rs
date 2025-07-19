@@ -47,7 +47,7 @@ use utoipa::openapi::{OpenApiBuilder, InfoBuilder, PathsBuilder, ComponentsBuild
         (name = "WebSocket", description = "WebSocket连接和实时通信相关接口"),
     )
 )]
-pub struct ApiDoc;
+pub struct _ApiDoc;
 
 /// 添加安全配置
 pub struct SecurityAddon;
@@ -72,7 +72,7 @@ impl Modify for SecurityAddon {
 }
 
 /// 获取OpenAPI规范JSON
-pub fn get_openapi_spec() -> utoipa::openapi::OpenApi {
+pub fn _get_openapi_spec() -> utoipa::openapi::OpenApi {
     // 使用更简单的方式创建OpenAPI文档
     let openapi = OpenApiBuilder::new()
         .info(InfoBuilder::new()
