@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 参考 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">API 参考</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#overview" class="nav-link active">API 概览</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#auth" class="nav-link">认证接口</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#system" class="nav-link">系统接口</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#file" class="nav-link">文件管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#voice" class="nav-link">语音消息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#template" class="nav-link">模板管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#ai" class="nav-link">AI 处理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#websocket" class="nav-link">WebSocket</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">其他文档</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link">项目概述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="architecture.html" class="nav-link">系统架构</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="modules.html" class="nav-link">模块详解</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deployment.html" class="nav-link">部署指南</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">API 参考文档</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                    <a href="http://localhost:8080/swagger-ui.html" class="btn btn-primary" target="_blank">在线文档</a>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <nav class="breadcrumb">
+                    <a href="../index.html" class="breadcrumb-item">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">API 参考</span>
+                </nav>
+
+                <div class="doc-content">
+                    <h1 class="doc-title">API 参考文档</h1>
+                    <p class="doc-subtitle">完整的 REST API 和 WebSocket 接口文档</p>
+
+                    <div class="toc">
+                        <h3 class="toc-title">本页目录</h3>
+                        <ul class="toc-list">
+                            <li class="toc-item"><a href="#overview" class="toc-link">API 概览</a></li>
+                            <li class="toc-item"><a href="#auth" class="toc-link">认证接口</a></li>
+                            <li class="toc-item"><a href="#system" class="toc-link">系统接口</a></li>
+                            <li class="toc-item"><a href="#file" class="toc-link">文件管理</a></li>
+                            <li class="toc-item"><a href="#voice" class="toc-link">语音消息</a></li>
+                            <li class="toc-item"><a href="#template" class="toc-link">模板管理</a></li>
+                            <li class="toc-item"><a href="#ai" class="toc-link">AI 处理</a></li>
+                            <li class="toc-item"><a href="#websocket" class="toc-link">WebSocket</a></li>
+                        </ul>
+                    </div>
+
+                    <section id="overview">
+                        <h2>API 概览</h2>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🌐 基础信息</div>
+                            <p>API 基础URL: <code>http://localhost:8080</code></p>
+                            <p>API 版本: v1.0.0</p>
+                            <p>支持格式: JSON</p>
+                        </div>
+
+                        <h3>通用响应格式</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">成功响应</h4>
+                            <div class="card-content">
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "操作成功",
+  "data": {
+    // 具体数据内容
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4 class="card-title">错误响应</h4>
+                            <div class="card-content">
+                                <pre><code class="language-json">{
+  "success": false,
+  "message": "错误信息",
+  "code": 400,
+  "details": {
+    "error_type": "validation_error",
+    "timestamp": "2024-01-01T00:00:00Z"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>HTTP 状态码</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>状态码</th>
+                                    <th>说明</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>200</code></td>
+                                    <td>OK</td>
+                                    <td>请求成功</td>
+                                </tr>
+                                <tr>
+                                    <td><code>201</code></td>
+                                    <td>Created</td>
+                                    <td>资源创建成功</td>
+                                </tr>
+                                <tr>
+                                    <td><code>400</code></td>
+                                    <td>Bad Request</td>
+                                    <td>请求参数错误</td>
+                                </tr>
+                                <tr>
+                                    <td><code>401</code></td>
+                                    <td>Unauthorized</td>
+                                    <td>未认证或认证失败</td>
+                                </tr>
+                                <tr>
+                                    <td><code>403</code></td>
+                                    <td>Forbidden</td>
+                                    <td>权限不足</td>
+                                </tr>
+                                <tr>
+                                    <td><code>404</code></td>
+                                    <td>Not Found</td>
+                                    <td>资源不存在</td>
+                                </tr>
+                                <tr>
+                                    <td><code>500</code></td>
+                                    <td>Internal Server Error</td>
+                                    <td>服务器内部错误</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>认证机制</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">会话认证</h4>
+                            <div class="card-content">
+                                <p>系统使用基于会话的认证机制，认证流程如下：</p>
+                                <ol>
+                                    <li>用户通过 <code>POST /auth/login</code> 登录</li>
+                                    <li>服务器返回 <code>session_id</code></li>
+                                    <li>后续请求在 Header 中携带 <code>session_id</code></li>
+                                    <li>服务器验证会话有效性</li>
+                                </ol>
+                                
+                                <p><strong>Header 格式：</strong></p>
+                                <pre><code>Authorization: Bearer {session_id}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="auth">
+                        <h2>认证接口</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">用户登录</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/auth/login</code></p>
+                                <p><strong>描述：</strong>用户登录认证</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>请求参数</h4>
+                                <pre><code class="language-json">{
+  "username": "admin",
+  "password": "password123"
+}</code></pre>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "登录成功",
+  "session_id": "session_uuid",
+  "user": {
+    "id": "user_id",
+    "username": "admin",
+    "display_name": "管理员",
+    "role": "admin",
+    "permissions": ["read", "write", "admin"]
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">强制登录</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/auth/force-login</code></p>
+                                <p><strong>描述：</strong>强制登录，断开其他会话</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>请求参数</h4>
+                                <p>同登录接口</p>
+                                
+                                <h4>响应示例</h4>
+                                <p>同登录接口</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">用户登出</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/auth/logout</code></p>
+                                <p><strong>描述：</strong>用户登出</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "登出成功"
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">会话验证</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/auth/validate</code></p>
+                                <p><strong>描述：</strong>验证会话有效性</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "会话有效",
+  "data": {
+    "session_id": "session_uuid",
+    "user": {
+      "id": "user_id",
+      "username": "admin",
+      "role": "admin"
+    }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">心跳检测</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/auth/heartbeat</code></p>
+                                <p><strong>描述：</strong>保持会话活跃状态</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "心跳成功"
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="system">
+                        <h2>系统接口</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">获取系统配置</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/config</code></p>
+                                <p><strong>描述：</strong>获取系统配置信息</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "websocket": {
+    "url": "ws://localhost:8080/ws"
+  },
+  "api": {
+    "url": "http://localhost:8080/api"
+  },
+  "upload": {
+    "max_file_size": 10485760,
+    "allowed_types": ["image/jpeg", "image/png", "application/pdf"],
+    "categories": ["images", "documents", "audio", "videos"]
+  },
+  "html_templates": {
+    "enabled": true,
+    "max_variables": 50,
+    "max_template_size": 1048576
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">获取在线用户统计</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/users</code></p>
+                                <p><strong>描述：</strong>获取在线用户统计信息</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "获取在线用户列表成功",
+  "data": {
+    "total_connections": 15,
+    "kefu_connections": 5,
+    "kehu_connections": 10
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">获取WebSocket统计</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/websocket/stats</code></p>
+                                <p><strong>描述：</strong>获取WebSocket连接统计</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "获取WebSocket统计信息成功",
+  "data": {
+    "total_connections": 15,
+    "kefu_connections": 5,
+    "kehu_connections": 10,
+    "total_messages": 1250
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">健康检查</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/health</code></p>
+                                <p><strong>描述：</strong>系统健康检查</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "status": "ok"
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="file">
+                        <h2>文件管理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">文件上传</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/api/file/upload</code></p>
+                                <p><strong>描述：</strong>文件上传</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                <p><strong>请求类型：</strong>multipart/form-data</p>
+                                
+                                <h4>请求参数</h4>
+                                <ul>
+                                    <li><code>file</code>: 文件内容</li>
+                                    <li><code>category</code>: 文件分类（可选）</li>
+                                    <li><code>description</code>: 文件描述（可选）</li>
+                                </ul>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "文件上传成功",
+  "data": {
+    "file_id": "file_uuid",
+    "filename": "document.pdf",
+    "size": 1024000,
+    "upload_time": "2024-01-01T00:00:00Z",
+    "access_url": "/api/file/download/file_uuid"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">获取文件列表</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/file/list</code></p>
+                                <p><strong>描述：</strong>获取文件列表</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>查询参数</h4>
+                                <ul>
+                                    <li><code>page</code>: 页码（默认1）</li>
+                                    <li><code>limit</code>: 每页数量（默认20）</li>
+                                    <li><code>category</code>: 文件分类</li>
+                                    <li><code>sort_by</code>: 排序字段</li>
+                                    <li><code>sort_order</code>: 排序方向（asc/desc）</li>
+                                </ul>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "文件列表获取成功",
+  "data": {
+    "files": [
+      {
+        "file_id": "file_uuid",
+        "filename": "document.pdf",
+        "size": 1024000,
+        "category": "documents",
+        "upload_time": "2024-01-01T00:00:00Z",
+        "uploaded_by": "user_id"
+      }
+    ],
+    "total": 50,
+    "page": 1,
+    "limit": 20
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">文件下载</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/file/download/{file_id}</code></p>
+                                <p><strong>描述：</strong>文件下载</p>
+                                <p><strong>需要认证：</strong>否</p>
+                                
+                                <h4>路径参数</h4>
+                                <ul>
+                                    <li><code>file_id</code>: 文件ID</li>
+                                </ul>
+                                
+                                <h4>响应</h4>
+                                <p>返回文件二进制流</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="voice">
+                        <h2>语音消息</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">语音上传</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/api/voice/upload</code></p>
+                                <p><strong>描述：</strong>语音消息上传</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                <p><strong>请求类型：</strong>multipart/form-data</p>
+                                
+                                <h4>请求参数</h4>
+                                <ul>
+                                    <li><code>voice</code>: 语音文件</li>
+                                    <li><code>to</code>: 接收者ID（可选）</li>
+                                    <li><code>duration</code>: 语音时长（可选）</li>
+                                </ul>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "语音上传成功",
+  "data": {
+    "voice_id": "voice_uuid",
+    "file_id": "file_uuid",
+    "duration": 30.5,
+    "format": "mp3",
+    "file_size": 512000,
+    "upload_time": "2024-01-01T00:00:00Z",
+    "access_url": "/api/voice/download/voice_uuid"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">获取语音列表</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/voice/list</code></p>
+                                <p><strong>描述：</strong>获取语音消息列表</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "语音列表获取成功",
+  "data": {
+    "voices": [
+      {
+        "voice_id": "voice_uuid",
+        "from": "user_id",
+        "to": "target_user_id",
+        "duration": 30.5,
+        "format": "mp3",
+        "upload_time": "2024-01-01T00:00:00Z"
+      }
+    ]
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="template">
+                        <h2>模板管理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">获取模板列表</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/api/template/list</code></p>
+                                <p><strong>描述：</strong>获取HTML模板列表</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "模板列表获取成功",
+  "data": {
+    "templates": [
+      {
+        "template_id": "template_uuid",
+        "name": "欢迎模板",
+        "description": "客户欢迎消息模板",
+        "category": "welcome",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+      }
+    ]
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">创建模板</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/api/template/create</code></p>
+                                <p><strong>描述：</strong>创建新的HTML模板</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>请求参数</h4>
+                                <pre><code class="language-json">{
+  "name": "新模板",
+  "description": "模板描述",
+  "category": "custom",
+  "content": "&lt;h1&gt;{{title}}&lt;/h1&gt;&lt;p&gt;{{content}}&lt;/p&gt;",
+  "variables": ["title", "content"]
+}</code></pre>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "success": true,
+  "message": "模板创建成功",
+  "data": {
+    "template_id": "template_uuid",
+    "name": "新模板",
+    "created_at": "2024-01-01T00:00:00Z"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="ai">
+                        <h2>AI 处理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">提交AI任务</h3>
+                            <div class="card-content">
+                                <p><strong>POST</strong> <code>/ai/tasks</code></p>
+                                <p><strong>描述：</strong>提交AI处理任务</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>请求参数</h4>
+                                <pre><code class="language-json">{
+  "task_type": "intent_recognition",
+  "user_id": "user_id",
+  "message_id": "message_id",
+  "input_data": {
+    "text": "我想查询订单状态"
+  },
+  "priority": 5
+}</code></pre>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "task_id": "task_uuid",
+  "status": "submitted",
+  "message": "任务已提交到AI处理队列"
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">获取任务状态</h3>
+                            <div class="card-content">
+                                <p><strong>GET</strong> <code>/ai/tasks/{task_id}</code></p>
+                                <p><strong>描述：</strong>获取AI任务状态</p>
+                                <p><strong>需要认证：</strong>是</p>
+                                
+                                <h4>响应示例</h4>
+                                <pre><code class="language-json">{
+  "task_id": "task_uuid",
+  "status": "completed",
+  "result": {
+    "intent": "order_inquiry",
+    "confidence": 0.95,
+    "entities": ["订单", "状态"]
+  },
+  "error": null
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="websocket">
+                        <h2>WebSocket</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">WebSocket连接</h3>
+                            <div class="card-content">
+                                <p><strong>WebSocket</strong> <code>ws://localhost:8080/ws</code></p>
+                                <p><strong>描述：</strong>建立WebSocket连接</p>
+                                <p><strong>协议：</strong>WebSocket</p>
+                                <p><strong>消息格式：</strong>JSON</p>
+                                
+                                <h4>连接参数</h4>
+                                <ul>
+                                    <li><code>user_id</code>: 用户ID</li>
+                                    <li><code>user_type</code>: 用户类型（kefu/kehu）</li>
+                                    <li><code>token</code>: 认证令牌</li>
+                                </ul>
+                                
+                                <h4>连接示例</h4>
+                                <pre><code class="language-javascript">const ws = new WebSocket('ws://localhost:8080/ws?user_id=123&user_type=kefu&token=abc123');</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">消息类型</h3>
+                            <div class="card-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>类型</th>
+                                            <th>说明</th>
+                                            <th>方向</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>user_join</code></td>
+                                            <td>用户加入</td>
+                                            <td>客户端 → 服务器</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>user_leave</code></td>
+                                            <td>用户离开</td>
+                                            <td>客户端 → 服务器</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>message</code></td>
+                                            <td>文本消息</td>
+                                            <td>双向</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>file</code></td>
+                                            <td>文件消息</td>
+                                            <td>双向</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>voice</code></td>
+                                            <td>语音消息</td>
+                                            <td>双向</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>typing</code></td>
+                                            <td>打字状态</td>
+                                            <td>双向</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>heartbeat</code></td>
+                                            <td>心跳包</td>
+                                            <td>双向</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">消息示例</h3>
+                            <div class="card-content">
+                                <h4>发送文本消息</h4>
+                                <pre><code class="language-json">{
+  "type": "message",
+  "from": "user_id",
+  "to": "target_user_id",
+  "content": "Hello, world!",
+  "timestamp": "2024-01-01T00:00:00Z"
+}</code></pre>
+                                
+                                <h4>发送文件消息</h4>
+                                <pre><code class="language-json">{
+  "type": "file",
+  "from": "user_id",
+  "to": "target_user_id",
+  "file_id": "file_uuid",
+  "filename": "document.pdf",
+  "file_size": 1024000,
+  "timestamp": "2024-01-01T00:00:00Z"
+}</code></pre>
+                                
+                                <h4>打字状态</h4>
+                                <pre><code class="language-json">{
+  "type": "typing",
+  "from": "user_id",
+  "to": "target_user_id",
+  "is_typing": true,
+  "timestamp": "2024-01-01T00:00:00Z"
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <p>&copy; 2024 企业级客服系统. 保留所有权利.</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html>
