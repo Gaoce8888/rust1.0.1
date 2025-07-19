@@ -18,11 +18,11 @@ use crate::storage::LocalStorage;
     tag = "系统"
 )]
 pub async fn handle_system_info(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("系统信息接口被访问");
     
-    let stats = ws_manager.get_connection_stats().await;
+    let stats = _ws_manager.get_connection_stats().await;
     let config = AppConfig::get();
     
     let system_info = SystemInfo {
@@ -54,7 +54,7 @@ pub async fn handle_system_info(
     tag = "系统"
 )]
 pub async fn handle_system_health(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("系统健康检查接口被访问");
@@ -96,11 +96,11 @@ pub async fn handle_system_health(
     tag = "系统"
 )]
 pub async fn handle_online_users(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("获取在线用户列表接口被访问");
     
-    let online_users = ws_manager.get_realtime_online_users().await;
+    let online_users = _ws_manager.get_realtime_online_users().await;
     
     let users: Vec<OnlineUserInfo> = online_users
         .into_iter()
@@ -176,7 +176,7 @@ pub async fn handle_get_config() -> Result<impl warp::Reply, warp::Rejection> {
 )]
 #[allow(dead_code)]
 pub async fn handle_get_online_users(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
     user_info: AppUserInfo,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!(
@@ -184,7 +184,7 @@ pub async fn handle_get_online_users(
         user_info.name, user_info.user_type
     );
 
-    let stats = ws_manager.get_connection_stats().await;
+    let stats = _ws_manager.get_connection_stats().await;
     let response = ApiResponse {
         success: true,
         message: "获取在线用户列表成功".to_string(),
@@ -208,11 +208,11 @@ pub async fn handle_get_online_users(
     tag = "系统"
 )]
 pub async fn handle_get_public_online_users(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("公开在线用户状态请求");
     
-    let stats = ws_manager.get_connection_stats().await;
+    let stats = _ws_manager.get_connection_stats().await;
     let response = ApiResponse {
         success: true,
         message: "获取公开在线用户状态成功".to_string(),
@@ -235,12 +235,12 @@ pub async fn handle_get_public_online_users(
     tag = "系统"
 )]
 pub async fn handle_get_realtime_users(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("实时用户列表请求");
     
-    let stats = ws_manager.get_connection_stats().await;
-    let online_users = ws_manager.get_realtime_online_users().await;
+    let stats = _ws_manager.get_connection_stats().await;
+    let online_users = _ws_manager.get_realtime_online_users().await;
     
     let response = ApiResponse {
         success: true,
@@ -273,7 +273,7 @@ pub async fn handle_get_realtime_users(
 )]
 #[allow(dead_code)]
 pub async fn handle_get_websocket_stats(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
     user_info: AppUserInfo,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!(
@@ -281,7 +281,7 @@ pub async fn handle_get_websocket_stats(
         user_info.name, user_info.user_type
     );
     
-    let stats = ws_manager.get_connection_stats().await;
+    let stats = _ws_manager.get_connection_stats().await;
     let response = ApiResponse {
         success: true,
         message: "获取WebSocket统计信息成功".to_string(),

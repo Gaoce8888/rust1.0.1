@@ -18,11 +18,11 @@ pub struct AnalyticsDateRange {
 
 // 系统概览统计
 pub async fn handle_analytics_overview(
-    ws_manager: Arc<WebSocketManager>,
-    storage: Arc<LocalStorage>,
+    _ws_manager: Arc<WebSocketManager>,
+    _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     // 获取当前连接统计
-    let connection_stats = ws_manager.get_connection_stats().await;
+    let _connection_stats = _ws_manager.get_connection_stats().await;
     
     // TODO: 从storage获取更多统计数据
     let overview = serde_json::json!({
@@ -67,9 +67,9 @@ pub async fn handle_analytics_overview(
 // 消息统计
 pub async fn handle_analytics_messages(
     query: AnalyticsDateRange,
-    storage: Arc<LocalStorage>,
+    _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
-    let group_by = query.group_by.unwrap_or_else(|| "day".to_string());
+    let _group_by = query.group_by.unwrap_or_else(|| "day".to_string());
     
     // TODO: 从storage获取实际统计数据
     let message_stats = serde_json::json!({
@@ -121,9 +121,9 @@ pub async fn handle_analytics_messages(
 
 // 用户活跃度统计
 pub async fn handle_analytics_users(
-    query: AnalyticsDateRange,
-    ws_manager: Arc<WebSocketManager>,
-    user_manager: Arc<UserManager>,
+    _query: AnalyticsDateRange,
+    _ws_manager: Arc<WebSocketManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 获取实际用户统计数据
     let user_stats = serde_json::json!({
@@ -174,9 +174,9 @@ pub async fn handle_analytics_users(
 
 // 性能指标
 pub async fn handle_analytics_performance(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
-    let connection_stats = ws_manager.get_connection_stats().await;
+    let _connection_stats = _ws_manager.get_connection_stats().await;
     
     let performance = serde_json::json!({
         "response_times": {
@@ -227,9 +227,9 @@ pub async fn handle_analytics_performance(
 
 // 生成分析报告
 pub async fn handle_generate_report(
-    request: GenerateReportRequest,
-    ws_manager: Arc<WebSocketManager>,
-    storage: Arc<LocalStorage>,
+    _request: GenerateReportRequest,
+    _ws_manager: Arc<WebSocketManager>,
+    _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let report_id = Uuid::new_v4().to_string();
     
@@ -258,8 +258,8 @@ pub struct GenerateReportRequest {
 
 // 业务洞察
 pub async fn handle_business_insights(
-    ws_manager: Arc<WebSocketManager>,
-    storage: Arc<LocalStorage>,
+    _ws_manager: Arc<WebSocketManager>,
+    _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let insights = serde_json::json!({
         "trending_topics": [
