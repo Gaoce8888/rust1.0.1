@@ -1,0 +1,18 @@
+
+> kefu-frontend@1.0.0 dev
+> vite --port 6005 --port 6005
+
+
+  VITE v4.5.14  ready in 208 ms
+
+  ➜  Local:   http://localhost:6005/
+  ➜  Network: http://10.255.255.254:6005/
+  ➜  Network: http://192.168.1.23:6005/
+  ➜  Network: http://169.254.216.90:6005/
+  ➜  Network: http://172.18.0.1:6005/
+  ➜  Network: http://172.17.0.1:6005/
+4:53:14 AM [vite] page reload OptimizedApp.jsx
+4:53:35 AM [vite] page reload OptimizedApp.jsx
+5:50:18 AM [vite] vite.config.js changed, restarting server...
+5:50:18 AM [vite] server restarted.
+Killed
