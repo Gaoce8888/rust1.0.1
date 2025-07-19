@@ -23,8 +23,6 @@ import {Icon} from "@iconify/react";
 
 import SidebarContainer from "./sidebar-with-chat-history";
 import MessagingChatMessage, { MessageType } from "./messaging-chat-message";
-import messagingChatAIConversations from "./messaging-chat-ai-conversations";
-
 import EnhancedPromptInput from "./enhanced-prompt-input";
 import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
