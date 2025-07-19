@@ -4,7 +4,7 @@ use tracing::info;
 /// 构建前端路由
 pub fn build_frontend_routes() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
-    // 主页路由
+    // 主页路由 - 服务入口页面
     let index_route = warp::path::end()
         .and(warp::get())
         .and_then(|| async {
@@ -23,11 +23,20 @@ pub fn build_frontend_routes() -> impl Filter<Extract = (impl warp::Reply,), Err
         .and(warp::get())
         .and_then(|| async {
             info!("👔 客服端主页被访问");
-            let html_content = std::fs::read_to_string("static/kefu-react/index.html")
+            // 使用构建后的文件
+            let html_content = std::fs::read_to_string("static/react-kefu/dist/index.html")
+                .or_else(|_| std::fs::read_to_string("static/react-kefu/index.html"))
                 .map_err(|e| {
                     tracing::error!("读取客服端主页失败: {:?}", e);
                     warp::reject::not_found()
                 })?;
+            
+            // 修复资源路径，添加/kefu前缀
+            let html_content = html_content
+                .replace("src=\"/assets/", "src=\"/kefu/assets/")
+                .replace("href=\"/assets/", "href=\"/kefu/assets/")
+                .replace("src=\"/src/", "src=\"/kefu/src/");
+                
             Ok::<_, warp::Rejection>(warp::reply::html(html_content))
         });
 
@@ -37,7 +46,7 @@ pub fn build_frontend_routes() -> impl Filter<Extract = (impl warp::Reply,), Err
         .and(warp::get())
         .and_then(|| async {
             info!("📱 客户端主页被访问");
-            let html_content = std::fs::read_to_string("static/kehu-react/index.html")
+            let html_content = std::fs::read_to_string("static/react-kehu/index.html")
                 .map_err(|e| {
                     tracing::error!("读取客户端主页失败: {:?}", e);
                     warp::reject::not_found()
@@ -47,11 +56,12 @@ pub fn build_frontend_routes() -> impl Filter<Extract = (impl warp::Reply,), Err
 
     // 客服端静态资源路由 /kefu/*
     let kefu_static_route = warp::path("kefu")
-        .and(warp::fs::dir("static/kefu-react"));
+        .and(warp::fs::dir("static/react-kefu/dist")
+            .or(warp::fs::dir("static/react-kefu")));
 
     // 客户端静态资源路由 /kehu/*
     let kehu_static_route = warp::path("kehu")
-        .and(warp::fs::dir("static/kehu-react"));
+        .and(warp::fs::dir("static/react-kehu"));
 
     // Demo客服端页面路由  
     let demo_kefu_route = warp::path!("demo" / "kefu.html")
@@ -97,13 +107,10 @@ pub fn build_frontend_routes() -> impl Filter<Extract = (impl warp::Reply,), Err
     let static_files = warp::fs::dir("static");
 
     // 组合所有前端路由
-    kefu_index_route
+    index_route
+        .or(kefu_index_route)
         .or(kefu_static_route)
         .or(kehu_index_route)
         .or(kehu_static_route)
-        .or(demo_kefu_route)
-        .or(demo_kehu_route) 
-        .or(demo_route)
-        .or(index_route)
         .or(static_files)
 } 
