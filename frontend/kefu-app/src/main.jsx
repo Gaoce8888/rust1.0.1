@@ -4,7 +4,7 @@ import App from './App'
 import './index.css'
 
 /**
- * 客户端应用入口文件
+ * 客服端应用入口文件
  * 使用 React 18 的 createRoot API
  * 启用严格模式以帮助发现潜在问题
  */

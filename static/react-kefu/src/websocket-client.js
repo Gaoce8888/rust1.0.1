@@ -1,35 +1,59 @@
- // WebSocket 客户端 - 升级版 (保持向后兼容)
-// 用于处理与后端的实时通信
-// 集成企业级高稳定性通信功能
+/**
+ * WebSocket 客户端 - 升级版 (保持向后兼容)
+ * 用于处理与后端的实时通信
+ * 集成企业级高稳定性通信功能
+ * 
+ * 功能特点：
+ * - 自动重连机制
+ * - 消息队列和离线缓存
+ * - 心跳检测
+ * - 性能监控
+ * - 企业级功能扩展
+ */
 
 import { enterpriseWSManager } from './services/enterprise-websocket.js';
 
+/**
+ * WebSocket客户端类
+ * 提供可靠的实时通信功能
+ */
 export class WebSocketClient {
+    /**
+     * 构造函数
+     * @param {string} url - WebSocket服务器URL
+     * @param {Object} options - 配置选项
+     * @param {number} options.reconnectInterval - 重连间隔时间（毫秒）
+     * @param {number} options.maxReconnectAttempts - 最大重连尝试次数
+     * @param {string} options.userId - 用户ID
+     * @param {string} options.userType - 用户类型（kefu/kehu）
+     * @param {string} options.sessionToken - 会话令牌
+     * @param {boolean} options.enableEnterpriseFeatures - 是否启用企业级功能
+     */
     constructor(url, options = {}) {
       this.baseUrl = url;
-      this.ws = null;
-      this.reconnectInterval = options.reconnectInterval || 5000;
-      this.maxReconnectAttempts = options.maxReconnectAttempts || 5;
-      this.reconnectAttempts = 0;
-      this.isConnecting = false;
-      this.handlers = new Map();
-      this.messageQueue = [];
-      this.heartbeatInterval = null;
-      this.userId = options.userId;
-      this.userType = options.userType || 'kefu';
-      this.sessionToken = options.sessionToken;
+      this.ws = null;  // WebSocket实例
+      this.reconnectInterval = options.reconnectInterval || 5000;  // 重连间隔（默认5秒）
+      this.maxReconnectAttempts = options.maxReconnectAttempts || 5;  // 最大重连次数
+      this.reconnectAttempts = 0;  // 当前重连次数
+      this.isConnecting = false;  // 是否正在连接
+      this.handlers = new Map();  // 事件处理器映射
+      this.messageQueue = [];  // 消息队列（离线时缓存消息）
+      this.heartbeatInterval = null;  // 心跳定时器
+      this.userId = options.userId;  // 用户ID
+      this.userType = options.userType || 'kefu';  // 用户类型
+      this.sessionToken = options.sessionToken;  // 会话令牌
       
       // 企业级功能开关
       this.enableEnterpriseFeatures = options.enableEnterpriseFeatures !== false;
       this.enterpriseManager = null;
       
-      // 性能监控
+      // 性能监控指标
       this.performanceMetrics = {
-        messagesReceived: 0,
-        messagesSent: 0,
-        reconnectCount: 0,
-        avgResponseTime: 0,
-        lastHeartbeat: null
+        messagesReceived: 0,  // 接收消息数
+        messagesSent: 0,  // 发送消息数
+        reconnectCount: 0,  // 重连次数
+        avgResponseTime: 0,  // 平均响应时间
+        lastHeartbeat: null  // 最后心跳时间
       };
       
       // 如果启用企业级功能，初始化企业级管理器
@@ -38,7 +62,10 @@ export class WebSocketClient {
       }
     }
   
-    // 初始化企业级功能
+    /**
+     * 初始化企业级功能
+     * 包括高级监控、负载均衡等
+     */
     initializeEnterpriseFeatures() {
       console.log('🚀 初始化企业级WebSocket功能');
       this.enterpriseManager = enterpriseWSManager;

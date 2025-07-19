@@ -15,23 +15,43 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
+/**
+ * 客服登录页面组件
+ * 
+ * 功能特点：
+ * - 用户名密码登录
+ * - 记住登录状态
+ * - 密码显示/隐藏切换
+ * - 登录错误提示
+ * - 加载状态显示
+ * - 响应式设计
+ * 
+ * @param {Function} onLoginSuccess - 登录成功回调函数
+ */
 export default function LoginPage({ onLoginSuccess }) {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [remember, setRemember] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState("");
+  // ========== 组件状态 ==========
+  const [isVisible, setIsVisible] = React.useState(false);  // 密码是否可见
+  const [username, setUsername] = React.useState("");  // 用户名
+  const [password, setPassword] = React.useState("");  // 密码
+  const [remember, setRemember] = React.useState(false);  // 记住登录状态
+  const [isLoading, setIsLoading] = React.useState(false);  // 加载状态
+  const [error, setError] = React.useState("");  // 错误信息
 
+  // 切换密码可见性
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  // 处理表单提交
+  /**
+   * 处理表单提交
+   * 发送登录请求到后端API
+   * @param {Event} event - 表单提交事件
+   */
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
+      // 获取API基础URL，支持环境变量配置
       const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:6006';
       
       const response = await fetch(`${baseUrl}/api/kefu/login`, {

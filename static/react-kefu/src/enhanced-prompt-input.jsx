@@ -21,8 +21,25 @@ import {cn} from "@heroui/react";
 
 import PromptInput from "./prompt-input";
 
-// 增强版输入框组件
-// 支持文字、图片、文件、语音等多种消息类型
+/**
+ * 增强版输入框组件
+ * 支持文字、图片、文件、语音等多种消息类型
+ * 
+ * 功能特点：
+ * - 文本输入和发送
+ * - 图片选择和预览
+ * - 文件选择和上传
+ * - 语音录制功能
+ * - 输入状态通知
+ * - 快捷键支持（Enter发送）
+ * - 附件管理
+ * 
+ * @param {Function} onSendMessage - 发送消息回调函数
+ * @param {Function} onTyping - 输入状态回调函数
+ * @param {string} placeholder - 输入框占位符文本
+ * @param {Object} classNames - 自定义样式类名
+ * @param {Object} props - 其他属性
+ */
 export default function EnhancedPromptInput({
   onSendMessage,
   onTyping,
@@ -30,22 +47,25 @@ export default function EnhancedPromptInput({
   classNames = {},
   ...props
 }) {
-  // 状态管理
-  const [prompt, setPrompt] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [previewImage, setPreviewImage] = useState(null);
+  // ========== 状态管理 ==========
+  const [prompt, setPrompt] = useState("");  // 输入文本
+  const [isRecording, setIsRecording] = useState(false);  // 是否正在录音
+  const [recordingTime, setRecordingTime] = useState(0);  // 录音时长
+  const [selectedFiles, setSelectedFiles] = useState([]);  // 选中的文件列表
+  const [previewImage, setPreviewImage] = useState(null);  // 预览图片
   
-  // Refs
-  const fileInputRef = useRef(null);
-  const imageInputRef = useRef(null);
-  const recordingIntervalRef = useRef(null);
+  // ========== Refs ==========
+  const fileInputRef = useRef(null);  // 文件输入框引用
+  const imageInputRef = useRef(null);  // 图片输入框引用
+  const recordingIntervalRef = useRef(null);  // 录音计时器引用
   
-  // Modal控制
+  // ========== Modal控制 ==========
   const {isOpen: isImageModalOpen, onOpen: onImageModalOpen, onClose: onImageModalClose} = useDisclosure();
 
-  // 发送文本消息
+  /**
+   * 发送文本消息
+   * 检查输入内容，调用发送回调，清空输入框
+   */
   const handleSendText = () => {
     if (!prompt.trim()) return;
     

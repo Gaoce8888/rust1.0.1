@@ -1,4 +1,12 @@
- // 消息类型定义
+/**
+ * 消息类型和工具函数定义
+ * 定义了聊天系统中所有的消息类型、状态和相关工具函数
+ */
+
+/**
+ * 消息类型枚举
+ * 定义系统支持的所有消息类型
+ */
 export const MessageType = {
     TEXT: 'text',           // 文本消息
     IMAGE: 'image',         // 图片消息
@@ -8,7 +16,10 @@ export const MessageType = {
     TYPING: 'typing',       // 正在输入提示
   };
   
-  // 消息状态
+  /**
+   * 消息状态枚举
+   * 追踪消息的发送和接收状态
+   */
   export const MessageStatus = {
     SENDING: 'sending',     // 发送中
     SENT: 'sent',          // 已发送
@@ -17,7 +28,10 @@ export const MessageType = {
     FAILED: 'failed',      // 发送失败
   };
   
-  // 文件类型
+  /**
+   * 文件类型分类
+   * 根据扩展名对文件进行分类
+   */
   export const FileType = {
     IMAGE: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     DOCUMENT: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
@@ -25,7 +39,10 @@ export const MessageType = {
     AUDIO: ['mp3', 'wav', 'ogg', 'm4a'],
   };
   
-  // 消息数据结构
+  /**
+   * 消息数据结构类
+   * 统一的消息数据格式，便于管理和传输
+   */
   export class Message {
     constructor(data) {
       this.id = data.id || Date.now().toString();
@@ -49,7 +66,12 @@ export const MessageType = {
     }
   }
   
-  // 文件大小格式化
+  /**
+   * 文件大小格式化
+   * 将字节数转换为人类可读的格式
+   * @param {number} bytes - 文件大小（字节）
+   * @returns {string} 格式化后的文件大小（如：2.5 MB）
+   */
   export function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -58,12 +80,20 @@ export const MessageType = {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
   
-  // 获取文件扩展名
+  /**
+   * 获取文件扩展名
+   * @param {string} filename - 文件名
+   * @returns {string} 小写的文件扩展名
+   */
   export function getFileExtension(filename) {
     return filename.split('.').pop().toLowerCase();
   }
   
-  // 判断是否为图片文件
+  /**
+   * 判断是否为图片文件
+   * @param {string} filename - 文件名
+   * @returns {boolean} 是否为支持的图片格式
+   */
   export function isImageFile(filename) {
     const ext = getFileExtension(filename);
     return FileType.IMAGE.includes(ext);
