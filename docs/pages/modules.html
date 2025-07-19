@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模块详解 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">模块详解</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#overview" class="nav-link active">模块概览</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#auth" class="nav-link">认证模块</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#file" class="nav-link">文件管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#voice" class="nav-link">语音消息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#template" class="nav-link">模板系统</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#ai" class="nav-link">AI 处理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#websocket" class="nav-link">WebSocket</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">模块详解</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <div class="doc-content">
+                    <h1 class="doc-title">模块详解</h1>
+                    <p class="doc-subtitle">深入了解每个功能模块的设计和实现</p>
+
+                    <section id="overview">
+                        <h2>模块概览</h2>
+                        
+                        <div class="grid grid-cols-2">
+                            <div class="card">
+                                <h3 class="card-title">🔐 认证模块</h3>
+                                <div class="card-content">
+                                    <p>负责用户身份验证、会话管理、权限控制等安全相关功能</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">📁 文件管理</h3>
+                                <div class="card-content">
+                                    <p>处理文件上传、下载、存储、分类等文件管理功能</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">🎤 语音消息</h3>
+                                <div class="card-content">
+                                    <p>处理语音文件的录制、播放、转码、存储等功能</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">🎨 模板系统</h3>
+                                <div class="card-content">
+                                    <p>管理HTML模板的创建、编辑、渲染和版本控制</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="auth">
+                        <h2>认证模块</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">核心功能</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li>用户登录认证</li>
+                                    <li>会话管理</li>
+                                    <li>权限控制</li>
+                                    <li>安全验证中间件</li>
+                                    <li>多因素认证支持</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">技术实现</h3>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 用户认证结构
+pub struct UserManager {
+    users: Vec&lt;User&gt;,
+    file_path: String,
+    redis_client: Client,
+    session_ttl: i64,
+}
+
+// 认证中间件
+pub async fn auth_middleware(
+    req: Request,
+    next: Next,
+) -> Result&lt;Response, Rejection&gt; {
+    let session_id = extract_session_id(&req)?;
+    let user_info = validate_session(&session_id).await?;
+    check_permissions(&user_info, &req.path())?;
+    next.run(req).await
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="file">
+                        <h2>文件管理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">文件分类</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>images</strong>: 图片文件 (jpg, png, gif, webp)</li>
+                                    <li><strong>documents</strong>: 文档文件 (pdf, doc, docx, txt)</li>
+                                    <li><strong>audio</strong>: 音频文件 (mp3, wav, m4a)</li>
+                                    <li><strong>videos</strong>: 视频文件 (mp4, avi, mov)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">存储策略</h3>
+                            <div class="card-content">
+                                <pre><code>data/
+├── blobs/
+│   ├── images/          # 图片存储
+│   ├── documents/       # 文档存储
+│   ├── audio/           # 音频存储
+│   └── videos/          # 视频存储
+└── metadata/            # 文件元数据</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="voice">
+                        <h2>语音消息</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">支持格式</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>输入格式</strong>: MP3, WAV, M4A, OGG</li>
+                                    <li><strong>输出格式</strong>: MP3 (标准化)</li>
+                                    <li><strong>采样率</strong>: 16kHz, 22.05kHz, 44.1kHz</li>
+                                    <li><strong>比特率</strong>: 64kbps, 128kbps, 320kbps</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">处理流程</h3>
+                            <div class="card-content">
+                                <pre><code>1. 接收语音文件
+   ↓
+2. 格式验证和安全检查
+   ↓
+3. 音频格式转换
+   ↓
+4. 时长计算和质量检查
+   ↓
+5. 存储到指定目录
+   ↓
+6. 生成访问URL
+   ↓
+7. 保存元数据</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="template">
+                        <h2>模板系统</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">模板功能</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li>HTML模板创建和编辑</li>
+                                    <li>动态变量替换</li>
+                                    <li>条件渲染支持</li>
+                                    <li>模板分类管理</li>
+                                    <li>版本控制</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">模板语法</h3>
+                            <div class="card-content">
+                                <pre><code class="language-html">&lt;!-- 变量替换 --&gt;
+&lt;h1&gt;{{title}}&lt;/h1&gt;
+&lt;p&gt;{{content}}&lt;/p&gt;
+
+&lt;!-- 条件渲染 --&gt;
+{{#if user.is_vip}}
+&lt;div class="vip-badge"&gt;VIP用户&lt;/div&gt;
+{{/if}}
+
+&lt;!-- 循环渲染 --&gt;
+{{#each items}}
+&lt;div class="item"&gt;{{this.name}}&lt;/div&gt;
+{{/each}}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="ai">
+                        <h2>AI 处理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">AI 服务</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>意图识别</strong>: 分析用户消息意图</li>
+                                    <li><strong>语言翻译</strong>: 多语言翻译支持</li>
+                                    <li><strong>情感分析</strong>: 分析用户情绪</li>
+                                    <li><strong>智能回复</strong>: 自动回复推荐</li>
+                                    <li><strong>语音识别</strong>: 语音转文字</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">任务队列</h3>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// AI任务类型
+pub enum AITaskType {
+    IntentRecognition,
+    Translation,
+    SentimentAnalysis,
+    SpeechRecognition,
+    SmartReply,
+}
+
+// AI任务结构
+pub struct AITask {
+    pub id: String,
+    pub task_type: AITaskType,
+    pub user_id: String,
+    pub message_id: String,
+    pub input_data: serde_json::Value,
+    pub priority: u8,
+    pub status: TaskStatus,
+    pub created_at: DateTime&lt;Utc&gt;,
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="websocket">
+                        <h2>WebSocket 管理</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">连接管理</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li>WebSocket连接建立和维护</li>
+                                    <li>用户在线状态跟踪</li>
+                                    <li>消息路由和转发</li>
+                                    <li>广播消息支持</li>
+                                    <li>心跳检测机制</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">消息处理</h3>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// WebSocket消息处理
+pub async fn handle_websocket_message(
+    ws: WebSocket,
+    user_id: String,
+    user_type: UserType,
+    ws_manager: Arc&lt;WebSocketManager&gt;,
+) {
+    // 注册用户连接
+    ws_manager.register_user(user_id.clone(), user_type, ws.clone()).await;
+    
+    // 处理消息
+    while let Some(msg) = ws.next().await {
+        match msg {
+            Ok(Message::Text(text)) => {
+                let message: ClientMessage = serde_json::from_str(&text)?;
+                route_message(message, &ws_manager).await;
+            }
+            Ok(Message::Binary(bin)) => {
+                handle_binary_message(bin, &ws_manager).await;
+            }
+            _ => {}
+        }
+    }
+    
+    // 注销用户连接
+    ws_manager.unregister_user(&user_id).await;
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html>
