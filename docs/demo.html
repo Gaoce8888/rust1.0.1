@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API功能演示 - 企业级客服系统</title>
+    
+    <!-- PWA支持 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .demo-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .demo-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+        
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        
+        .websocket-messages {
+            height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        .ws-message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .ws-sent {
+            background: #e3f2fd;
+            margin-left: 2rem;
+        }
+        
+        .ws-received {
+            background: #f3e5f5;
+            margin-right: 2rem;
+        }
+        
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected {
+            background: #4caf50;
+        }
+        
+        .status-dot.disconnected {
+            background: #f44336;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button:hover {
+            color: #495057;
+        }
+        
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <header class="header" style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;">
+            <h1 class="header-title">API功能演示</h1>
+            <div class="header-actions">
+                <div class="connection-status">
+                    <span class="status-dot disconnected" id="connectionDot"></span>
+                    <span id="connectionText">未连接</span>
+                </div>
+                <a href="index.html" class="btn btn-secondary">返回文档</a>
+            </div>
+        </header>
+
+        <div class="demo-container" style="margin-top: 80px;">
+            <div class="doc-content">
+                <h1 class="doc-title">API功能实时演示</h1>
+                <p class="doc-subtitle">在此页面可以实时测试企业级客服系统的各种API功能</p>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">🚀 使用说明</div>
+                    <p>请确保后端服务已启动在 <code>http://localhost:8080</code>，然后可以在此页面测试各种API功能。</p>
+                </div>
+
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('auth')">认证接口</button>
+                        <button class="tab-button" onclick="switchTab('system')">系统接口</button>
+                        <button class="tab-button" onclick="switchTab('file')">文件管理</button>
+                        <button class="tab-button" onclick="switchTab('websocket')">WebSocket</button>
+                        <button class="tab-button" onclick="switchTab('ai')">AI功能</button>
+                    </div>
+
+                    <!-- 认证接口演示 -->
+                    <div class="tab-content active" id="authTab">
+                        <div class="demo-section">
+                            <h3>用户登录</h3>
+                            <div class="demo-controls">
+                                <input type="text" class="demo-input" id="loginUsername" placeholder="用户名" value="admin">
+                                <input type="password" class="demo-input" id="loginPassword" placeholder="密码" value="admin123">
+                                <button class="btn btn-primary" onclick="testLogin()">
+                                    登录测试
+                                    <span class="demo-status" id="loginStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="loginResult">等待测试...</div>
+                        </div>
+
+                        <div class="demo-section">
+                            <h3>用户注册</h3>
+                            <div class="demo-controls">
+                                <input type="text" class="demo-input" id="registerUsername" placeholder="用户名">
+                                <input type="email" class="demo-input" id="registerEmail" placeholder="邮箱">
+                                <input type="password" class="demo-input" id="registerPassword" placeholder="密码">
+                                <button class="btn btn-primary" onclick="testRegister()">
+                                    注册测试
+                                    <span class="demo-status" id="registerStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="registerResult">等待测试...</div>
+                        </div>
+                    </div>
+
+                    <!-- 系统接口演示 -->
+                    <div class="tab-content" id="systemTab">
+                        <div class="demo-section">
+                            <h3>健康检查</h3>
+                            <div class="demo-controls">
+                                <button class="btn btn-primary" onclick="testHealth()">
+                                    检查系统健康状态
+                                    <span class="demo-status" id="healthStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="healthResult">等待测试...</div>
+                        </div>
+
+                        <div class="demo-section">
+                            <h3>系统信息</h3>
+                            <div class="demo-controls">
+                                <button class="btn btn-primary" onclick="testSystemInfo()">
+                                    获取系统信息
+                                    <span class="demo-status" id="systemStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="systemResult">等待测试...</div>
+                        </div>
+                    </div>
+
+                    <!-- 文件管理演示 -->
+                    <div class="tab-content" id="fileTab">
+                        <div class="demo-section">
+                            <h3>文件上传</h3>
+                            <div class="demo-controls">
+                                <input type="file" class="demo-input" id="fileInput">
+                                <button class="btn btn-primary" onclick="testFileUpload()">
+                                    上传文件
+                                    <span class="demo-status" id="uploadStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="uploadResult">等待测试...</div>
+                        </div>
+
+                        <div class="demo-section">
+                            <h3>文件列表</h3>
+                            <div class="demo-controls">
+                                <button class="btn btn-primary" onclick="testFileList()">
+                                    获取文件列表
+                                    <span class="demo-status" id="fileListStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="fileListResult">等待测试...</div>
+                        </div>
+                    </div>
+
+                    <!-- WebSocket演示 -->
+                    <div class="tab-content" id="websocketTab">
+                        <div class="demo-section">
+                            <h3>WebSocket实时通信</h3>
+                            <div class="demo-controls">
+                                <button class="btn btn-primary" onclick="connectWebSocket()">连接</button>
+                                <button class="btn btn-secondary" onclick="disconnectWebSocket()">断开</button>
+                            </div>
+                            <div class="demo-controls">
+                                <input type="text" class="demo-input" id="wsMessage" placeholder="输入消息内容">
+                                <button class="btn btn-primary" onclick="sendWebSocketMessage()">发送消息</button>
+                            </div>
+                            <div class="websocket-messages" id="wsMessages"></div>
+                        </div>
+                    </div>
+
+                    <!-- AI功能演示 -->
+                    <div class="tab-content" id="aiTab">
+                        <div class="demo-section">
+                            <h3>智能意图识别</h3>
+                            <div class="demo-controls">
+                                <input type="text" class="demo-input" id="intentText" placeholder="输入文本进行意图识别" value="我想退款">
+                                <button class="btn btn-primary" onclick="testIntentRecognition()">
+                                    识别意图
+                                    <span class="demo-status" id="intentStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="intentResult">等待测试...</div>
+                        </div>
+
+                        <div class="demo-section">
+                            <h3>智能翻译</h3>
+                            <div class="demo-controls">
+                                <input type="text" class="demo-input" id="translateText" placeholder="输入要翻译的文本" value="Hello World">
+                                <select class="demo-input" id="targetLang" style="flex: 0 0 150px;">
+                                    <option value="zh">中文</option>
+                                    <option value="ja">日语</option>
+                                    <option value="ko">韩语</option>
+                                    <option value="fr">法语</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="testTranslation()">
+                                    翻译
+                                    <span class="demo-status" id="translateStatus"></span>
+                                </button>
+                            </div>
+                            <div class="demo-result" id="translateResult">等待测试...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE = 'http://localhost:8080';
+        let ws = null;
+        let authToken = null;
+
+        // 标签切换
+        function switchTab(tabName) {
+            // 更新按钮状态
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // 通用API调用函数
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+
+                const data = await response.json();
+                return { status: response.status, data };
+            } catch (error) {
+                return { status: 'error', data: { error: error.message } };
+            }
+        }
+
+        // 更新状态显示
+        function updateStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = text;
+                element.className = `demo-status status-${status}`;
+            }
+        }
+
+        // 认证接口测试
+        async function testLogin() {
+            updateStatus('loginStatus', 'pending', '测试中...');
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = await apiCall('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+            
+            if (result.status === 200) {
+                authToken = result.data.token;
+                updateStatus('loginStatus', 'success', '成功');
+                document.getElementById('loginResult').textContent = JSON.stringify(result.data, null, 2);
+            } else {
+                updateStatus('loginStatus', 'error', '失败');
+                document.getElementById('loginResult').textContent = JSON.stringify(result.data, null, 2);
+            }
+        }
+
+        async function testRegister() {
+            updateStatus('registerStatus', 'pending', '测试中...');
+            
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            const result = await apiCall('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+            });
+            
+            if (result.status === 201) {
+                updateStatus('registerStatus', 'success', '成功');
+            } else {
+                updateStatus('registerStatus', 'error', '失败');
+            }
+            document.getElementById('registerResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        // 系统接口测试
+        async function testHealth() {
+            updateStatus('healthStatus', 'pending', '测试中...');
+            
+            const result = await apiCall('/health');
+            
+            if (result.status === 200) {
+                updateStatus('healthStatus', 'success', '健康');
+            } else {
+                updateStatus('healthStatus', 'error', '异常');
+            }
+            document.getElementById('healthResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        async function testSystemInfo() {
+            updateStatus('systemStatus', 'pending', '测试中...');
+            
+            const result = await apiCall('/api/system/info');
+            
+            if (result.status === 200) {
+                updateStatus('systemStatus', 'success', '成功');
+            } else {
+                updateStatus('systemStatus', 'error', '失败');
+            }
+            document.getElementById('systemResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        // 文件管理测试
+        async function testFileUpload() {
+            updateStatus('uploadStatus', 'pending', '上传中...');
+            
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                updateStatus('uploadStatus', 'error', '请选择文件');
+                document.getElementById('uploadResult').textContent = '请先选择要上传的文件';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/files/upload`, {
+                    method: 'POST',
+                    headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    updateStatus('uploadStatus', 'success', '成功');
+                } else {
+                    updateStatus('uploadStatus', 'error', '失败');
+                }
+                document.getElementById('uploadResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                updateStatus('uploadStatus', 'error', '错误');
+                document.getElementById('uploadResult').textContent = error.message;
+            }
+        }
+
+        async function testFileList() {
+            updateStatus('fileListStatus', 'pending', '获取中...');
+            
+            const result = await apiCall('/api/files/list');
+            
+            if (result.status === 200) {
+                updateStatus('fileListStatus', 'success', '成功');
+            } else {
+                updateStatus('fileListStatus', 'error', '失败');
+            }
+            document.getElementById('fileListResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        // WebSocket功能
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addWebSocketMessage('系统', '已经连接');
+                return;
+            }
+            
+            ws = new WebSocket(`ws://localhost:8080/ws`);
+            
+            ws.onopen = () => {
+                updateConnectionStatus(true);
+                addWebSocketMessage('系统', '连接成功');
+            };
+            
+            ws.onmessage = (event) => {
+                addWebSocketMessage('服务器', event.data, 'received');
+            };
+            
+            ws.onclose = () => {
+                updateConnectionStatus(false);
+                addWebSocketMessage('系统', '连接已断开');
+            };
+            
+            ws.onerror = (error) => {
+                addWebSocketMessage('系统', '连接错误: ' + error.message);
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function sendWebSocketMessage() {
+            const input = document.getElementById('wsMessage');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'message',
+                    content: message,
+                    timestamp: new Date().toISOString()
+                }));
+                addWebSocketMessage('我', message, 'sent');
+                input.value = '';
+            } else {
+                addWebSocketMessage('系统', '请先连接WebSocket');
+            }
+        }
+
+        function addWebSocketMessage(sender, message, type = 'system') {
+            const container = document.getElementById('wsMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `ws-message ${type === 'sent' ? 'ws-sent' : type === 'received' ? 'ws-received' : ''}`;
+            
+            const time = new Date().toLocaleTimeString();
+            messageDiv.innerHTML = `<strong>${sender}</strong> <span style="color: #999; font-size: 0.8rem;">${time}</span><br>${message}`;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+            
+            if (connected) {
+                dot.className = 'status-dot connected';
+                text.textContent = '已连接';
+            } else {
+                dot.className = 'status-dot disconnected';
+                text.textContent = '未连接';
+            }
+        }
+
+        // AI功能测试
+        async function testIntentRecognition() {
+            updateStatus('intentStatus', 'pending', '识别中...');
+            
+            const text = document.getElementById('intentText').value;
+            
+            const result = await apiCall('/api/ai/intent', {
+                method: 'POST',
+                body: JSON.stringify({ text })
+            });
+            
+            if (result.status === 200) {
+                updateStatus('intentStatus', 'success', '成功');
+            } else {
+                updateStatus('intentStatus', 'error', '失败');
+            }
+            document.getElementById('intentResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        async function testTranslation() {
+            updateStatus('translateStatus', 'pending', '翻译中...');
+            
+            const text = document.getElementById('translateText').value;
+            const target_language = document.getElementById('targetLang').value;
+            
+            const result = await apiCall('/api/ai/translate', {
+                method: 'POST',
+                body: JSON.stringify({ text, target_language })
+            });
+            
+            if (result.status === 200) {
+                updateStatus('translateStatus', 'success', '成功');
+            } else {
+                updateStatus('translateStatus', 'error', '失败');
+            }
+            document.getElementById('translateResult').textContent = JSON.stringify(result.data, null, 2);
+        }
+
+        // 页面加载时检查系统状态
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+    <script src="assets/js/mobile.js"></script>
+</body>
+</html>
