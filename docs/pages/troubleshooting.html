@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障排除 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">故障排除</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#common-issues" class="nav-link active">常见问题</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#performance" class="nav-link">性能优化</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#debugging" class="nav-link">调试指南</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#logs" class="nav-link">日志分析</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#monitoring" class="nav-link">监控告警</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#recovery" class="nav-link">故障恢复</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">其他文档</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link">项目概述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="api.html" class="nav-link">API 参考</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="architecture.html" class="nav-link">系统架构</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deployment.html" class="nav-link">部署指南</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">故障排除指南</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                    <button class="btn btn-primary print-btn">打印</button>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <nav class="breadcrumb">
+                    <a href="../index.html" class="breadcrumb-item">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">故障排除</span>
+                </nav>
+
+                <div class="doc-content">
+                    <h1 class="doc-title">故障排除指南</h1>
+                    <p class="doc-subtitle">企业级客服系统常见问题解决方案和故障排除指南</p>
+
+                    <div class="toc">
+                        <h3 class="toc-title">本页目录</h3>
+                        <ul class="toc-list">
+                            <li class="toc-item"><a href="#common-issues" class="toc-link">常见问题</a></li>
+                            <li class="toc-item"><a href="#performance" class="toc-link">性能优化</a></li>
+                            <li class="toc-item"><a href="#debugging" class="toc-link">调试指南</a></li>
+                            <li class="toc-item"><a href="#logs" class="toc-link">日志分析</a></li>
+                            <li class="toc-item"><a href="#monitoring" class="toc-link">监控告警</a></li>
+                            <li class="toc-item"><a href="#recovery" class="toc-link">故障恢复</a></li>
+                        </ul>
+                    </div>
+
+                    <section id="common-issues">
+                        <h2>常见问题</h2>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🔧 问题诊断</div>
+                            <p>本节列出了系统运行中最常见的问题及其解决方案。</p>
+                        </div>
+
+                        <h3>启动问题</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">问题：服务启动失败</h4>
+                            <div class="card-content">
+                                <h5>症状</h5>
+                                <ul>
+                                    <li>服务无法启动</li>
+                                    <li>端口被占用</li>
+                                    <li>依赖服务未启动</li>
+                                </ul>
+                                
+                                <h5>解决方案</h5>
+                                <pre><code class="language-bash"># 检查端口占用
+netstat -tulpn | grep :8080
+
+# 杀死占用端口的进程
+sudo kill -9 $(lsof -t -i:8080)
+
+# 检查Redis连接
+redis-cli ping
+
+# 检查配置文件
+cargo check
+cargo build</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4 class="card-title">问题：WebSocket连接失败</h4>
+                            <div class="card-content">
+                                <h5>症状</h5>
+                                <ul>
+                                    <li>实时消息无法发送</li>
+                                    <li>连接频繁断开</li>
+                                    <li>客户端显示连接错误</li>
+                                </ul>
+                                
+                                <h5>解决方案</h5>
+                                <pre><code class="language-bash"># 检查WebSocket服务状态
+curl -I http://localhost:8080/ws
+
+# 检查防火墙设置
+sudo ufw status
+
+# 检查Nginx配置
+nginx -t
+sudo systemctl restart nginx</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>认证问题</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">问题：用户登录失败</h4>
+                            <div class="card-content">
+                                <h5>症状</h5>
+                                <ul>
+                                    <li>登录时提示密码错误</li>
+                                    <li>Token验证失败</li>
+                                    <li>会话频繁过期</li>
+                                </ul>
+                                
+                                <h5>解决方案</h5>
+                                <pre><code class="language-bash"># 检查Redis中的会话数据
+redis-cli keys "session:*"
+
+# 清除过期会话
+redis-cli --scan --pattern "session:*" | xargs redis-cli del
+
+# 检查JWT密钥配置
+cat config/app-config.json | grep jwt</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>数据库问题</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">问题：数据存储失败</h4>
+                            <div class="card-content">
+                                <h5>症状</h5>
+                                <ul>
+                                    <li>消息无法保存</li>
+                                    <li>文件上传失败</li>
+                                    <li>数据查询超时</li>
+                                </ul>
+                                
+                                <h5>解决方案</h5>
+                                <pre><code class="language-bash"># 检查Sled数据库状态
+ls -la data/sled_db/
+
+# 检查磁盘空间
+df -h
+
+# 检查文件权限
+ls -la data/
+
+# 修复数据库
+cargo run --bin db-repair</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="performance">
+                        <h2>性能优化</h2>
+                        
+                        <div class="alert alert-success">
+                            <div class="alert-title">⚡ 性能优化</div>
+                            <p>系统性能优化策略和最佳实践。</p>
+                        </div>
+
+                        <h3>系统性能监控</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">性能指标</h4>
+                            <div class="card-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>指标</th>
+                                            <th>正常范围</th>
+                                            <th>告警阈值</th>
+                                            <th>监控命令</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CPU使用率</td>
+                                            <td>&lt; 70%</td>
+                                            <td>&gt; 80%</td>
+                                            <td><code>top -p $(pgrep customer-service)</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>内存使用率</td>
+                                            <td>&lt; 80%</td>
+                                            <td>&gt; 90%</td>
+                                            <td><code>free -h</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>磁盘使用率</td>
+                                            <td>&lt; 85%</td>
+                                            <td>&gt; 95%</td>
+                                            <td><code>df -h</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>网络延迟</td>
+                                            <td>&lt; 100ms</td>
+                                            <td>&gt; 200ms</td>
+                                            <td><code>ping localhost</code></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>缓存优化</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Redis性能调优</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 检查Redis性能
+redis-cli info memory
+redis-cli info stats
+
+# 优化Redis配置
+cat > /etc/redis/redis.conf << EOF
+maxmemory 2gb
+maxmemory-policy allkeys-lru
+save 900 1
+save 300 10
+save 60 10000
+EOF
+
+# 重启Redis
+sudo systemctl restart redis-server</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>数据库优化</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Sled数据库优化</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 优化数据库配置
+use sled::Config;
+
+let config = Config::default()
+    .cache_capacity(1024 * 1024 * 100) // 100MB缓存
+    .compression_factor(8)
+    .flush_every_ms(1000)
+    .snapshot_after_ops(10000);
+
+let db = config.open("data/sled_db")?;</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="debugging">
+                        <h2>调试指南</h2>
+                        
+                        <h3>日志调试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">启用详细日志</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 设置日志级别
+export RUST_LOG=debug
+export RUST_BACKTRACE=1
+
+# 启动服务并查看日志
+cargo run 2>&1 | tee app.log
+
+# 实时查看日志
+tail -f app.log | grep ERROR</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>网络调试</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">网络连接测试</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 测试HTTP连接
+curl -v http://localhost:8080/health
+
+# 测试WebSocket连接
+wscat -c ws://localhost:8080/ws
+
+# 检查端口监听
+netstat -tulpn | grep 8080
+
+# 检查防火墙规则
+sudo iptables -L</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>性能分析</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">使用perf进行性能分析</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 安装perf
+sudo apt install linux-tools-common
+
+# 分析CPU使用情况
+sudo perf record -g -p $(pgrep customer-service)
+sudo perf report
+
+# 分析内存使用
+sudo perf record -g -p $(pgrep customer-service)
+sudo perf report
+
+# 分析内存使用
+sudo valgrind --leak-check=full ./target/debug/customer-service
+
+# 生成火焰图
+cargo install flamegraph
+cargo flamegraph</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="logs">
+                        <h2>日志分析</h2>
+                        
+                        <div class="alert alert-warning">
+                            <div class="alert-title">📋 日志管理</div>
+                            <p>有效的日志分析是故障排除的关键。</p>
+                        </div>
+
+                        <h3>日志配置</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">日志级别配置</h4>
+                            <div class="card-content">
+                                <pre><code class="language-toml"># 在 Cargo.toml 中配置
+[dependencies.env_logger]
+version = "0.10"
+
+# 在 config/log-config.toml 中配置
+[log]
+level = "info"
+file = "logs/app.log"
+max_size = "100MB"
+max_files = 10
+
+[log.format]
+timestamp = true
+target = true
+level = true
+thread_id = true</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>日志分析工具</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">常用日志分析命令</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 查找错误日志
+grep -i error logs/app.log | tail -50
+
+# 按时间范围查找
+awk '/2024-01-01 10:00/,/2024-01-01 11:00/' logs/app.log
+
+# 统计错误频率
+grep ERROR logs/app.log | awk '{print $4}' | sort | uniq -c | sort -rn
+
+# 实时监控日志
+tail -f logs/app.log | grep --line-buffered -E "(ERROR|WARN)"
+
+# 使用journalctl查看系统日志
+journalctl -u customer-service -f</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>日志聚合</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">ELK Stack配置</h4>
+                            <div class="card-content">
+                                <pre><code class="language-yaml"># logstash配置
+input {
+  file {
+    path => "/var/log/customer-service/*.log"
+    start_position => "beginning"
+    type => "rust-app"
+  }
+}
+
+filter {
+  grok {
+    match => {
+      "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:message}"
+    }
+  }
+  date {
+    match => [ "timestamp", "ISO8601" ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "customer-service-%{+YYYY.MM.dd}"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="monitoring">
+                        <h2>监控告警</h2>
+                        
+                        <h3>监控设置</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Prometheus配置</h4>
+                            <div class="card-content">
+                                <pre><code class="language-yaml"># prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'customer-service'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/metrics'</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>告警规则</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">AlertManager规则</h4>
+                            <div class="card-content">
+                                <pre><code class="language-yaml"># alert-rules.yml
+groups:
+  - name: customer-service
+    rules:
+      - alert: HighCPUUsage
+        expr: process_cpu_seconds_total > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "高CPU使用率"
+          description: "CPU使用率超过80%"
+          
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 2147483648
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "高内存使用"
+          description: "内存使用超过2GB"
+          
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "服务宕机"
+          description: "客服系统服务不可用"</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>监控仪表板</h3>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">📊 Grafana仪表板</div>
+                            <ul>
+                                <li><strong>系统概览</strong>：CPU、内存、磁盘使用情况</li>
+                                <li><strong>应用指标</strong>：请求量、响应时间、错误率</li>
+                                <li><strong>业务指标</strong>：用户数、消息量、文件上传量</li>
+                                <li><strong>实时监控</strong>：WebSocket连接数、活跃用户数</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section id="recovery">
+                        <h2>故障恢复</h2>
+                        
+                        <div class="alert alert-error">
+                            <div class="alert-title">🚨 紧急恢复流程</div>
+                            <p>当系统出现严重故障时，请按照以下流程进行恢复。</p>
+                        </div>
+
+                        <h3>备份恢复</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">数据备份脚本</h4>
+                            <div class="card-content">
+                                <pre><code class="language-bash">#!/bin/bash
+# backup.sh - 数据备份脚本
+
+BACKUP_DIR="/backup/customer-service"
+DATA_DIR="/var/customer-service/data"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# 创建备份目录
+mkdir -p $BACKUP_DIR/$TIMESTAMP
+
+# 备份Sled数据库
+cp -r $DATA_DIR/sled_db $BACKUP_DIR/$TIMESTAMP/
+
+# 备份Redis数据
+redis-cli --rdb $BACKUP_DIR/$TIMESTAMP/redis.rdb
+
+# 备份配置文件
+cp -r /etc/customer-service $BACKUP_DIR/$TIMESTAMP/config
+
+# 压缩备份
+tar -czf $BACKUP_DIR/backup_$TIMESTAMP.tar.gz -C $BACKUP_DIR $TIMESTAMP
+
+# 清理临时文件
+rm -rf $BACKUP_DIR/$TIMESTAMP
+
+echo "备份完成: $BACKUP_DIR/backup_$TIMESTAMP.tar.gz"</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>故障恢复步骤</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">恢复流程</h4>
+                            <div class="card-content">
+                                <ol>
+                                    <li>
+                                        <strong>停止服务</strong>
+                                        <pre><code class="language-bash">sudo systemctl stop customer-service</code></pre>
+                                    </li>
+                                    <li>
+                                        <strong>备份当前数据</strong>
+                                        <pre><code class="language-bash">./backup.sh</code></pre>
+                                    </li>
+                                    <li>
+                                        <strong>恢复备份数据</strong>
+                                        <pre><code class="language-bash"># 解压备份
+tar -xzf backup_20240101_120000.tar.gz
+
+# 恢复数据
+cp -r backup/sled_db /var/customer-service/data/
+redis-cli --pipe < backup/redis.rdb</code></pre>
+                                    </li>
+                                    <li>
+                                        <strong>检查配置</strong>
+                                        <pre><code class="language-bash">diff -r backup/config /etc/customer-service</code></pre>
+                                    </li>
+                                    <li>
+                                        <strong>启动服务</strong>
+                                        <pre><code class="language-bash">sudo systemctl start customer-service
+sudo systemctl status customer-service</code></pre>
+                                    </li>
+                                    <li>
+                                        <strong>验证服务</strong>
+                                        <pre><code class="language-bash">curl http://localhost:8080/health
+tail -f /var/log/customer-service/app.log</code></pre>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <h3>灾难恢复</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">灾难恢复计划</h4>
+                            <div class="card-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>故障类型</th>
+                                            <th>恢复时间目标(RTO)</th>
+                                            <th>恢复点目标(RPO)</th>
+                                            <th>恢复策略</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>服务器故障</td>
+                                            <td>30分钟</td>
+                                            <td>5分钟</td>
+                                            <td>切换到备用服务器</td>
+                                        </tr>
+                                        <tr>
+                                            <td>数据库损坏</td>
+                                            <td>1小时</td>
+                                            <td>15分钟</td>
+                                            <td>从备份恢复</td>
+                                        </tr>
+                                        <tr>
+                                            <td>网络故障</td>
+                                            <td>15分钟</td>
+                                            <td>0分钟</td>
+                                            <td>切换到备用网络</td>
+                                        </tr>
+                                        <tr>
+                                            <td>数据中心故障</td>
+                                            <td>2小时</td>
+                                            <td>30分钟</td>
+                                            <td>切换到异地数据中心</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>应急联系人</h3>
+                        
+                        <div class="alert alert-warning">
+                            <div class="alert-title">📞 紧急联系方式</div>
+                            <ul>
+                                <li><strong>技术负责人</strong>：张三 (13800138000)</li>
+                                <li><strong>运维负责人</strong>：李四 (13900139000)</li>
+                                <li><strong>DBA</strong>：王五 (13700137000)</li>
+                                <li><strong>7x24小时热线</strong>：400-888-8888</li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html> 
