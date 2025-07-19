@@ -1,0 +1,543 @@
+warning: unused import: `error`
+ --> src/auth/kefu_auth.rs:7:27
+  |
+7 | use tracing::{info, warn, error};
+  |                           ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:121:5
+    |
+121 |     pub async fn kefu_login(&self, kefu_auth: &KefuAuth, session_id: &str) -> Result<bool> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:148:14
+    |
+148 |         conn.set_ex(&key, status_json, 3600).await?; // 1小时过期
+    |              ^^^^^^
+    = note: `#[warn(dependency_on_unit_never_type_fallback)]` on by default
+help: use `()` annotations to avoid fallback changes
+    |
+148 ~         conn.set_ex::<_, _, ()>(&key, status_json, 3600).await?; // 1小时过期
+149 |         
+150 |         // 添加到在线列表
+151 |         let online_list_key = "kefu:online:list";
+152 ~         conn.sadd::<_, _, ()>(&online_list_key, &kefu_auth.kefu_id).await?;
+    |
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:159:5
+    |
+159 |     pub async fn kefu_logout(&self, kefu_id: &str) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:166:14
+    |
+166 |         conn.del(&key).await?;
+    |              ^^^
+help: use `()` annotations to avoid fallback changes
+    |
+166 ~         conn.del::<_, ()>(&key).await?;
+167 |         
+168 |         // 从在线列表移除
+169 |         let online_list_key = "kefu:online:list";
+170 ~         conn.srem::<_, _, ()>(&online_list_key, kefu_id).await?;
+    |
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:177:5
+    |
+177 |     pub async fn update_kefu_heartbeat(&self, kefu_id: &str) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:191:22
+    |
+191 |                 conn.set_ex(&key, updated_json, 3600).await?;
+    |                      ^^^^^^
+help: use `()` annotations to avoid fallback changes
+    |
+191 |                 conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
+    |                            ++++++++++++
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:219:5
+    |
+219 |     pub async fn assign_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:242:18
+    |
+242 |             conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;
+    |                  ^^^^^^
+help: use `()` annotations to avoid fallback changes
+    |
+242 |             conn.set_ex::<_, _, ()>(&customer_key, &kefu.kefu_id, 3600).await?;
+    |                        ++++++++++++
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:252:5
+    |
+252 |     async fn increment_kefu_customers(&self, kefu_id: &str, increment: i32) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:265:22
+    |
+265 |                 conn.set_ex(&key, updated_json, 3600).await?;
+    |                      ^^^^^^
+help: use `()` annotations to avoid fallback changes
+    |
+265 |                 conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
+    |                            ++++++++++++
+
+warning: this function depends on never type fallback being `()`
+   --> src/auth/kefu_auth.rs:273:5
+    |
+273 |     pub async fn release_kefu_for_customer(&self, customer_id: &str) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in Rust 2024 and in a future release in all editions!
+    = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2024/never-type-fallback.html>
+    = help: specify the types explicitly
+note: in edition 2024, the requirement `!: FromRedisValue` will fail
+   --> src/auth/kefu_auth.rs:279:18
+    |
+279 |             conn.del(&customer_key).await?;
+    |                  ^^^
+help: use `()` annotations to avoid fallback changes
+    |
+279 |             conn.del::<_, ()>(&customer_key).await?;
+    |                     +++++++++
+
+warning: unused variable: `ws_manager`
+  --> src/handlers/system.rs:57:5
+   |
+57 |     ws_manager: Arc<WebSocketManager>,
+   |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `storage`
+  --> src/handlers/system_extended.rs:95:5
+   |
+95 |     storage: Arc<crate::storage::LocalStorage>,
+   |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/system_extended.rs:148:5
+    |
+148 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/system_extended.rs:184:5
+    |
+184 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/system_extended.rs:218:5
+    |
+218 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `storage`
+   --> src/handlers/system_extended.rs:260:5
+    |
+260 |     storage: Arc<crate::storage::LocalStorage>,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `user_manager`
+  --> src/handlers/users.rs:47:5
+   |
+47 |     user_manager: Arc<UserManager>,
+   |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+  --> src/handlers/users.rs:91:5
+   |
+91 |     user_manager: Arc<UserManager>,
+   |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/users.rs:131:5
+    |
+131 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/users.rs:160:5
+    |
+160 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/users.rs:184:5
+    |
+184 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/users.rs:204:5
+    |
+204 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/users.rs:224:5
+    |
+224 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `ws_manager`
+  --> src/handlers/sessions.rs:51:5
+   |
+51 |     ws_manager: Arc<WebSocketManager>,
+   |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/sessions.rs:104:5
+    |
+104 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/sessions.rs:154:5
+    |
+154 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `storage`
+   --> src/handlers/sessions.rs:155:5
+    |
+155 |     storage: Arc<LocalStorage>,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `include_system`
+   --> src/handlers/sessions.rs:159:9
+    |
+159 |     let include_system = query.include_system.unwrap_or(false);
+    |         ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_include_system`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/sessions.rs:203:5
+    |
+203 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/sessions.rs:226:5
+    |
+226 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/sessions.rs:247:5
+    |
+247 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `storage`
+  --> src/handlers/analytics.rs:22:5
+   |
+22 |     storage: Arc<LocalStorage>,
+   |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `storage`
+  --> src/handlers/analytics.rs:70:5
+   |
+70 |     storage: Arc<LocalStorage>,
+   |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `group_by`
+  --> src/handlers/analytics.rs:72:9
+   |
+72 |     let group_by = query.group_by.unwrap_or_else(|| "day".to_string());
+   |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_group_by`
+
+warning: unused variable: `query`
+   --> src/handlers/analytics.rs:124:5
+    |
+124 |     query: AnalyticsDateRange,
+    |     ^^^^^ help: if this is intentional, prefix it with an underscore: `_query`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/analytics.rs:125:5
+    |
+125 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `user_manager`
+   --> src/handlers/analytics.rs:126:5
+    |
+126 |     user_manager: Arc<UserManager>,
+    |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_manager`
+
+warning: unused variable: `connection_stats`
+   --> src/handlers/analytics.rs:179:9
+    |
+179 |     let connection_stats = ws_manager.get_connection_stats().await;
+    |         ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_connection_stats`
+
+warning: unused variable: `request`
+   --> src/handlers/analytics.rs:230:5
+    |
+230 |     request: GenerateReportRequest,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_request`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/analytics.rs:231:5
+    |
+231 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `storage`
+   --> src/handlers/analytics.rs:232:5
+    |
+232 |     storage: Arc<LocalStorage>,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: unused variable: `ws_manager`
+   --> src/handlers/analytics.rs:261:5
+    |
+261 |     ws_manager: Arc<WebSocketManager>,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ws_manager`
+
+warning: unused variable: `storage`
+   --> src/handlers/analytics.rs:262:5
+    |
+262 |     storage: Arc<LocalStorage>,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_storage`
+
+warning: methods `list_files`, `delete_file`, and `get_file_info` are never used
+  --> src/file_manager_ext.rs:10:14
+   |
+9  | pub trait FileManagerExt {
+   |           -------------- methods in this trait
+10 |     async fn list_files(&self, category: Option<&str>, user_id: Option<&str>) -> Result<Vec<FileInfo>>;
+   |              ^^^^^^^^^^
+...
+13 |     async fn delete_file(&self, file_id: &str, user_id: &str) -> Result<()>;
+   |              ^^^^^^^^^^^
+14 |     async fn get_file_info(&self, file_id: &str) -> Result<serde_json::Value>;
+   |              ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: function `create_enhanced_file_manager` is never used
+   --> src/file_manager_ext.rs:192:8
+    |
+192 | pub fn create_enhanced_file_manager(config: crate::config::StorageConfig) -> Result<Arc<FileManager>> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `assign_kefu_for_customer`, `increment_kefu_customers`, `release_kefu_for_customer`, `get_kefu_for_customer`, and `cleanup_expired_kefu` are never used
+   --> src/auth/kefu_auth.rs:219:18
+    |
+44  | impl KefuAuthManager {
+    | -------------------- methods in this implementation
+...
+219 |     pub async fn assign_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+252 |     async fn increment_kefu_customers(&self, kefu_id: &str, increment: i32) -> Result<()> {
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+273 |     pub async fn release_kefu_for_customer(&self, customer_id: &str) -> Result<()> {
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+287 |     pub async fn get_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
+    |                  ^^^^^^^^^^^^^^^^^^^^^
+...
+308 |     pub async fn cleanup_expired_kefu(&self) -> Result<()> {
+    |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_system_info` is never used
+  --> src/handlers/system.rs:20:14
+   |
+20 | pub async fn handle_system_info(
+   |              ^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_system_health` is never used
+  --> src/handlers/system.rs:56:14
+   |
+56 | pub async fn handle_system_health(
+   |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_online_users` is never used
+  --> src/handlers/system.rs:98:14
+   |
+98 | pub async fn handle_online_users(
+   |              ^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_bulk_delete_messages` is never used
+   --> src/handlers/messages.rs:204:14
+    |
+204 | pub async fn handle_bulk_delete_messages(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_mark_messages_read` is never used
+   --> src/handlers/messages.rs:224:14
+    |
+224 | pub async fn handle_mark_messages_read(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_end_session` is never used
+   --> src/handlers/sessions.rs:224:14
+    |
+224 | pub async fn handle_end_session(
+    |              ^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_session_statistics` is never used
+   --> src/handlers/sessions.rs:245:14
+    |
+245 | pub async fn handle_session_statistics(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_generate_report` is never used
+   --> src/handlers/analytics.rs:229:14
+    |
+229 | pub async fn handle_generate_report(
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `handle_business_insights` is never used
+   --> src/handlers/analytics.rs:260:14
+    |
+260 | pub async fn handle_business_insights(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ApiDoc` is never constructed
+  --> src/swagger.rs:50:12
+   |
+50 | pub struct ApiDoc;
+   |            ^^^^^^
+
+warning: function `get_openapi_spec` is never used
+  --> src/swagger.rs:75:8
+   |
+75 | pub fn get_openapi_spec() -> utoipa::openapi::OpenApi {
+   |        ^^^^^^^^^^^^^^^^
+
+warning: `kefu-system` (bin "kefu-system") generated 54 warnings (run `cargo fix --bin "kefu-system"` to apply 7 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.46s
+     Running `target/release/kefu-system`
+[2m2025-07-18T07:37:08.985245Z[0m [32m INFO[0m [2mkefu_system[0m[2m:[0m 启动企业级客服系统...
+[2m2025-07-18T07:37:08.986931Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 配置加载成功: 企业级客服系统 v2.1.0
+[2m2025-07-18T07:37:08.990773Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池初始化成功 - URL: redis://127.0.0.1:6379, 最大连接数: 32, 最小空闲: Some(8)
+[2m2025-07-18T07:37:08.991545Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m Redis连接池初始化成功: redis://127.0.0.1:6379
+[2m2025-07-18T07:37:08.991624Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 连接池配置: 最大连接数=0, 当前连接数=0
+[2m2025-07-18T07:37:08.991662Z[0m [32m INFO[0m [2mkefu_system::storage[0m[2m:[0m 🚀 企业级存储初始化: 基础路径=/root/gaoce8888/rust-chat-1.0.1/data, Sled路径=/root/gaoce8888/rust-chat-1.0.1/data/sled_db
+[2m2025-07-18T07:37:08.994204Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/1, 利用率: 0.0%
+[2m2025-07-18T07:37:08.999031Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 本地存储初始化成功: ./data
+[2m2025-07-18T07:37:08.999075Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 文件管理器初始化成功: ./data/blobs
+[2m2025-07-18T07:37:08.999401Z[0m [32m INFO[0m [2mkefu_system::html_template_manager[0m[2m:[0m 加载了 0 个HTML模板
+[2m2025-07-18T07:37:08.999429Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m HTML模板管理器初始化成功
+[2m2025-07-18T07:37:08.999658Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m ✅ 成功加载用户数据，共3个用户
+[2m2025-07-18T07:37:09.000678Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m ✅ Redis连接成功
+[2m2025-07-18T07:37:09.000718Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 用户管理器初始化成功
+[2m2025-07-18T07:37:09.000726Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🎤 语音消息管理器初始化成功
+[2m2025-07-18T07:37:09.082212Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🤖 AI管理器初始化成功
+[2m2025-07-18T07:37:09.082249Z[0m [32m INFO[0m [2mkefu_system::auth::kefu_auth[0m[2m:[0m 🔐 初始化默认客服账号
+[2m2025-07-18T07:37:09.082442Z[0m [32m INFO[0m [2mkefu_system::auth::kefu_auth[0m[2m:[0m ✅ 默认客服账号初始化完成
+[2m2025-07-18T07:37:09.082463Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🔐 客服认证管理器初始化成功
+[2m2025-07-18T07:37:09.082467Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🏢 企业级组件暂时禁用，正在修复编译错误...
+[2m2025-07-18T07:37:09.082498Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m ✅ 基于会话的在线状态检测已启用 - 基于活动时间判断
+[2m2025-07-18T07:37:09.082503Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🤖 AI处理器已启动，开始处理任务队列
+[2m2025-07-18T07:37:09.082505Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m ✅ 会话清理任务已启动，每小时清理一次过期会话
+[2m2025-07-18T07:37:09.082507Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🏢 企业级后台任务暂时禁用
+[2m2025-07-18T07:37:09.082615Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🚀 企业级客服系统启动成功！
+[2m2025-07-18T07:37:09.082633Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 📡 HTTP服务器地址: http://0.0.0.0:6006
+[2m2025-07-18T07:37:09.082637Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔌 WebSocket地址: ws://0.0.0.0:6006/ws
+[2m2025-07-18T07:37:09.082639Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 📚 API文档: http://0.0.0.0:6006/api-docs
+[2m2025-07-18T07:37:09.082641Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🎯 前端地址: http://0.0.0.0:6006
+[2m2025-07-18T07:37:09.082642Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 💡 如果浏览器没有自动打开，请手动访问上述地址
+[2m2025-07-18T07:37:09.082644Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🌐 正在打开浏览器: http://localhost:6006
+[2m2025-07-18T07:37:09.083868Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🧹 开始定期清理过期会话...
+[2m2025-07-18T07:37:09.083890Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m 🧹 Redis自动处理过期会话，无需手动清理
+[2m2025-07-18T07:37:09.088692Z[0m [32m INFO[0m [2mkefu_system::websocket[0m[2m:[0m Found 3 offline users, cleaning up
+[2m2025-07-18T07:37:09.089213Z[0m [32m INFO[0m [1mServer::run[0m[1m{[0m[3maddr[0m[2m=[0m0.0.0.0:6006[1m}[0m[2m:[0m [2mwarp::server[0m[2m:[0m listening on http://0.0.0.0:6006
+/usr/bin/xdg-open: 882: x-www-browser: not found
+/usr/bin/xdg-open: 882: firefox: not found
+/usr/bin/xdg-open: 882: iceweasel: not found
+/usr/bin/xdg-open: 882: seamonkey: not found
+/usr/bin/xdg-open: 882: mozilla: not found
+/usr/bin/xdg-open: 882: epiphany: not found
+/usr/bin/xdg-open: 882: konqueror: not found
+/usr/bin/xdg-open: 882: chromium: not found
+/usr/bin/xdg-open: 882: chromium-browser: not found
+/usr/bin/xdg-open: 882: google-chrome: not found
+/usr/bin/xdg-open: 882: www-browser: not found
+/usr/bin/xdg-open: 882: links2: not found
+/usr/bin/xdg-open: 882: elinks: not found
+/usr/bin/xdg-open: 882: links: not found
+/usr/bin/xdg-open: 882: lynx: not found
+/usr/bin/xdg-open: 882: w3m: not found
+xdg-open: no method available for opening 'http://localhost:6006'
+[2m2025-07-18T07:37:38.993776Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T07:38:08.993794Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T07:38:38.994053Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T07:39:08.994264Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T07:39:39.306476Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T07:40:09.306951Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:40:38.993481Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:41:08.994043Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:41:39.297600Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:42:09.299045Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:42:28.798003Z[0m [32m INFO[0m [2mkefu_system::routes::swagger[0m[2m:[0m 📚 API文档访问: GET / -> 404 Not Found
+[2m2025-07-18T07:42:28.799941Z[0m [32m INFO[0m [2mkefu_system::routes::frontend[0m[2m:[0m 🏠 主页被访问
+[2m2025-07-18T07:42:28.799992Z[0m [31mERROR[0m [2mkefu_system::routes::frontend[0m[2m:[0m 读取主页失败: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+[2m2025-07-18T07:42:28.800491Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔍 路由调试: GET / -> 状态: 404 | 耗时: 3.259026ms | 来源: Some(127.0.0.1:52631)
+[2m2025-07-18T07:42:28.819873Z[0m [32m INFO[0m [2mkefu_system::routes[0m[2m:[0m 🎯 Favicon请求
+[2m2025-07-18T07:42:28.819914Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔍 路由调试: GET /favicon.ico -> 状态: 204 | 耗时: 55.404µs | 来源: Some(127.0.0.1:52635)
+[2m2025-07-18T07:42:38.993754Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:43:08.993932Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:43:38.993967Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:44:08.994203Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:44:38.993733Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:45:09.299606Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 2/3, 利用率: 6.2%
+[2m2025-07-18T07:45:38.994367Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:46:09.295010Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 1/3, 利用率: 3.1%
+[2m2025-07-18T07:46:38.994208Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:47:08.993541Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:47:38.993553Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:48:09.303331Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 2/3, 利用率: 6.2%
+[2m2025-07-18T07:48:38.993802Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:49:08.994034Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:49:38.993971Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:50:08.994067Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:50:38.993628Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:51:08.993880Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:51:38.994161Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:52:08.993389Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:52:38.994253Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:53:09.300140Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 2/3, 利用率: 6.2%
+[2m2025-07-18T07:53:38.993891Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:54:08.993830Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:54:38.994411Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:55:09.302746Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 2/3, 利用率: 6.2%
+[2m2025-07-18T07:55:38.993671Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:56:08.994019Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:56:38.993320Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:57:08.993513Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:57:38.993936Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:58:08.993622Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T07:58:38.993953Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
