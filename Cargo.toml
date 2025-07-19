@@ -1,0 +1,91 @@
+[package]
+name = "kefu-system"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "kefu-system"
+path = "src/main.rs"
+
+# 企业级编译优化配置
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+split-debuginfo = "unpacked"
+incremental = true
+
+# 减少链接器负载的配置
+[profile.dev.package."*"]
+opt-level = 3
+
+[dependencies]
+# WebSocket 和 HTTP 服务器
+tokio = { version = "1.0", features = ["full"] }
+tokio-tungstenite = "0.20"
+warp = "0.3"
+futures-util = "0.3"
+
+# Redis 客户端和连接池
+redis = { version = "0.23", features = ["tokio-comp"] }
+deadpool-redis = "0.13"
+
+# JSON 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# 本地存储
+sled = "0.34"
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# 时间处理
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID 生成
+uuid = { version = "1.0", features = ["v4", "serde"] }
+flate2 = "1.0"
+base64 = "0.21"
+
+# 文件哈希计算
+md5 = "0.7"
+digest = "0.10"
+sha2 = "0.10"
+
+# URL 解析
+url = "2.4"
+
+# 错误处理
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 异步trait支持
+async-trait = "0.1"
+
+# HTTP客户端
+reqwest = { version = "0.11", features = ["json"] }
+
+# 文件处理和multipart支持
+bytes = "1.0"
+
+# 正则表达式支持 (HTML模板变量解析)
+regex = "1.0"
+
+# 文件类型检测
+mime_guess = "2.0"
+
+# Swagger/OpenAPI 文档生成
+utoipa = { version = "4.2", features = ["axum_extras", "chrono", "uuid"] }
+utoipa-swagger-ui = { version = "6.0", features = ["axum"] }
+utoipa-redoc = { version = "3.0", features = ["axum"] }
+utoipa-rapidoc = { version = "3.0", features = ["axum"] }
+rand = "0.9.1"
+async-stream = "0.3.6"
