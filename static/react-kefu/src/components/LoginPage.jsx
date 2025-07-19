@@ -11,7 +11,8 @@ import {
   CardBody,
   CardFooter,
   Chip,
-  Avatar
+  Avatar,
+  Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
@@ -22,17 +23,18 @@ export default function LoginPage({ onLoginSuccess }) {
   const [remember, setRemember] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [selectedAccount, setSelectedAccount] = React.useState(null);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  // 处理表单提交
+  // 处理表单提交 - 适配最新后端API
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:6006';
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       
       const response = await fetch(`${baseUrl}/api/kefu/login`, {
         method: 'POST',
@@ -48,7 +50,7 @@ export default function LoginPage({ onLoginSuccess }) {
       const data = await response.json();
 
       if (data.success) {
-        // 保存用户信息
+        // 保存用户信息 - 适配新的后端响应格式
         const userInfo = {
           id: data.kefu_id,
           name: data.real_name,
@@ -85,14 +87,15 @@ export default function LoginPage({ onLoginSuccess }) {
 
   // 快速登录账号
   const quickAccounts = [
-    { username: 'kefu001', password: '123456', name: '客服小王' },
-    { username: 'kefu002', password: '123456', name: '客服小李' },
+    { username: 'kefu001', password: '123456', name: '客服小王', avatar: '👨‍💼', status: 'online' },
+    { username: 'kefu002', password: '123456', name: '客服小李', avatar: '👩‍💼', status: 'offline' },
   ];
 
   // 快速填充账号
   const handleQuickFill = (account) => {
     setUsername(account.username);
     setPassword(account.password);
+    setSelectedAccount(account.username);
     setError("");
   };
 
@@ -114,16 +117,29 @@ export default function LoginPage({ onLoginSuccess }) {
   }, []);
 
   return (
-    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-default-100 via-primary-100 to-secondary-100">
-      <Card className="w-full max-w-sm shadow-2xl">
-        <CardHeader className="flex flex-col gap-1 px-8 pt-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-              <Icon icon="solar:chat-round-line-duotone" className="text-white" width={24} />
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-32 w-80 h-80 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 opacity-30 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-32 w-80 h-80 rounded-full bg-gradient-to-tr from-blue-200 to-cyan-200 opacity-30 blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 opacity-20 blur-3xl"></div>
+      </div>
+
+      <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/90 border-0">
+        <CardHeader className="flex flex-col gap-1 px-8 pt-8 pb-0">
+          <div className="flex flex-col items-center gap-4">
+            {/* Logo动画 */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-xl opacity-60 animate-pulse"></div>
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+                <Icon icon="solar:chat-round-line-duotone" className="text-white" width={32} />
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold">客服系统登录</h1>
-              <p className="text-small text-default-500">企业级客服管理平台</p>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                客服系统登录
+              </h1>
+              <p className="text-small text-default-500 mt-1">企业级智能客服管理平台 v2.0</p>
             </div>
           </div>
         </CardHeader>
@@ -142,6 +158,10 @@ export default function LoginPage({ onLoginSuccess }) {
               startContent={
                 <Icon icon="solar:user-linear" className="text-default-400" width={20} />
               }
+              classNames={{
+                input: "text-small",
+                inputWrapper: "hover:border-purple-400 focus-within:!border-purple-500"
+              }}
               isInvalid={!!error && !username}
               errorMessage={!username && error ? "请输入账号" : ""}
             />
@@ -178,6 +198,10 @@ export default function LoginPage({ onLoginSuccess }) {
                   )}
                 </button>
               }
+              classNames={{
+                input: "text-small",
+                inputWrapper: "hover:border-purple-400 focus-within:!border-purple-500"
+              }}
               isInvalid={!!error && !password}
               errorMessage={!password && error ? "请输入密码" : ""}
             />
@@ -188,28 +212,31 @@ export default function LoginPage({ onLoginSuccess }) {
                 size="sm"
                 isSelected={remember}
                 onValueChange={setRemember}
+                classNames={{
+                  wrapper: "before:border-purple-400"
+                }}
               >
-                记住我
+                <span className="text-small text-default-600">记住我</span>
               </Checkbox>
-              <Link className="text-default-500" href="#" size="sm">
+              <Link className="text-purple-500 hover:text-purple-600" href="#" size="sm">
                 忘记密码？
               </Link>
             </div>
 
             {error && (
-              <Chip color="danger" variant="flat" className="w-full">
+              <Chip color="danger" variant="flat" className="w-full animate-shake">
                 <span className="text-small">{error}</span>
               </Chip>
             )}
             
             <Button
-              className="w-full"
-              color="primary"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all"
               type="submit"
               isLoading={isLoading}
+              spinner={<Spinner color="white" size="sm" />}
               startContent={!isLoading && <Icon icon="solar:login-3-linear" width={20} />}
             >
-              {isLoading ? "登录中..." : "登录"}
+              {isLoading ? "登录中..." : "立即登录"}
             </Button>
           </form>
 
@@ -223,20 +250,25 @@ export default function LoginPage({ onLoginSuccess }) {
             {quickAccounts.map((account, index) => (
               <Button
                 key={index}
-                variant="flat"
-                size="sm"
+                variant={selectedAccount === account.username ? "flat" : "light"}
+                size="md"
                 startContent={
-                  <Avatar
-                    size="sm"
-                    name={account.name}
-                    className="w-5 h-5"
-                  />
+                  <div className="relative">
+                    <span className="text-2xl">{account.avatar}</span>
+                    {account.status === 'online' && (
+                      <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                    )}
+                  </div>
                 }
                 onClick={() => handleQuickFill(account)}
-                className="justify-start"
+                className={`justify-start hover:scale-[1.02] transition-all ${
+                  selectedAccount === account.username 
+                    ? 'bg-purple-100 border-purple-400' 
+                    : 'hover:bg-default-100'
+                }`}
               >
-                <div className="flex flex-col items-start">
-                  <span className="text-small">{account.name}</span>
+                <div className="flex flex-col items-start ml-2">
+                  <span className="text-small font-medium">{account.name}</span>
                   <span className="text-tiny text-default-400">{account.username}</span>
                 </div>
               </Button>
@@ -245,22 +277,48 @@ export default function LoginPage({ onLoginSuccess }) {
         </CardBody>
 
         <CardFooter className="px-8 pb-6">
-          <div className="flex flex-col w-full gap-2">
-            <p className="text-center text-tiny text-default-400">
-              版本 v1.0.0 | © 2025 企业级客服系统
-            </p>
-            <div className="flex justify-center gap-2">
-              <Link href="#" size="sm" className="text-default-400">
+          <div className="flex flex-col w-full gap-3">
+            <div className="flex justify-center gap-4 text-tiny text-default-400">
+              <Link href="#" className="hover:text-purple-500 transition-colors">
+                <Icon icon="solar:shield-check-linear" width={16} className="inline mr-1" />
+                安全登录
+              </Link>
+              <span className="text-default-300">|</span>
+              <Link href="#" className="hover:text-purple-500 transition-colors">
+                <Icon icon="solar:question-circle-linear" width={16} className="inline mr-1" />
                 使用帮助
               </Link>
               <span className="text-default-300">|</span>
-              <Link href="#" size="sm" className="text-default-400">
+              <Link href="#" className="hover:text-purple-500 transition-colors">
+                <Icon icon="solar:phone-linear" width={16} className="inline mr-1" />
                 联系管理员
               </Link>
             </div>
+            <p className="text-center text-tiny text-default-400">
+              © 2025 企业级客服系统 | 已适配最新后端API
+            </p>
           </div>
         </CardFooter>
       </Card>
     </div>
   );
+}
+
+// 添加抖动动画样式
+const shakeAnimation = `
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+`;
+
+// 将样式注入到页面
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = shakeAnimation;
+  document.head.appendChild(style);
 }
