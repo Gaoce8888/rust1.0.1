@@ -1,0 +1,418 @@
+{
+  "timestamp": "2025-07-19T04:30:45.764Z",
+  "summary": {
+    "total": 38,
+    "passed": 36,
+    "failed": 0,
+    "errors": 0,
+    "info": 2
+  },
+  "results": [
+    {
+      "timestamp": "2025-07-19T04:30:15.742Z",
+      "test": "客服WebSocket连接",
+      "status": "✅ PASS",
+      "message": "连接成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.742Z",
+      "test": "获取在线用户",
+      "status": "✅ PASS",
+      "message": "请求已发送",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.744Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: Welcome",
+      "details": {
+        "message": {
+          "type": "Welcome",
+          "user_id": "kf001",
+          "user_name": "kefu001",
+          "user_type": "Kefu",
+          "zhanghao": null,
+          "timestamp": "2025-07-19T04:30:15.742065643Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.744Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": []
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: History",
+      "details": {
+        "message": {
+          "type": "History",
+          "messages": []
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: UserJoined",
+      "details": {
+        "message": {
+          "type": "UserJoined",
+          "user_id": "kf001",
+          "user_name": "kefu001",
+          "user_type": "Kefu",
+          "zhanghao": null,
+          "timestamp": "2025-07-19T04:30:15.742079785Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": [
+            {
+              "user_id": "kf001",
+              "user_name": "kefu001",
+              "user_type": "Kefu",
+              "status": "Online",
+              "zhanghao": null,
+              "last_seen": "2025-07-19T04:30:15.741009497Z",
+              "avatar": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: System",
+      "details": {
+        "message": {
+          "type": "System",
+          "content": "🟢 kefu001(kf001) 已上线",
+          "timestamp": "2025-07-19T04:30:15.742624249Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": [
+            {
+              "user_id": "kf001",
+              "user_name": "kefu001",
+              "user_type": "Kefu",
+              "status": "Online",
+              "zhanghao": null,
+              "last_seen": "2025-07-19T04:30:15.743860549Z",
+              "avatar": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:15.745Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": []
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:20.747Z",
+      "test": "客服心跳发送",
+      "status": "✅ PASS",
+      "message": "心跳已发送",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:20.749Z",
+      "test": "客服收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: Heartbeat",
+      "details": {
+        "message": {
+          "type": "Heartbeat",
+          "user_id": "kf001",
+          "timestamp": "2025-07-19T04:30:20.748977552Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:25.745Z",
+      "test": "客服WebSocket关闭",
+      "status": "ℹ️ INFO",
+      "message": "连接已关闭",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.751Z",
+      "test": "客户WebSocket连接",
+      "status": "✅ PASS",
+      "message": "连接成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.755Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: Welcome, 总消息数: 1",
+      "details": {
+        "message": {
+          "type": "Welcome",
+          "user_id": "customer_1752899427748",
+          "user_name": "测试客户",
+          "user_type": "Kehu",
+          "zhanghao": null,
+          "timestamp": "2025-07-19T04:30:27.752438223Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.755Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers, 总消息数: 2",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": [
+            {
+              "user_id": "customer_1752899427748",
+              "user_name": "测试客户",
+              "user_type": "Kehu",
+              "status": "Online",
+              "zhanghao": null,
+              "last_seen": "2025-07-19T04:30:27.750705752Z",
+              "avatar": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.755Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: History, 总消息数: 3",
+      "details": {
+        "message": {
+          "type": "History",
+          "messages": []
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.755Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: UserJoined, 总消息数: 4",
+      "details": {
+        "message": {
+          "type": "UserJoined",
+          "user_id": "customer_1752899427748",
+          "user_name": "测试客户",
+          "user_type": "Kehu",
+          "zhanghao": null,
+          "timestamp": "2025-07-19T04:30:27.752466646Z"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:27.755Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: OnlineUsers, 总消息数: 5",
+      "details": {
+        "message": {
+          "type": "OnlineUsers",
+          "users": [
+            {
+              "user_id": "customer_1752899427748",
+              "user_name": "测试客户",
+              "user_type": "Kehu",
+              "status": "Online",
+              "zhanghao": null,
+              "last_seen": "2025-07-19T04:30:27.750716218Z",
+              "avatar": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:28.753Z",
+      "test": "客户发送消息",
+      "status": "✅ PASS",
+      "message": "聊天消息已发送",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:28.756Z",
+      "test": "客户收到消息",
+      "status": "✅ PASS",
+      "message": "消息类型: Chat, 总消息数: 6",
+      "details": {
+        "message": {
+          "type": "Chat",
+          "id": "f56070bd-5b85-4330-83d9-f85498ef4228",
+          "from": "customer_1752899427748",
+          "to": null,
+          "content": "你好，我需要帮助",
+          "content_type": "Text",
+          "filename": null,
+          "timestamp": "2025-07-19T04:30:28.753Z",
+          "url": "#1752899428753"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:30:29.753Z",
+      "test": "客户打字状态",
+      "status": "✅ PASS",
+      "message": "打字状态已发送",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:35.757Z",
+      "test": "客户WebSocket关闭",
+      "status": "ℹ️ INFO",
+      "message": "连接已关闭",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.762Z",
+      "test": "格式测试连接",
+      "status": "✅ PASS",
+      "message": "连接成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.765Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: Welcome",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.765Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: OnlineUsers",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.765Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: History",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.765Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: UserJoined",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:37.766Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: OnlineUsers",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:38.764Z",
+      "test": "发送文本消息",
+      "status": "✅ PASS",
+      "message": "消息格式正确",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:38.767Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: Chat",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:39.763Z",
+      "test": "发送图片消息",
+      "status": "✅ PASS",
+      "message": "消息格式正确",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:39.766Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: Chat",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:40.764Z",
+      "test": "发送文件消息",
+      "status": "✅ PASS",
+      "message": "消息格式正确",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:40.767Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: Chat",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:41.763Z",
+      "test": "发送心跳消息",
+      "status": "✅ PASS",
+      "message": "消息格式正确",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:41.765Z",
+      "test": "格式验证响应",
+      "status": "✅ PASS",
+      "message": "收到响应: Heartbeat",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-07-19T04:30:42.764Z",
+      "test": "发送历史请求",
+      "status": "✅ PASS",
+      "message": "消息格式正确",
+      "details": {}
+    }
+  ]
+}
