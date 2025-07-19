@@ -12,6 +12,7 @@ pub mod auth_simple;
 // 扩展API路由模块
 pub mod api_extended;
 pub mod api_real;
+pub mod api_complete;
 
 // 客服认证路由模块
 pub mod kefu_auth;
@@ -27,15 +28,7 @@ use crate::storage::LocalStorage;
 use crate::ai::AIManager;
 use crate::handlers::ai::AIHandler;
 use crate::auth::kefu_auth::KefuAuthManager;
-// Temporarily disabled enterprise modules for compilation
-// use crate::load_balancer::LoadBalancer;
-// use crate::websocket_pool::WebSocketConnectionPool;
-// use crate::api_routes::ApiRoutes;
-// use crate::http_fallback::HttpFallbackManager;
-// use crate::auto_upgrade::AutoUpgradeManager;
-// use crate::performance_optimizer::PerformanceOptimizer;
-// use crate::health_monitor::HealthMonitor;
-// use crate::failover_manager::FailoverManager;
+// Enterprise modules removed for cleaner codebase
 
 /// 构建所有路由
 pub fn build_all_routes(
@@ -72,6 +65,13 @@ pub fn build_all_routes(
     // 真实的文件管理API路由
     let real_file_api_routes = api_real::build_real_file_api_routes(
         file_manager.clone(),
+    );
+    
+    // 完整API路由（集成所有未使用的处理器）
+    let complete_api_routes = api_complete::build_complete_api_routes(
+        ws_manager.clone(),
+        user_manager.clone(),
+        storage.clone(),
     );
     
     let websocket_routes = websocket::build_websocket_routes(ws_manager.clone(), kefu_auth_manager.clone());
@@ -127,6 +127,7 @@ pub fn build_all_routes(
         .or(simple_api_routes)
         .or(extended_api_routes)
         .or(real_file_api_routes)
+        .or(complete_api_routes)
         // 7. WebSocket路由
         .or(websocket_routes)
         // 8. 前端路由（静态文件）放在最后

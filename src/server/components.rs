@@ -11,15 +11,7 @@ use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
 use crate::auth::kefu_auth::KefuAuthManager;
-// Temporarily disabled enterprise modules for compilation
-// use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
-// use crate::websocket_pool::{WebSocketConnectionPool, WebSocketPoolConfig};
-// use crate::api_routes::ApiRoutes;
-// use crate::http_fallback::HttpFallbackManager;
-// use crate::auto_upgrade::AutoUpgradeManager;
-// use crate::performance_optimizer::{PerformanceOptimizer, OptimizerConfig};
-// use crate::health_monitor::HealthMonitor;
-// use crate::failover_manager::{FailoverManager, FailoverConfig};
+// Enterprise modules removed for cleaner codebase
 
 /// 系统组件集合
 pub struct SystemComponents {

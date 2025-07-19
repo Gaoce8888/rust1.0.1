@@ -67,10 +67,46 @@ pub fn build_kefu_auth_routes(
         .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
         .and_then(handle_kefu_heartbeat);
 
+    // 客服分配路由
+    let assign_kefu_route = warp::path("api")
+        .and(warp::path("kefu"))
+        .and(warp::path("assign"))
+        .and(warp::path::param::<String>())
+        .and(warp::post())
+        .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
+        .and_then(handle_assign_kefu);
+
+    let release_kefu_route = warp::path("api")
+        .and(warp::path("kefu"))
+        .and(warp::path("release"))
+        .and(warp::path::param::<String>())
+        .and(warp::post())
+        .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
+        .and_then(handle_release_kefu);
+
+    let get_customer_kefu_route = warp::path("api")
+        .and(warp::path("kefu"))
+        .and(warp::path("customer"))
+        .and(warp::path::param::<String>())
+        .and(warp::get())
+        .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
+        .and_then(handle_get_customer_kefu);
+
+    let cleanup_expired_route = warp::path("api")
+        .and(warp::path("kefu"))
+        .and(warp::path("cleanup"))
+        .and(warp::post())
+        .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
+        .and_then(handle_cleanup_expired);
+
     login_route
         .or(logout_route)
         .or(status_route)
         .or(heartbeat_route)
+        .or(assign_kefu_route)
+        .or(release_kefu_route)
+        .or(get_customer_kefu_route)
+        .or(cleanup_expired_route)
 }
 
 /// 客服认证管理器注入
@@ -274,6 +310,107 @@ async fn handle_kefu_heartbeat(
             Ok(warp::reply::json(&serde_json::json!({
                 "success": false,
                 "message": "心跳更新失败"
+            })))
+        }
+    }
+}
+
+/// 处理客服分配
+async fn handle_assign_kefu(
+    customer_id: String,
+    kefu_auth_manager: Arc<KefuAuthManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    match kefu_auth_manager.assign_kefu_for_customer(&customer_id).await {
+        Ok(Some(kefu_id)) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": true,
+                "kefu_id": kefu_id,
+                "message": format!("已为客户 {} 分配客服", customer_id)
+            })))
+        }
+        Ok(None) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": "暂无可用客服"
+            })))
+        }
+        Err(e) => {
+            tracing::error!("客服分配失败: {}", e);
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": format!("分配失败: {}", e)
+            })))
+        }
+    }
+}
+
+/// 处理释放客服
+async fn handle_release_kefu(
+    customer_id: String,
+    kefu_auth_manager: Arc<KefuAuthManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    match kefu_auth_manager.release_kefu_for_customer(&customer_id).await {
+        Ok(()) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": true,
+                "message": format!("已释放客户 {} 的客服", customer_id)
+            })))
+        }
+        Err(e) => {
+            tracing::error!("释放客服失败: {}", e);
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": format!("释放失败: {}", e)
+            })))
+        }
+    }
+}
+
+/// 获取客户的客服
+async fn handle_get_customer_kefu(
+    customer_id: String,
+    kefu_auth_manager: Arc<KefuAuthManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    match kefu_auth_manager.get_kefu_for_customer(&customer_id).await {
+        Ok(Some(kefu_id)) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": true,
+                "kefu_id": kefu_id,
+                "customer_id": customer_id
+            })))
+        }
+        Ok(None) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": "该客户未分配客服"
+            })))
+        }
+        Err(e) => {
+            tracing::error!("获取客服失败: {}", e);
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": format!("获取失败: {}", e)
+            })))
+        }
+    }
+}
+
+/// 清理过期客服
+async fn handle_cleanup_expired(
+    kefu_auth_manager: Arc<KefuAuthManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    match kefu_auth_manager.cleanup_expired_kefu().await {
+        Ok(()) => {
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": true,
+                "message": "过期客服清理完成"
+            })))
+        }
+        Err(e) => {
+            tracing::error!("清理过期客服失败: {}", e);
+            Ok(warp::reply::json(&serde_json::json!({
+                "success": false,
+                "message": format!("清理失败: {}", e)
             })))
         }
     }

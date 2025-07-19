@@ -22,7 +22,7 @@ pub async fn handle_analytics_overview(
     _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     // 获取当前连接统计
-    let _connection_stats = _ws_manager.get_connection_stats().await;
+    let connection_stats = _ws_manager.get_connection_stats().await;
     
     // TODO: 从storage获取更多统计数据
     let overview = serde_json::json!({

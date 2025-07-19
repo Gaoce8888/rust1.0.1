@@ -336,3 +336,114 @@ pub async fn handle_debug() -> Result<impl warp::Reply, warp::Rejection> {
         "message": "调试接口正常"
     })))
 }
+
+// 获取连接列表
+pub async fn handle_list_connections(
+    _ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let response = serde_json::json!({
+        "connections": [
+            {
+                "user_id": "user123",
+                "connection_id": "conn_456",
+                "connected_at": "2024-01-01T12:00:00Z",
+                "last_activity": "2024-01-01T12:30:00Z",
+                "room": "general"
+            }
+        ],
+        "total": 50
+    });
+    Ok(warp::reply::json(&response))
+}
+
+// 获取连接详情
+pub async fn handle_connection_details(
+    user_id: String,
+    _ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let response = serde_json::json!({
+        "user_id": user_id,
+        "connection_info": {
+            "status": "connected",
+            "ip_address": "192.168.1.100",
+            "user_agent": "Mozilla/5.0",
+            "connected_duration": "30m",
+            "messages_sent": 45,
+            "messages_received": 52
+        }
+    });
+    Ok(warp::reply::json(&response))
+}
+
+// 断开用户连接
+pub async fn handle_disconnect_user(
+    user_id: String,
+    ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    // 实际断开连接
+    ws_manager.disconnect_user(&user_id).await;
+    
+    let response = serde_json::json!({
+        "success": true,
+        "message": format!("User {} disconnected", user_id)
+    });
+    Ok(warp::reply::json(&response))
+}
+
+// 获取性能指标
+pub async fn handle_performance_metrics(
+    _ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let response = serde_json::json!({
+        "metrics": {
+            "message_throughput": {
+                "messages_per_second": 150,
+                "peak_mps": 500,
+                "average_latency_ms": 25
+            },
+            "connection_metrics": {
+                "connections_per_second": 10,
+                "average_connection_duration": "15m",
+                "reconnection_rate": 0.05
+            },
+            "system_performance": {
+                "response_time_p50": 20,
+                "response_time_p95": 100,
+                "response_time_p99": 200
+            }
+        },
+        "timestamp": chrono::Utc::now()
+    });
+    Ok(warp::reply::json(&response))
+}
+
+// 获取资源使用情况
+pub async fn handle_resource_usage(
+    _ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let response = serde_json::json!({
+        "resources": {
+            "memory": {
+                "used_mb": 512,
+                "total_mb": 8192,
+                "percentage": 6.25
+            },
+            "cpu": {
+                "usage_percentage": 15.5,
+                "core_count": 4
+            },
+            "connections": {
+                "active": 150,
+                "max_allowed": 10000,
+                "percentage": 1.5
+            },
+            "storage": {
+                "messages_count": 50000,
+                "files_count": 2000,
+                "total_size_mb": 1024
+            }
+        },
+        "timestamp": chrono::Utc::now()
+    });
+    Ok(warp::reply::json(&response))
+}

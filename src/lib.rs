@@ -1,9 +1,2 @@
 // Temporarily disabled enterprise modules for compilation
-// pub mod load_balancer;
-// pub mod websocket_pool;
-// pub mod api_routes;
-// pub mod http_fallback;
-// pub mod auto_upgrade;
-// pub mod performance_optimizer;
-// pub mod health_monitor;
-// pub mod failover_manager;
+// Enterprise modules removed for cleaner codebase
