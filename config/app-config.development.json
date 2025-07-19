@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "企业级客服系统",
+    "version": "2.1.0",
+    "environment": "development"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 6007,
+    "cors": {
+      "enabled": true,
+      "origins": ["http://localhost:6007", "http://localhost:3000", "http://127.0.0.1:6007"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "headers": ["Content-Type", "Authorization", "user-id", "admin-key", "filename"]
+    }
+  },
+  "frontend": {
+    "host": "localhost",
+    "port": 6007,
+    "apiUrl": "http://localhost:6007",
+    "wsUrl": "ws://localhost:6007/ws",
+    "features": {
+      "imageUpload": true,
+      "audioNotifications": true,
+      "messageCompression": true,
+      "virtualScrolling": true,
+      "offlineSupport": true
+    },
+    "upload": {
+      "maxFileSize": 10485760,
+      "allowedTypes": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+      "compressionEnabled": true,
+      "compressionQuality": 0.8,
+      "maxWidth": 1920,
+      "maxHeight": 1080
+    }
+  },
+  "websocket": {
+    "heartbeatInterval": 30000,
+    "reconnectInterval": 5000,
+    "maxReconnectAttempts": 5,
+    "messageTimeout": 10000,
+    "maxMessageSize": 1048576
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": "",
+    "database": 0,
+    "pool": {
+      "maxSize": 10,
+      "minIdle": 2,
+      "maxLifetime": 3600,
+      "idleTimeout": 300
+    }
+  },
+  "storage": {
+    "dataDir": "./data",
+    "blobsDir": "./data/blobs",
+    "snapshotInterval": 300,
+    "maxSnapshotSize": 104857600
+  },
+  "security": {
+    "jwtSecret": "development-secret-key-not-for-production",
+    "jwtExpiry": 86400,
+    "bcryptRounds": 8,
+    "rateLimiting": {
+      "enabled": false,
+      "windowMs": 60000,
+      "maxRequests": 1000
+    }
+  },
+  "logging": {
+    "level": "debug",
+    "format": "pretty",
+    "file": {
+      "enabled": false,
+      "path": "./logs/app.log",
+      "maxSize": 10485760,
+      "maxFiles": 5
+    }
+  },
+  "performance": {
+    "messageCache": {
+      "enabled": true,
+      "maxSize": 1000,
+      "ttl": 3600
+    },
+    "compression": {
+      "enabled": true,
+      "threshold": 1024
+    }
+  }
+} 
