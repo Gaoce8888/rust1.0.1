@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端优化测试 - 企业级客服系统</title>
+    
+    <!-- PWA支持 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
+    
+    <style>
+        /* 测试专用样式 */
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>移动端测试</h1>
+                <p>优化效果展示</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">测试项目</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#cards" class="nav-link active">卡片布局</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#typography" class="nav-link">文字排版</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#grid" class="nav-link">网格系统</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#forms" class="nav-link">表单元素</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">移动端优化测试</h1>
+            </header>
+
+            <div class="content">
+                <div class="doc-content">
+                    <section id="intro">
+                        <h1 class="doc-title">移动端深度优化测试</h1>
+                        <p class="doc-subtitle">测试各种优化后的组件在移动端的显示效果</p>
+                    </section>
+
+                    <section id="cards">
+                        <h2>卡片布局测试</h2>
+                        
+                        <div class="test-section">
+                            <h3 class="test-title">单个卡片</h3>
+                            <div class="card">
+                                <h3 class="card-title" data-icon="📱">响应式设计</h3>
+                                <div class="card-content">
+                                    <p>这是一个测试卡片，用于验证移动端的显示效果。文字应该正确换行，内容应该完整显示，整体布局应该美观。</p>
+                                    <ul>
+                                        <li>支持多种屏幕尺寸</li>
+                                        <li>自适应布局系统</li>
+                                        <li>优化的触摸体验</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">网格中的卡片</h3>
+                            <div class="grid grid-cols-2">
+                                <div class="card card-primary">
+                                    <h3 class="card-title" data-icon="🚀">高性能</h3>
+                                    <div class="card-content">
+                                        <p>基于Rust语言开发，提供卓越的性能表现。</p>
+                                    </div>
+                                </div>
+                                <div class="card card-success">
+                                    <h3 class="card-title" data-icon="🛡️">高安全</h3>
+                                    <div class="card-content">
+                                        <p>内置多重安全机制，保障系统和数据安全。</p>
+                                    </div>
+                                </div>
+                                <div class="card card-warning">
+                                    <h3 class="card-title" data-icon="📈">可扩展</h3>
+                                    <div class="card-content">
+                                        <p>模块化设计，支持水平扩展和功能定制。</p>
+                                    </div>
+                                </div>
+                                <div class="card card-info">
+                                    <h3 class="card-title" data-icon="💡">易使用</h3>
+                                    <div class="card-content">
+                                        <p>简洁的API设计，完善的文档支持。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="typography">
+                        <h2>文字排版测试</h2>
+                        
+                        <div class="test-section">
+                            <h3 class="test-title">标题层次</h3>
+                            <h1 class="doc-title">一级标题 - 渐变色效果</h1>
+                            <h2>二级标题 - 带装饰线</h2>
+                            <h3>三级标题 - 带图标</h3>
+                            <h4>四级标题 - 常规样式</h4>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">段落文本</h3>
+                            <p>这是一段测试文本，用于验证中文字体的显示效果。在移动端设备上，文字应该清晰易读，行高和字间距应该适中。长文本应该能够正确换行，不会出现溢出或者截断的情况。</p>
+                            <p>第二段文本测试不同的内容长度。短句子。</p>
+                            <p>第三段包含一些<strong>加粗文本</strong>和<em>斜体文本</em>，以及<code>内联代码</code>的显示效果。</p>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">列表样式</h3>
+                            <ul>
+                                <li>无序列表项目一</li>
+                                <li>无序列表项目二，这是一个比较长的列表项，用于测试换行效果</li>
+                                <li>无序列表项目三</li>
+                            </ul>
+                            <ol>
+                                <li>有序列表项目一</li>
+                                <li>有序列表项目二</li>
+                                <li>有序列表项目三</li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <section id="grid">
+                        <h2>网格系统测试</h2>
+                        
+                        <div class="test-section">
+                            <h3 class="test-title">两列网格</h3>
+                            <div class="grid grid-cols-2">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <p>左侧内容</p>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <p>右侧内容</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">三列网格</h3>
+                            <div class="grid grid-cols-3">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <p>第一列</p>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <p>第二列</p>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <p>第三列</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="forms">
+                        <h2>表单元素测试</h2>
+                        
+                        <div class="test-section">
+                            <h3 class="test-title">输入框</h3>
+                            <input type="text" placeholder="文本输入框" style="width: 100%; margin-bottom: 1rem;">
+                            <textarea placeholder="多行文本输入" rows="4" style="width: 100%; margin-bottom: 1rem;"></textarea>
+                            <select style="width: 100%; margin-bottom: 1rem;">
+                                <option>选择选项</option>
+                                <option>选项一</option>
+                                <option>选项二</option>
+                            </select>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">按钮样式</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <button class="btn btn-primary">主要按钮</button>
+                                <button class="btn btn-secondary">次要按钮</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="misc">
+                        <h2>其他元素测试</h2>
+                        
+                        <div class="test-section">
+                            <h3 class="test-title">代码块</h3>
+                            <pre><code>// Rust 代码示例
+fn main() {
+    println!("Hello, World!");
+    let message = "移动端优化测试";
+    println!("{}", message);
+}</code></pre>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">警告框</h3>
+                            <div class="alert alert-info">
+                                <div class="alert-title">信息提示</div>
+                                <p>这是一个信息提示框。</p>
+                            </div>
+                            <div class="alert alert-success">
+                                <div class="alert-title">成功提示</div>
+                                <p>操作成功完成。</p>
+                            </div>
+                            <div class="alert alert-warning">
+                                <div class="alert-title">警告提示</div>
+                                <p>请注意相关事项。</p>
+                            </div>
+                        </div>
+
+                        <div class="test-section">
+                            <h3 class="test-title">表格</h3>
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>功能</th>
+                                            <th>状态</th>
+                                            <th>说明</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td data-label="功能">响应式布局</td>
+                                            <td data-label="状态">完成</td>
+                                            <td data-label="说明">支持所有屏幕尺寸</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="功能">触摸优化</td>
+                                            <td data-label="状态">完成</td>
+                                            <td data-label="说明">优化触摸目标大小</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="功能">PWA支持</td>
+                                            <td data-label="状态">完成</td>
+                                            <td data-label="说明">可安装到主屏幕</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <p>移动端优化测试页面</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/mobile.js"></script>
+</body>
+</html> 
