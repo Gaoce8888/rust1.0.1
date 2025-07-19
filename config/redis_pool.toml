@@ -1,0 +1,66 @@
+# Redis连接池配置文件
+# 此文件定义了Redis连接池的各项参数，优化系统性能
+
+[redis_pool]
+# Redis服务器连接URL
+# 支持格式: redis://[username:password@]host:port[/database]
+# 支持Redis Cluster: redis://host1:port1,host2:port2,host3:port3
+url = "redis://127.0.0.1:6379"
+
+# 连接池最大连接数
+# 建议根据并发用户数和服务器性能调整
+# 生产环境推荐: 50-200
+# 开发环境推荐: 16-32
+max_size = 32
+
+# 最小空闲连接数 (可选)
+# 保持一定数量的空闲连接，减少连接建立开销
+# 建议设置为 max_size 的 25%-50%
+min_idle = 8
+
+# 连接最大生存时间 (秒)
+# 防止长时间连接导致的资源泄露
+# 建议: 3600秒 (1小时)
+max_lifetime = 3600
+
+# 空闲连接超时时间 (秒)
+# 超过此时间的空闲连接将被关闭
+# 建议: 600秒 (10分钟)
+idle_timeout = 600
+
+# 连接获取超时时间 (秒)
+# 当连接池满时，等待获取连接的最大时间
+# 建议: 5-10秒
+connection_timeout = 5
+
+# 连接回收超时时间 (秒)
+# 回收连接到池中的最大等待时间
+# 建议: 2-5秒
+recycle_timeout = 2
+
+[monitoring]
+# 启用详细监控
+enable_detailed_metrics = true
+
+# 健康检查间隔 (秒)
+health_check_interval = 30
+
+# 性能警告阈值
+# 连接池使用率超过此值时发出警告
+pool_utilization_warning_threshold = 80.0
+
+# 连接获取时间超过此值时发出警告 (毫秒)
+acquire_time_warning_threshold = 100.0
+
+[performance]
+# 启用连接预热
+# 系统启动时预先创建最小数量的连接
+enable_connection_warmup = true
+
+# 启用自适应调整
+# 根据负载情况自动调整连接池参数
+enable_adaptive_sizing = true
+
+# 批量操作优化
+# 启用批量Redis操作以提升性能
+enable_batch_operations = true 
