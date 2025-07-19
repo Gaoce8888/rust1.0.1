@@ -9,9 +9,9 @@ path = "src/main.rs"
 
 # 企业级编译优化配置
 [profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
+opt-level = 2  # 从3降低到2，减少内存使用
+lto = "thin"   # 从true改为thin，减少内存使用
+codegen-units = 4  # 从1增加到4，减少内存使用
 panic = "abort"
 strip = true
 
