@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部署指南 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">部署运维</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#overview" class="nav-link active">部署概览</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#requirements" class="nav-link">环境要求</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#manual" class="nav-link">手动部署</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#docker" class="nav-link">Docker 部署</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#kubernetes" class="nav-link">Kubernetes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#monitoring" class="nav-link">监控配置</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">部署指南</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <div class="doc-content">
+                    <h1 class="doc-title">部署指南</h1>
+                    <p class="doc-subtitle">生产环境部署和运维指南</p>
+
+                    <section id="overview">
+                        <h2>部署概览</h2>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🚀 部署选项</div>
+                            <p>系统支持多种部署方式，根据您的需求选择最适合的部署方案。</p>
+                        </div>
+
+                        <div class="grid grid-cols-3">
+                            <div class="card">
+                                <h3 class="card-title">🖥️ 传统部署</h3>
+                                <div class="card-content">
+                                    <p>直接在服务器上部署，适合小规模应用</p>
+                                    <ul>
+                                        <li>简单直接</li>
+                                        <li>资源利用率高</li>
+                                        <li>易于调试</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">🐳 Docker 部署</h3>
+                                <div class="card-content">
+                                    <p>使用容器化部署，适合中等规模应用</p>
+                                    <ul>
+                                        <li>环境一致性</li>
+                                        <li>易于扩展</li>
+                                        <li>快速部署</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">☸️ Kubernetes</h3>
+                                <div class="card-content">
+                                    <p>使用 K8s 编排，适合大规模企业应用</p>
+                                    <ul>
+                                        <li>自动伸缩</li>
+                                        <li>高可用性</li>
+                                        <li>服务发现</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="requirements">
+                        <h2>环境要求</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">硬件要求</h3>
+                            <div class="card-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>规模</th>
+                                            <th>CPU</th>
+                                            <th>内存</th>
+                                            <th>存储</th>
+                                            <th>网络</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>小型 (100用户)</td>
+                                            <td>2核</td>
+                                            <td>4GB</td>
+                                            <td>20GB</td>
+                                            <td>10Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>中型 (1000用户)</td>
+                                            <td>4核</td>
+                                            <td>8GB</td>
+                                            <td>100GB</td>
+                                            <td>100Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>大型 (10000用户)</td>
+                                            <td>8核</td>
+                                            <td>16GB</td>
+                                            <td>500GB</td>
+                                            <td>1Gbps</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">软件要求</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>操作系统</strong>: Linux (Ubuntu 20.04+, CentOS 8+)</li>
+                                    <li><strong>Rust</strong>: 1.70.0 或更高版本</li>
+                                    <li><strong>Redis</strong>: 6.0 或更高版本</li>
+                                    <li><strong>Node.js</strong>: 16.0 或更高版本 (前端构建)</li>
+                                    <li><strong>Nginx</strong>: 1.18 或更高版本 (可选)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="manual">
+                        <h2>手动部署</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">1. 环境准备</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 更新系统
+sudo apt update && sudo apt upgrade -y
+
+# 安装必要软件
+sudo apt install -y curl git build-essential
+
+# 安装 Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+
+# 安装 Redis
+sudo apt install -y redis-server
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+
+# 安装 Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">2. 下载和构建</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 克隆代码
+git clone https://github.com/your-org/customer-service-system.git
+cd customer-service-system
+
+# 构建后端
+cargo build --release
+
+# 构建前端
+cd frontend
+npm install
+npm run build
+cd ..</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">3. 配置文件</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 复制配置文件
+cp config/app-config.example.json config/app-config.json
+cp config/secrets.example.env config/secrets.env
+
+# 编辑配置文件
+nano config/app-config.json</code></pre>
+                                
+                                <p>配置文件示例：</p>
+                                <pre><code class="language-json">{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": ""
+  },
+  "upload": {
+    "max_file_size": 10485760,
+    "upload_path": "./data/uploads"
+  },
+  "log": {
+    "level": "info",
+    "file": "./logs/app.log"
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">4. 启动服务</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 创建系统服务
+sudo tee /etc/systemd/system/customer-service.service > /dev/null <<EOF
+[Unit]
+Description=Customer Service System
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/customer-service-system
+ExecStart=/home/ubuntu/customer-service-system/target/release/customer-service-system
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 启动服务
+sudo systemctl daemon-reload
+sudo systemctl enable customer-service
+sudo systemctl start customer-service
+
+# 检查状态
+sudo systemctl status customer-service</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="docker">
+                        <h2>Docker 部署</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">1. Dockerfile</h3>
+                            <div class="card-content">
+                                <pre><code class="language-dockerfile"># 多阶段构建
+FROM rust:1.70 AS builder
+
+WORKDIR /app
+COPY . .
+RUN cargo build --release
+
+FROM ubuntu:22.04
+
+# 安装运行时依赖
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制二进制文件
+COPY --from=builder /app/target/release/customer-service-system /usr/local/bin/
+
+# 复制配置文件
+COPY config/ /app/config/
+
+# 创建数据目录
+RUN mkdir -p /app/data /app/logs
+
+WORKDIR /app
+
+EXPOSE 8080
+
+CMD ["customer-service-system"]</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">2. docker-compose.yml</h3>
+                            <div class="card-content">
+                                <pre><code class="language-yaml">version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  customer-service:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - customer-service
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl
+    restart: unless-stopped
+
+volumes:
+  redis_data:</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">3. 部署命令</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 构建镜像
+docker build -t customer-service:latest .
+
+# 启动服务
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f customer-service
+
+# 停止服务
+docker-compose down</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="kubernetes">
+                        <h2>Kubernetes 部署</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">1. 部署文件</h3>
+                            <div class="card-content">
+                                <pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: customer-service
+  template:
+    metadata:
+      labels:
+        app: customer-service
+    spec:
+      containers:
+      - name: customer-service
+        image: customer-service:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer-service
+spec:
+  selector:
+    app: customer-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">2. Redis 部署</h3>
+                            <div class="card-content">
+                                <pre><code class="language-yaml"># redis.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">3. 部署命令</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 部署 Redis
+kubectl apply -f redis.yaml
+
+# 部署应用
+kubectl apply -f deployment.yaml
+
+# 查看状态
+kubectl get pods
+kubectl get services
+
+# 查看日志
+kubectl logs -f deployment/customer-service
+
+# 扩缩容
+kubectl scale deployment customer-service --replicas=5</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="monitoring">
+                        <h2>监控配置</h2>
+                        
+                        <div class="card">
+                            <h3 class="card-title">系统监控</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>CPU 使用率</strong>: 监控处理器负载</li>
+                                    <li><strong>内存使用率</strong>: 监控内存占用</li>
+                                    <li><strong>磁盘空间</strong>: 监控存储空间</li>
+                                    <li><strong>网络流量</strong>: 监控网络使用</li>
+                                    <li><strong>进程状态</strong>: 监控服务运行状态</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">应用监控</h3>
+                            <div class="card-content">
+                                <ul>
+                                    <li><strong>请求响应时间</strong>: API 性能监控</li>
+                                    <li><strong>并发连接数</strong>: WebSocket 连接数</li>
+                                    <li><strong>错误率</strong>: 错误请求统计</li>
+                                    <li><strong>数据库连接</strong>: Redis 连接状态</li>
+                                    <li><strong>文件上传</strong>: 文件处理统计</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">日志配置</h3>
+                            <div class="card-content">
+                                <pre><code class="language-bash"># 配置日志轮转
+sudo tee /etc/logrotate.d/customer-service > /dev/null <<EOF
+/app/logs/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0644 ubuntu ubuntu
+    postrotate
+        sudo systemctl reload customer-service
+    endscript
+}
+EOF</code></pre>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html>
