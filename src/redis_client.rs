@@ -543,6 +543,42 @@ impl RedisManager {
     }
 
     // 获取客服工作负载统计
+    // 缓存相关方法
+    pub async fn get_cache<T: serde::de::DeserializeOwned>(&self, key: &str) -> Result<Option<T>> {
+        let mut conn = self.get_async_connection().await?;
+        
+        match conn.get::<_, Option<String>>(key).await? {
+            Some(value) => {
+                let deserialized = serde_json::from_str(&value)?;
+                Ok(Some(deserialized))
+            }
+            None => Ok(None),
+        }
+    }
+    
+    pub async fn set_cache(&self, key: &str, value: &str, ttl: i64) -> Result<()> {
+        let mut conn = self.get_async_connection().await?;
+        conn.set_ex(key, value, ttl as usize).await?;
+        Ok(())
+    }
+    
+    pub async fn delete_cache(&self, key: &str) -> Result<()> {
+        let mut conn = self.get_async_connection().await?;
+        conn.del(key).await?;
+        Ok(())
+    }
+    
+    pub async fn delete_pattern(&self, pattern: &str) -> Result<()> {
+        let mut conn = self.get_async_connection().await?;
+        let keys: Vec<String> = conn.keys(pattern).await?;
+        
+        if !keys.is_empty() {
+            conn.del(keys).await?;
+        }
+        
+        Ok(())
+    }
+    
     pub async fn get_kefu_workload(&self, kefu_id: &str) -> Result<serde_json::Value> {
         let mut conn = self.get_async_connection().await?;
 
