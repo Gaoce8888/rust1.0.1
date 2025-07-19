@@ -1,0 +1,21 @@
+# 企业级客服系统环境变量配置
+# 复制此文件为 environment 并修改相应的值
+
+# 应用环境：development | staging | production
+APP_ENV=production
+
+# 服务器配置
+SERVER_HOST=0.0.0.0
+SERVER_PORT=6007
+
+# Redis配置
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# 安全配置
+JWT_SECRET=your-secret-key-here-change-in-production
+
+# 前端配置（用于前端构建时）
+API_URL=https://a.ylqkf.com
+WS_URL=wss://a.ylqkf.com/ws 
