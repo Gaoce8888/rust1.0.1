@@ -54,7 +54,7 @@ pub async fn handle_system_info(
     tag = "系统"
 )]
 pub async fn handle_system_health(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("系统健康检查接口被访问");

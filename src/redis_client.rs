@@ -563,7 +563,7 @@ impl RedisManager {
         conn.set_ex(
             format!("workload:{}", kefu_id),
             workload_info.to_string(),
-            300, // 5分钟缓存
+            300i64, // 5分钟缓存
         )
         .await?;
 

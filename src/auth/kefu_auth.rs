@@ -4,7 +4,7 @@ use anyhow::Result;
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
-use tracing::{info, warn, error};
+use tracing::{info, warn};
 
 use crate::redis_pool::RedisPoolManager;
 
@@ -145,11 +145,11 @@ impl KefuAuthManager {
         // 保存到Redis
         let key = format!("kefu:online:{}", kefu_auth.kefu_id);
         let status_json = serde_json::to_string(&online_status)?;
-        conn.set_ex(&key, status_json, 3600).await?; // 1小时过期
-        
+                conn.set_ex::<_, _, ()>(&key, status_json, 3600).await?; // 1小时过期
+
         // 添加到在线列表
         let online_list_key = "kefu:online:list";
-        conn.sadd(&online_list_key, &kefu_auth.kefu_id).await?;
+        conn.sadd::<_, _, ()>(&online_list_key, &kefu_auth.kefu_id).await?;
         
         info!("✅ 客服上线成功: {}", kefu_auth.kefu_id);
         Ok(true)
@@ -163,11 +163,11 @@ impl KefuAuthManager {
         
         // 删除在线状态
         let key = format!("kefu:online:{}", kefu_id);
-        conn.del(&key).await?;
+        conn.del::<_, ()>(&key).await?;
         
         // 从在线列表移除
         let online_list_key = "kefu:online:list";
-        conn.srem(&online_list_key, kefu_id).await?;
+        conn.srem::<_, _, ()>(&online_list_key, kefu_id).await?;
         
         info!("✅ 客服下线完成: {}", kefu_id);
         Ok(())
@@ -188,7 +188,7 @@ impl KefuAuthManager {
             if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&json) {
                 status.last_heartbeat = chrono::Utc::now();
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex(&key, updated_json, 3600).await?;
+                conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
             }
         }
         
@@ -205,7 +205,7 @@ impl KefuAuthManager {
         
         for kefu_id in kefu_ids {
             let key = format!("kefu:online:{}", kefu_id);
-            if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
+            if let Ok(status_json) = conn.get(&key).await {
                 if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
                     online_kefu.push(status);
                 }
@@ -239,7 +239,7 @@ impl KefuAuthManager {
             // 记录客户-客服关系
             let mut conn = self.redis_pool.get_connection().await?;
             let customer_key = format!("customer:kefu:{}", customer_id);
-            conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;
+            conn.set_ex::<_, _, ()>(&customer_key, &kefu.kefu_id, 3600).await?;
             
             return Ok(Some(kefu.kefu_id.clone()));
         }
@@ -253,7 +253,7 @@ impl KefuAuthManager {
         let mut conn = self.redis_pool.get_connection().await?;
         let key = format!("kefu:online:{}", kefu_id);
         
-        if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
+        if let Ok(status_json) = conn.get(&key).await {
             if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
                 if increment > 0 {
                     status.current_customers += increment as u32;
@@ -262,7 +262,7 @@ impl KefuAuthManager {
                 }
                 
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex(&key, updated_json, 3600).await?;
+                conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
             }
         }
         
@@ -274,9 +274,9 @@ impl KefuAuthManager {
         let mut conn = self.redis_pool.get_connection().await?;
         let customer_key = format!("customer:kefu:{}", customer_id);
         
-        if let Ok(Some(kefu_id)) = conn.get::<_, Option<String>>(&customer_key).await {
+        if let Ok(kefu_id) = conn.get(&customer_key).await {
             self.increment_kefu_customers(&kefu_id, -1).await?;
-            conn.del(&customer_key).await?;
+            conn.del::<_, ()>(&customer_key).await?;
             info!("✅ 为客户 {} 释放客服: {}", customer_id, kefu_id);
         }
         
@@ -315,7 +315,7 @@ impl KefuAuthManager {
         for kefu_id in kefu_ids {
             let key = format!("kefu:online:{}", kefu_id);
             
-            if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
+            if let Ok(status_json) = conn.get(&key).await {
                 if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
                     // 如果超过5分钟没有心跳，认为已断线
                     if now.signed_duration_since(status.last_heartbeat).num_minutes() > 5 {

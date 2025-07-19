@@ -1,3 +1,8 @@
+// Core modules
+pub mod monitoring;
+pub mod middleware;
+pub mod cache;
+
 // Temporarily disabled enterprise modules for compilation
 // pub mod load_balancer;
 // pub mod websocket_pool;
