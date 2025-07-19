@@ -744,6 +744,14 @@ impl AsyncConnection {
             AsyncConnection::Direct(conn) => conn.llen(key).await,
         }
     }
+
+    /// Scan keys by pattern (wrapper around Redis KEYS command)
+    pub async fn keys(&mut self, pattern: &str) -> Result<Vec<String>> {
+        match self {
+            AsyncConnection::Pooled(conn) => conn.keys(pattern).await,
+            AsyncConnection::Direct(conn) => conn.keys(pattern).await,
+        }
+    }
 }
 
 // 连接池连接包装器
@@ -829,6 +837,12 @@ impl PooledConnection {
     pub async fn llen(&mut self, key: &str) -> Result<usize> {
         self.conn.llen(key).await.map_err(Into::into)
     }
+
+    /// Execute KEYS pattern query
+    pub async fn keys(&mut self, pattern: &str) -> Result<Vec<String>> {
+        use redis::AsyncCommands;
+        self.conn.keys(pattern).await.map_err(Into::into)
+    }
 }
 
 // 直接连接包装器
@@ -913,5 +927,11 @@ impl DirectConnection {
     #[allow(dead_code)]
     pub async fn llen(&mut self, key: &str) -> Result<usize> {
         self.conn.llen(key).await.map_err(Into::into)
+    }
+
+    /// Execute KEYS pattern query
+    pub async fn keys(&mut self, pattern: &str) -> Result<Vec<String>> {
+        use redis::AsyncCommands;
+        self.conn.keys(pattern).await.map_err(Into::into)
     }
 }
