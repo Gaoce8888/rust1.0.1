@@ -1,0 +1,908 @@
+{
+  "timestamp": "2025-07-19T04:28:30.725Z",
+  "summary": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 3
+  },
+  "categories": {
+    "客服认证": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0
+    },
+    "通用认证": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0
+    },
+    "系统配置": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0
+    },
+    "文件管理": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0
+    },
+    "语音消息": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "模板": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "客户端": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0
+    },
+    "用户管理": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "消息管理": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "会话管理": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "分析统计": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "系统管理": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    }
+  },
+  "details": [
+    {
+      "timestamp": "2025-07-19T04:28:30.674Z",
+      "category": "客服认证",
+      "endpoint": "/api/kefu/login",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "登录成功",
+          "kefu_id": "kf001",
+          "real_name": "客服小王",
+          "max_customers": 5,
+          "session_token": "kefu_session_kf001_1752899310"
+        },
+        "headers": {
+          "content-length": "152",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.678Z",
+      "category": "客服认证",
+      "endpoint": "/api/kefu/status",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "data": [
+            {
+              "current_customers": 0,
+              "is_online": true,
+              "kefu_id": "kf001",
+              "login_time": "2025-07-19 04:28:30",
+              "max_customers": 5,
+              "real_name": "客服小王"
+            }
+          ],
+          "success": true
+        },
+        "headers": {
+          "content-length": "164",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.681Z",
+      "category": "客服认证",
+      "endpoint": "/api/kefu/heartbeat?kefu_id=kf001",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "message": "心跳更新成功",
+          "success": true
+        },
+        "headers": {
+          "content-length": "47",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.684Z",
+      "category": "通用认证",
+      "endpoint": "/auth/login",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "message": "登录成功",
+          "session_id": "mock_session_id",
+          "success": true,
+          "user": {
+            "display_name": "用户",
+            "id": "user001",
+            "permissions": [
+              "chat",
+              "view_users"
+            ],
+            "role": "kefu",
+            "username": "user001"
+          }
+        },
+        "headers": {
+          "content-length": "191",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.686Z",
+      "category": "通用认证",
+      "endpoint": "/auth/validate",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "会话验证成功",
+          "data": {
+            "session_id": "mock_session_id",
+            "user": {
+              "display_name": "管理员",
+              "id": "admin",
+              "permissions": [
+                "chat",
+                "view_users",
+                "manage_files"
+              ],
+              "role": "kefu",
+              "username": "admin"
+            }
+          }
+        },
+        "headers": {
+          "content-length": "220",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.688Z",
+      "category": "通用认证",
+      "endpoint": "/auth/heartbeat",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "心跳检测成功"
+        },
+        "headers": {
+          "content-length": "47",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.690Z",
+      "category": "系统配置",
+      "endpoint": "/api/config",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "websocket": {
+            "url": "wss://b.ylqkf.com/ws"
+          },
+          "api": {
+            "url": "http://localhost:6006/api"
+          },
+          "upload": {
+            "max_file_size": 10485760,
+            "allowed_types": [
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "categories": [
+              {
+                "category": "Image",
+                "path": "images",
+                "allowed_extensions": [
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "gif",
+                  "webp",
+                  "bmp",
+                  "svg",
+                  "ico"
+                ],
+                "max_file_size": 10485760,
+                "compression_enabled": true
+              },
+              {
+                "category": "File",
+                "path": "documents",
+                "allowed_extensions": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "xls",
+                  "xlsx",
+                  "ppt",
+                  "pptx",
+                  "txt",
+                  "rtf",
+                  "csv",
+                  "zip",
+                  "rar"
+                ],
+                "max_file_size": 52428800,
+                "compression_enabled": false
+              },
+              {
+                "category": "Voice",
+                "path": "audio",
+                "allowed_extensions": [
+                  "mp3",
+                  "wav",
+                  "ogg",
+                  "m4a",
+                  "aac",
+                  "flac"
+                ],
+                "max_file_size": 20971520,
+                "compression_enabled": false
+              },
+              {
+                "category": "Video",
+                "path": "videos",
+                "allowed_extensions": [
+                  "mp4",
+                  "avi",
+                  "mov",
+                  "wmv",
+                  "flv",
+                  "webm",
+                  "mkv"
+                ],
+                "max_file_size": 104857600,
+                "compression_enabled": false
+              }
+            ]
+          },
+          "html_templates": {
+            "enabled": true,
+            "max_variables": 50,
+            "max_template_size": 1048576
+          }
+        },
+        "headers": {
+          "content-length": "944",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.694Z",
+      "category": "系统配置",
+      "endpoint": "/api/users",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取在线用户列表成功",
+          "data": {
+            "kefu_connections": 0,
+            "kehu_connections": 0,
+            "total_connections": 0
+          }
+        },
+        "headers": {
+          "content-length": "132",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.698Z",
+      "category": "系统配置",
+      "endpoint": "/api/users/online",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取公开在线用户状态成功",
+          "data": {
+            "kefu_available": false,
+            "total_connections": 0
+          }
+        },
+        "headers": {
+          "content-length": "119",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.700Z",
+      "category": "系统配置",
+      "endpoint": "/api/websocket/stats",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取WebSocket统计信息成功",
+          "data": {
+            "kefu_connections": 0,
+            "kehu_connections": 0,
+            "total_connections": 0,
+            "total_messages": 0
+          }
+        },
+        "headers": {
+          "content-length": "154",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.703Z",
+      "category": "文件管理",
+      "endpoint": "/api/file/list",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "文件列表获取成功",
+          "data": {
+            "files": [
+              {
+                "category": "document",
+                "file_id": "mock_file_id_001",
+                "filename": "sample_document.pdf",
+                "size": 2048,
+                "upload_time": "2025-07-14T22:00:00Z",
+                "uploaded_by": "admin"
+              },
+              {
+                "category": "image",
+                "file_id": "mock_file_id_002",
+                "filename": "sample_image.jpg",
+                "size": 1536,
+                "upload_time": "2025-07-14T21:30:00Z",
+                "uploaded_by": "admin"
+              }
+            ],
+            "limit": 10,
+            "page": 1,
+            "total": 2
+          }
+        },
+        "headers": {
+          "content-length": "410",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.704Z",
+      "category": "文件管理",
+      "endpoint": "/api/file/list?page=1&limit=10",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "文件列表获取成功",
+          "data": {
+            "files": [
+              {
+                "category": "document",
+                "file_id": "mock_file_id_001",
+                "filename": "sample_document.pdf",
+                "size": 2048,
+                "upload_time": "2025-07-14T22:00:00Z",
+                "uploaded_by": "admin"
+              },
+              {
+                "category": "image",
+                "file_id": "mock_file_id_002",
+                "filename": "sample_image.jpg",
+                "size": 1536,
+                "upload_time": "2025-07-14T21:30:00Z",
+                "uploaded_by": "admin"
+              }
+            ],
+            "limit": 10,
+            "page": 1,
+            "total": 2
+          }
+        },
+        "headers": {
+          "content-length": "410",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.706Z",
+      "category": "语音消息",
+      "endpoint": "/api/voice/list",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "语音列表获取成功",
+          "data": {
+            "voices": [
+              {
+                "duration": 5,
+                "format": "webm",
+                "from": "admin",
+                "to": "customer_001",
+                "upload_time": "2025-07-14T22:00:00Z",
+                "voice_id": "mock_voice_id_001"
+              },
+              {
+                "duration": 3,
+                "format": "webm",
+                "from": "customer_001",
+                "to": "admin",
+                "upload_time": "2025-07-14T21:45:00Z",
+                "voice_id": "mock_voice_id_002"
+              }
+            ]
+          }
+        },
+        "headers": {
+          "content-length": "341",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.709Z",
+      "category": "模板",
+      "endpoint": "/api/template/list",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "模板列表获取成功",
+          "data": {
+            "templates": [
+              {
+                "category": "greeting",
+                "created_at": "2025-07-14T20:00:00Z",
+                "description": "新客户欢迎消息",
+                "name": "欢迎消息模板",
+                "template_id": "template_001",
+                "updated_at": "2025-07-14T21:00:00Z"
+              },
+              {
+                "category": "faq",
+                "created_at": "2025-07-14T19:00:00Z",
+                "description": "常见问题快速回复",
+                "name": "问题解答模板",
+                "template_id": "template_002",
+                "updated_at": "2025-07-14T20:30:00Z"
+              }
+            ]
+          }
+        },
+        "headers": {
+          "content-length": "456",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.710Z",
+      "category": "客户端",
+      "endpoint": "/api/client/location?ip=8.8.8.8",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "IP地理位置查询成功",
+          "data": {
+            "ip": "8.8.8.8",
+            "country": "美国",
+            "region": "加利福尼亚",
+            "city": "山景城",
+            "latitude": 37.4056,
+            "longitude": -122.0775,
+            "isp": "Google",
+            "timezone": "America/Los_Angeles"
+          }
+        },
+        "headers": {
+          "content-length": "233",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.713Z",
+      "category": "客户端",
+      "endpoint": "/api/client/register-info",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "客户端注册成功",
+          "data": {
+            "client_id": "6a483f3f-fc30-43ed-a985-982fdd105b61",
+            "registered_at": "2025-07-19T04:28:30.712284916+00:00",
+            "location": {
+              "ip": "127.0.0.1",
+              "country": "本地网络",
+              "region": "内网",
+              "city": "本地",
+              "latitude": null,
+              "longitude": null,
+              "isp": "内网",
+              "timezone": "Asia/Shanghai"
+            }
+          }
+        },
+        "headers": {
+          "content-length": "328",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.715Z",
+      "category": "用户管理",
+      "endpoint": "/api/users/list",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取用户列表成功",
+          "data": {
+            "limit": 10,
+            "page": 1,
+            "total": 2,
+            "users": [
+              {
+                "created_at": "2025-01-01T00:00:00Z",
+                "display_name": "系统管理员",
+                "id": "user_001",
+                "last_login": "2025-07-16T10:00:00Z",
+                "permissions": [
+                  "all"
+                ],
+                "role": "admin",
+                "status": "active",
+                "username": "admin"
+              },
+              {
+                "created_at": "2025-02-01T00:00:00Z",
+                "display_name": "客服小王",
+                "id": "user_002",
+                "last_login": "2025-07-16T09:30:00Z",
+                "permissions": [
+                  "chat",
+                  "view_users",
+                  "view_messages"
+                ],
+                "role": "kefu",
+                "status": "active",
+                "username": "kefu_001"
+              }
+            ]
+          }
+        },
+        "headers": {
+          "content-length": "525",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.717Z",
+      "category": "消息管理",
+      "endpoint": "/api/messages",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取消息列表成功",
+          "data": {
+            "messages": [
+              {
+                "content": "你好，有什么可以帮助您的吗？",
+                "content_type": "text",
+                "from": "user_001",
+                "id": "msg_001",
+                "read": true,
+                "timestamp": "2025-07-16T10:00:00Z",
+                "to": "user_002"
+              },
+              {
+                "content": "我想咨询一下产品信息",
+                "content_type": "text",
+                "from": "user_002",
+                "id": "msg_002",
+                "read": true,
+                "timestamp": "2025-07-16T10:01:00Z",
+                "to": "user_001"
+              }
+            ],
+            "pagination": {
+              "limit": 20,
+              "page": 1,
+              "total": 100,
+              "total_pages": 5
+            }
+          }
+        },
+        "headers": {
+          "content-length": "476",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.718Z",
+      "category": "会话管理",
+      "endpoint": "/api/sessions/list",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取会话列表成功",
+          "data": {
+            "pagination": {
+              "limit": 20,
+              "page": 1,
+              "total": 50,
+              "total_pages": 3
+            },
+            "sessions": [
+              {
+                "created_at": "2025-07-19T03:28:30.718034010Z",
+                "kefu_id": "kefu_001",
+                "kefu_name": "客服小王",
+                "kehu_id": "kehu_001",
+                "kehu_name": "客户张三",
+                "last_message": "好的，我会处理这个问题",
+                "message_count": 15,
+                "session_id": "session_001",
+                "status": "active",
+                "updated_at": "2025-07-19T04:23:30.718034430Z"
+              },
+              {
+                "created_at": "2025-07-19T01:28:30.718034911Z",
+                "kefu_id": "kefu_002",
+                "kefu_name": "客服小李",
+                "kehu_id": "kehu_002",
+                "kehu_name": "客户李四",
+                "last_message": "感谢您的咨询，再见！",
+                "message_count": 25,
+                "session_id": "session_002",
+                "status": "completed",
+                "updated_at": "2025-07-19T02:28:30.718035001Z"
+              }
+            ]
+          }
+        },
+        "headers": {
+          "content-length": "747",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.720Z",
+      "category": "分析统计",
+      "endpoint": "/api/analytics/overview",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "获取系统概览成功",
+          "data": {
+            "comparison": {
+              "customer_satisfaction": "4.8/5.0",
+              "messages_change": "+12.5%",
+              "response_time_change": "-15.2%",
+              "sessions_change": "+8.3%"
+            },
+            "real_time": {
+              "active_sessions": 5,
+              "online_kefu": 0,
+              "online_kehu": 0,
+              "online_users": 0,
+              "waiting_customers": 2
+            },
+            "system_health": {
+              "cpu_usage": "35%",
+              "disk_usage": "45GB/100GB",
+              "memory_usage": "2.1GB/8GB",
+              "redis_connections": 10,
+              "uptime_hours": 168
+            },
+            "today": {
+              "avg_response_time_seconds": 35,
+              "avg_session_duration_seconds": 420,
+              "new_customers": 15,
+              "total_messages": 1250,
+              "total_sessions": 85
+            }
+          }
+        },
+        "headers": {
+          "content-length": "569",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.722Z",
+      "category": "系统管理",
+      "endpoint": "/api/system/health",
+      "method": "GET",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "success": true,
+          "message": "系统健康状态良好",
+          "data": {
+            "checks": {
+              "api": {
+                "avg_response_time_ms": 45,
+                "status": "ok"
+              },
+              "redis": {
+                "connected": true,
+                "latency_ms": 2,
+                "status": "ok"
+              },
+              "storage": {
+                "available_space_gb": 55,
+                "status": "ok",
+                "used_space_gb": 45
+              },
+              "websocket": {
+                "connections": 0,
+                "details": {
+                  "kefu": 0,
+                  "kehu": 0
+                },
+                "status": "ok"
+              }
+            },
+            "status": "healthy",
+            "timestamp": "2025-07-19T04:28:30.722293802Z",
+            "version": {
+              "api": "1.0.0",
+              "app": "2.1.0"
+            }
+          }
+        },
+        "headers": {
+          "content-length": "424",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-19T04:28:30.724Z",
+      "category": "客服认证",
+      "endpoint": "/api/kefu/logout?kefu_id=kf001",
+      "method": "POST",
+      "status": "✅ PASS",
+      "message": "Status: 200",
+      "details": {
+        "responseData": {
+          "message": "下线成功",
+          "success": true
+        },
+        "headers": {
+          "content-length": "41",
+          "content-type": "application/json",
+          "date": "Sat, 19 Jul 2025 04:28:30 GMT"
+        }
+      }
+    }
+  ]
+}
