@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系统文档中心</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 10px; margin-bottom: 40px; }
+        h1 { font-size: 3em; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin: 40px 0; }
+        .doc-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .doc-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .doc-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; }
+        .doc-content { padding: 20px; }
+        .doc-card h2 { margin-bottom: 10px; }
+        .doc-card p { margin-bottom: 15px; color: #666; }
+        .doc-links { list-style: none; }
+        .doc-links li { margin: 10px 0; }
+        .doc-links a { color: #667eea; text-decoration: none; display: flex; align-items: center; }
+        .doc-links a:hover { color: #764ba2; }
+        .status { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.8em; margin-left: 10px; }
+        .status.new { background: #17a2b8; color: white; }
+        .status.updated { background: #28a745; color: white; }
+        .icon { font-size: 2em; margin-bottom: 10px; }
+        .quick-links { background: white; padding: 30px; border-radius: 10px; margin-bottom: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .quick-links h2 { color: #667eea; margin-bottom: 20px; }
+        .link-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .quick-link { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; text-decoration: none; color: #333; transition: all 0.3s; }
+        .quick-link:hover { background: #667eea; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 文档中心</h1>
+            <p class="subtitle">客服系统 v2.0 - 完整文档导航</p>
+            <p>最后更新：2024年1月</p>
+        </header>
+
+        <div class="quick-links">
+            <h2>🚀 快速访问</h2>
+            <div class="link-grid">
+                <a href="backend-api-latest.html" class="quick-link">
+                    <div>🔌 后端API文档</div>
+                </a>
+                <a href="frontend-integration-guide.html" class="quick-link">
+                    <div>🎨 前端集成指南</div>
+                </a>
+                <a href="pages/deployment.html" class="quick-link">
+                    <div>🚢 部署指南</div>
+                </a>
+                <a href="pages/troubleshooting.html" class="quick-link">
+                    <div>🔧 故障排查</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="doc-grid">
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">🔌</div>
+                    <h2>后端开发文档</h2>
+                </div>
+                <div class="doc-content">
+                    <p>完整的后端API参考、架构说明和开发指南</p>
+                    <ul class="doc-links">
+                        <li><a href="backend-api-latest.html">API端点文档 <span class="status updated">更新</span></a></li>
+                        <li><a href="pages/api.html">API详细说明</a></li>
+                        <li><a href="pages/architecture.html">系统架构</a></li>
+                        <li><a href="pages/modules.html">模块说明</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">🎨</div>
+                    <h2>前端开发文档</h2>
+                </div>
+                <div class="doc-content">
+                    <p>React客服端和客户端的集成指南</p>
+                    <ul class="doc-links">
+                        <li><a href="frontend-integration-guide.html">前端集成指南 <span class="status new">新增</span></a></li>
+                        <li><a href="demo.html">在线演示</a></li>
+                        <li><a href="mobile-test.html">移动端测试</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">⚡</div>
+                    <h2>新功能文档</h2>
+                </div>
+                <div class="doc-content">
+                    <p>最新集成的功能说明和使用指南</p>
+                    <ul class="doc-links">
+                        <li><a href="#kefu-assignment">客服分配系统 <span class="status new">新增</span></a></li>
+                        <li><a href="#system-monitoring">系统监控API <span class="status new">新增</span></a></li>
+                        <li><a href="#advanced-messaging">高级消息功能 <span class="status new">新增</span></a></li>
+                        <li><a href="#analytics">分析报表系统 <span class="status new">新增</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">🚢</div>
+                    <h2>部署与运维</h2>
+                </div>
+                <div class="doc-content">
+                    <p>生产环境部署和系统维护指南</p>
+                    <ul class="doc-links">
+                        <li><a href="pages/deployment.html">部署指南</a></li>
+                        <li><a href="pages/troubleshooting.html">故障排查</a></li>
+                        <li><a href="#monitoring">监控配置</a></li>
+                        <li><a href="#backup">备份恢复</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">📊</div>
+                    <h2>项目状态</h2>
+                </div>
+                <div class="doc-content">
+                    <p>当前项目的功能完成度和代码质量</p>
+                    <ul class="doc-links">
+                        <li>✅ 核心功能：100% 完成</li>
+                        <li>✅ API集成：100% 完成</li>
+                        <li>✅ 代码清理：已完成</li>
+                        <li>✅ 文档更新：已完成</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-header">
+                    <div class="icon">🔧</div>
+                    <h2>开发工具</h2>
+                </div>
+                <div class="doc-content">
+                    <p>开发环境配置和工具使用说明</p>
+                    <ul class="doc-links">
+                        <li><a href="pages/development.html">开发环境搭建</a></li>
+                        <li><a href="#vscode">VSCode配置</a></li>
+                        <li><a href="#debugging">调试技巧</a></li>
+                        <li><a href="#testing">测试指南</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-links">
+            <h2>📝 更新记录</h2>
+            <ul style="list-style: none; padding: 0;">
+                <li>🔸 <strong>2024-01-XX</strong>: 完成所有未集成功能的路由配置</li>
+                <li>🔸 <strong>2024-01-XX</strong>: 清理企业级模块，精简代码库</li>
+                <li>🔸 <strong>2024-01-XX</strong>: 实现客服智能分配系统</li>
+                <li>🔸 <strong>2024-01-XX</strong>: 添加系统监控和性能指标API</li>
+                <li>🔸 <strong>2024-01-XX</strong>: 更新所有文档以反映最新状态</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

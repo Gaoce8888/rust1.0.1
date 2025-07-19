@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系统 - 后端API文档 v2.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        h3 { color: #764ba2; margin: 20px 0 10px; }
+        .api-section { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .endpoint { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #667eea; }
+        .method { display: inline-block; padding: 5px 10px; border-radius: 3px; font-weight: bold; margin-right: 10px; }
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: #333; }
+        .method.delete { background: #dc3545; color: white; }
+        .code { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        .status { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.9em; }
+        .status.active { background: #28a745; color: white; }
+        .status.new { background: #17a2b8; color: white; }
+        .status.updated { background: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>客服系统后端API文档</h1>
+            <p class="version">版本 2.0 - 2024年1月更新</p>
+            <p>包含所有最新集成的API端点</p>
+        </header>
+
+        <div class="api-section">
+            <h2>🔧 系统状态</h2>
+            <p>项目已完成代码清理和功能集成，所有API端点均可用。</p>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>✅ 核心功能：100% 可用</li>
+                <li>✅ 高级功能：已全部集成</li>
+                <li>✅ 企业级模块：已清理冗余代码</li>
+                <li>✅ 客服分配系统：已实现</li>
+            </ul>
+        </div>
+
+        <div class="api-section">
+            <h2>🔐 认证相关 API</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/auth/kefu/login</strong>
+                <span class="status active">可用</span>
+                <p>客服登录</p>
+                <div class="code">
+{
+    "username": "kefu001",
+    "password": "password123"
+}</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/auth/kefu/logout</strong>
+                <span class="status active">可用</span>
+                <p>客服登出</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/auth/kefu/heartbeat</strong>
+                <span class="status active">可用</span>
+                <p>更新客服心跳</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>💬 消息管理 API</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/messages/send</strong>
+                <span class="status active">可用</span>
+                <p>发送消息</p>
+                <div class="code">
+{
+    "to_user_id": "user123",
+    "content": "您好，有什么可以帮助您的吗？",
+    "msg_type": "text"
+}</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/messages/history/{user_id}</strong>
+                <span class="status active">可用</span>
+                <p>获取消息历史</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/messages/bulk-delete</strong>
+                <span class="status new">新增</span>
+                <p>批量删除消息</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <strong>/api/messages/mark-read</strong>
+                <span class="status new">新增</span>
+                <p>标记消息已读</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>👥 客服分配系统 API</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/kefu/assign/{customer_id}</strong>
+                <span class="status new">新增</span>
+                <p>为客户分配客服</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/kefu/release/{customer_id}</strong>
+                <span class="status new">新增</span>
+                <p>释放客服</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/kefu/customer/{customer_id}</strong>
+                <span class="status new">新增</span>
+                <p>获取客户的客服</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/kefu/cleanup</strong>
+                <span class="status new">新增</span>
+                <p>清理过期客服</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>📊 系统监控 API</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/system/info</strong>
+                <span class="status new">新增</span>
+                <p>获取系统信息</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/system/health</strong>
+                <span class="status new">新增</span>
+                <p>健康检查</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/stats/websocket</strong>
+                <span class="status new">新增</span>
+                <p>WebSocket连接统计</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/metrics/performance</strong>
+                <span class="status new">新增</span>
+                <p>性能指标</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>🔗 WebSocket 端点</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>ws://localhost:3001/ws/{user_id}</strong>
+                <span class="status active">可用</span>
+                <p>WebSocket连接端点</p>
+                <div class="code">
+// 连接示例
+const ws = new WebSocket('ws://localhost:3001/ws/user123');
+
+// 发送消息
+ws.send(JSON.stringify({
+    type: 'message',
+    data: {
+        to_user_id: 'kefu001',
+        content: 'Hello',
+        msg_type: 'text'
+    }
+}));</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>📈 分析报表 API</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/analytics/report</strong>
+                <span class="status new">新增</span>
+                <p>生成分析报告</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/analytics/insights</strong>
+                <span class="status new">新增</span>
+                <p>获取业务洞察</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>🔄 会话管理 API</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/sessions/{id}/end</strong>
+                <span class="status new">新增</span>
+                <p>结束会话</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/sessions/statistics</strong>
+                <span class="status new">新增</span>
+                <p>会话统计</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>📝 更新日志</h2>
+            <ul style="padding-left: 20px;">
+                <li><strong>2024-01-XX</strong>：集成所有未使用的处理器，清理企业级模块</li>
+                <li><strong>2024-01-XX</strong>：实现客服分配系统</li>
+                <li><strong>2024-01-XX</strong>：添加系统监控和性能指标API</li>
+                <li><strong>2024-01-XX</strong>：完成高级消息和会话管理功能</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

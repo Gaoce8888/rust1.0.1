@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系统 - 前端集成指南</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        .section { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .code-block { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; }
+        .highlight { background: #ffeaa7; padding: 2px 5px; border-radius: 3px; }
+        .warning { background: #ff7675; color: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .success { background: #00b894; color: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .feature-card { background: #f8f9fa; padding: 20px; border-radius: 5px; border: 1px solid #dee2e6; }
+        .feature-card h3 { color: #764ba2; margin-bottom: 10px; }
+        ul { padding-left: 20px; margin: 10px 0; }
+        .btn { display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+        .btn:hover { background: #764ba2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>前端集成指南</h1>
+            <p class="version">适用于客服系统 v2.0</p>
+            <p>React客服端 + React客户端完整对接说明</p>
+        </header>
+
+        <div class="section">
+            <h2>🚀 快速开始</h2>
+            <p>系统包含两个独立的前端应用：</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>客服端 (react-kefu)</h3>
+                    <p>位置：<code>/static/react-kefu/</code></p>
+                    <ul>
+                        <li>客服人员使用的管理界面</li>
+                        <li>支持多客户会话管理</li>
+                        <li>实时消息推送</li>
+                        <li>客户信息展示</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>客户端 (react-kehu)</h3>
+                    <p>位置：<code>/static/react-kehu/</code></p>
+                    <ul>
+                        <li>客户使用的聊天界面</li>
+                        <li>支持文本、图片、文件消息</li>
+                        <li>消息状态显示</li>
+                        <li>响应式设计</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📡 WebSocket 连接配置</h2>
+            <p>两个前端都需要建立WebSocket连接：</p>
+            
+            <h3>客服端连接</h3>
+            <div class="code-block">
+// /static/react-kefu/src/hooks/useEnterpriseWebSocket.js
+const ws = new WebSocket(`ws://localhost:3001/ws/${kefuId}`);
+
+ws.onopen = () => {
+    console.log('客服端WebSocket连接成功');
+    // 发送认证信息
+    ws.send(JSON.stringify({
+        type: 'auth',
+        data: {
+            user_type: 'kefu',
+            kefu_id: kefuId
+        }
+    }));
+};
+
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    // 处理接收到的消息
+    handleIncomingMessage(message);
+};</div>
+
+            <h3>客户端连接</h3>
+            <div class="code-block">
+// /static/react-kehu/src/App.jsx
+const ws = new WebSocket(`ws://localhost:3001/ws/${userId}`);
+
+ws.onopen = () => {
+    console.log('客户端WebSocket连接成功');
+    // 发送认证信息
+    ws.send(JSON.stringify({
+        type: 'auth',
+        data: {
+            user_type: 'customer',
+            user_id: userId
+        }
+    }));
+};</div>
+        </div>
+
+        <div class="section">
+            <h2>🔌 API 集成要点</h2>
+            
+            <h3>1. 客服登录集成</h3>
+            <div class="code-block">
+// 客服登录
+async function kefuLogin(username, password) {
+    const response = await fetch('/api/auth/kefu/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        // 保存session信息
+        localStorage.setItem('kefu_session', result.session_id);
+        localStorage.setItem('kefu_id', result.kefu_info.kefu_id);
+    }
+    return result;
+}</div>
+
+            <h3>2. 消息发送集成</h3>
+            <div class="code-block">
+// 发送消息通过WebSocket
+function sendMessage(toUserId, content, msgType = 'text') {
+    const message = {
+        type: 'message',
+        data: {
+            to_user_id: toUserId,
+            content: content,
+            msg_type: msgType,
+            timestamp: new Date().toISOString()
+        }
+    };
+    
+    ws.send(JSON.stringify(message));
+}</div>
+
+            <h3>3. 文件上传集成</h3>
+            <div class="code-block">
+// 文件上传
+async function uploadFile(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', 'chat');
+    
+    const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData
+    });
+    
+    const result = await response.json();
+    return result.url; // 返回文件URL用于发送
+}</div>
+        </div>
+
+        <div class="section">
+            <h2>🎨 UI组件说明</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>客服端主要组件</h3>
+                    <ul>
+                        <li><code>ConversationList</code> - 会话列表</li>
+                        <li><code>ChatWindow</code> - 聊天窗口</li>
+                        <li><code>UserInfo</code> - 用户信息面板</li>
+                        <li><code>QuickReply</code> - 快捷回复</li>
+                        <li><code>TransferDialog</code> - 转接对话框</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>客户端主要组件</h3>
+                    <ul>
+                        <li><code>ChatPanel</code> - 聊天面板</li>
+                        <li><code>MessageList</code> - 消息列表</li>
+                        <li><code>InputArea</code> - 输入区域</li>
+                        <li><code>FileUploader</code> - 文件上传</li>
+                        <li><code>EmojiPicker</code> - 表情选择</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 新功能集成</h2>
+            
+            <h3>客服分配系统</h3>
+            <div class="code-block">
+// 自动分配客服
+async function requestKefu(customerId) {
+    const response = await fetch(`/api/kefu/assign/${customerId}`, {
+        method: 'POST'
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        console.log(`已分配客服: ${result.kefu_id}`);
+        // 更新UI显示分配的客服
+        updateAssignedKefu(result.kefu_id);
+    }
+}</div>
+
+            <h3>系统监控集成</h3>
+            <div class="code-block">
+// 获取系统状态
+async function getSystemStatus() {
+    const [health, wsStats] = await Promise.all([
+        fetch('/api/system/health').then(r => r.json()),
+        fetch('/api/stats/websocket').then(r => r.json())
+    ]);
+    
+    // 更新仪表板
+    updateDashboard({
+        health: health.status,
+        connections: wsStats.total_connections,
+        activeUsers: wsStats.active_connections
+    });
+}</div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 配置说明</h2>
+            
+            <h3>环境变量配置</h3>
+            <div class="code-block">
+// .env 文件
+REACT_APP_WS_URL=ws://localhost:3001
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_FILE_UPLOAD_LIMIT=10485760  # 10MB</div>
+
+            <h3>代理配置（开发环境）</h3>
+            <div class="code-block">
+// package.json
+{
+  "proxy": "http://localhost:3001"
+}</div>
+
+            <h3>生产环境配置</h3>
+            <div class="code-block">
+// nginx.conf
+location /ws {
+    proxy_pass http://backend:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+}
+
+location /api {
+    proxy_pass http://backend:3001;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}</div>
+        </div>
+
+        <div class="section">
+            <h2>📋 检查清单</h2>
+            <ul style="list-style-type: none; padding: 0;">
+                <li>✅ WebSocket连接正常建立</li>
+                <li>✅ 消息收发功能正常</li>
+                <li>✅ 文件上传下载正常</li>
+                <li>✅ 客服登录认证正常</li>
+                <li>✅ 客服分配功能正常</li>
+                <li>✅ 心跳机制正常工作</li>
+                <li>✅ 断线重连机制正常</li>
+                <li>✅ 系统监控数据正常</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🚨 常见问题</h2>
+            
+            <div class="warning">
+                <strong>WebSocket连接失败</strong>
+                <p>检查：1) 后端服务是否启动 2) 端口是否正确 3) 防火墙设置</p>
+            </div>
+            
+            <div class="warning">
+                <strong>跨域问题</strong>
+                <p>开发环境使用proxy配置，生产环境配置nginx反向代理</p>
+            </div>
+            
+            <div class="success">
+                <strong>提示</strong>
+                <p>建议使用Chrome DevTools的Network面板监控WebSocket消息</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 相关文档</h2>
+            <a href="backend-api-latest.html" class="btn">后端API文档</a>
+            <a href="websocket-protocol.html" class="btn">WebSocket协议文档</a>
+            <a href="deployment.html" class="btn">部署指南</a>
+        </div>
+    </div>
+</body>
+</html>
