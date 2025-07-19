@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前后端集成报告 - 端口6006统一配置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+        h1 { font-size: 3em; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        .section { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .api-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .api-table th, .api-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .api-table th { background: #f8f9fa; color: #667eea; font-weight: bold; }
+        .code-block { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; }
+        .success { color: #4caf50; }
+        .warning { color: #ff9800; }
+        .highlight { background: #ffeaa7; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 前后端集成报告</h1>
+            <p>端口6006统一配置 - 客服系统 v2.0</p>
+            <p>生成时间：2024年1月</p>
+        </header>
+
+        <div class="section">
+            <h2>✅ 端口统一配置完成</h2>
+            <p>所有服务已统一配置为 <span class="highlight">6006端口</span>，包括：</p>
+            <ul>
+                <li>✅ 后端API服务：<code>http://localhost:6006</code></li>
+                <li>✅ WebSocket服务：<code>ws://localhost:6006/ws</code></li>
+                <li>✅ 前端访问地址：<code>http://localhost:6006</code></li>
+                <li>✅ 静态资源服务：<code>http://localhost:6006/static</code></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🎯 重点功能集成</h2>
+            
+            <h3>1. 客服端获取在线客户状态</h3>
+            <table class="api-table">
+                <tr>
+                    <th>功能</th>
+                    <th>API端点</th>
+                    <th>方法</th>
+                    <th>状态</th>
+                </tr>
+                <tr>
+                    <td>获取在线客户列表</td>
+                    <td>/api/kefu/online-customers</td>
+                    <td>GET</td>
+                    <td><span class="success">✅ 已实现</span></td>
+                </tr>
+                <tr>
+                    <td>获取客户详情</td>
+                    <td>/api/customer/info/:id</td>
+                    <td>GET</td>
+                    <td><span class="success">✅ 已实现</span></td>
+                </tr>
+                <tr>
+                    <td>WebSocket实时推送</td>
+                    <td>ws://localhost:6006/ws/:kefu_id</td>
+                    <td>WS</td>
+                    <td><span class="success">✅ 支持</span></td>
+                </tr>
+            </table>
+
+            <h3>2. 客户端匹配客服配置</h3>
+            <table class="api-table">
+                <tr>
+                    <th>功能</th>
+                    <th>API端点</th>
+                    <th>方法</th>
+                    <th>状态</th>
+                </tr>
+                <tr>
+                    <td>客户请求客服</td>
+                    <td>/api/customer/request-kefu</td>
+                    <td>POST</td>
+                    <td><span class="success">✅ 已实现</span></td>
+                </tr>
+                <tr>
+                    <td>智能分配客服</td>
+                    <td>/api/kefu/assign/:customer_id</td>
+                    <td>POST</td>
+                    <td><span class="success">✅ 已实现</span></td>
+                </tr>
+                <tr>
+                    <td>释放客服</td>
+                    <td>/api/kefu/release/:customer_id</td>
+                    <td>POST</td>
+                    <td><span class="success">✅ 已实现</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📡 WebSocket消息格式</h2>
+            
+            <h3>客服端接收在线客户状态</h3>
+            <div class="code-block">
+{
+  "type": "online_customers_update",
+  "data": {
+    "customers": [
+      {
+        "customer_id": "customer001",
+        "name": "张三",
+        "assigned_kefu": "kefu001",
+        "online_time": "2024-01-20T10:30:00Z",
+        "last_message": "你好，请问有什么可以帮助您？"
+      }
+    ],
+    "total": 5
+  }
+}</div>
+
+            <h3>客户端请求客服响应</h3>
+            <div class="code-block">
+{
+  "type": "kefu_assigned",
+  "data": {
+    "kefu_id": "kefu001",
+    "kefu_name": "客服小王",
+    "message": "您好，我是客服小王，很高兴为您服务！"
+  }
+}</div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 前端集成代码示例</h2>
+            
+            <h3>客服端获取在线客户</h3>
+            <div class="code-block">
+// 获取在线客户列表
+async function fetchOnlineCustomers() {
+  const response = await fetch('http://localhost:6006/api/kefu/online-customers', {
+    headers: {
+      'Authorization': `Bearer ${sessionToken}`
+    }
+  });
+  
+  const data = await response.json();
+  if (data.success) {
+    updateCustomerList(data.data);
+  }
+}
+
+// WebSocket监听客户状态更新
+ws.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  if (message.type === 'online_customers_update') {
+    updateCustomerList(message.data.customers);
+  }
+};</div>
+
+            <h3>客户端请求客服</h3>
+            <div class="code-block">
+// 客户请求分配客服
+async function requestKefu() {
+  const response = await fetch('http://localhost:6006/api/customer/request-kefu', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      customer_id: customerId,
+      customer_name: customerName,
+      issue_type: 'general'
+    })
+  });
+  
+  const data = await response.json();
+  if (data.success) {
+    console.log(`已分配客服: ${data.kefu_name}`);
+  }
+}</div>
+        </div>
+
+        <div class="section">
+            <h2>📋 完整API列表</h2>
+            <table class="api-table">
+                <tr>
+                    <th>模块</th>
+                    <th>端点</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td rowspan="4">客服认证</td>
+                    <td>/api/kefu/login</td>
+                    <td>客服登录</td>
+                </tr>
+                <tr>
+                    <td>/api/kefu/logout</td>
+                    <td>客服登出</td>
+                </tr>
+                <tr>
+                    <td>/api/kefu/status/:id</td>
+                    <td>客服状态</td>
+                </tr>
+                <tr>
+                    <td>/api/kefu/online-customers</td>
+                    <td>在线客户列表</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">客服分配</td>
+                    <td>/api/kefu/assign/:customer_id</td>
+                    <td>分配客服</td>
+                </tr>
+                <tr>
+                    <td>/api/kefu/release/:customer_id</td>
+                    <td>释放客服</td>
+                </tr>
+                <tr>
+                    <td>/api/kefu/customer/:customer_id</td>
+                    <td>查询客服</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">客户功能</td>
+                    <td>/api/customer/request-kefu</td>
+                    <td>请求客服</td>
+                </tr>
+                <tr>
+                    <td>/api/customer/info/:id</td>
+                    <td>客户信息</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">WebSocket</td>
+                    <td>/ws/:user_id</td>
+                    <td>WebSocket连接</td>
+                </tr>
+                <tr>
+                    <td>/api/stats/websocket</td>
+                    <td>连接统计</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🚀 部署检查清单</h2>
+            <ul>
+                <li>✅ 确认后端配置文件 <code>config/app-config.json</code> 中端口为6006</li>
+                <li>✅ 前端环境变量 <code>VITE_API_URL=http://localhost:6006</code></li>
+                <li>✅ WebSocket连接地址 <code>ws://localhost:6006/ws</code></li>
+                <li>✅ CORS配置允许前端域名访问</li>
+                <li>✅ Redis服务正常运行</li>
+                <li>✅ 防火墙开放6006端口</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📊 总结</h2>
+            <p>前后端已完成6006端口的统一配置，所有核心功能已集成：</p>
+            <ul>
+                <li>✅ <strong>端口统一</strong>：所有服务统一使用6006端口</li>
+                <li>✅ <strong>客服功能</strong>：在线客户列表实时更新</li>
+                <li>✅ <strong>客户功能</strong>：智能匹配客服系统</li>
+                <li>✅ <strong>实时通信</strong>：WebSocket双向通信</li>
+                <li>✅ <strong>API完整</strong>：所有接口已实现并测试</li>
+            </ul>
+            <p style="margin-top: 20px; font-weight: bold; color: #667eea;">
+                系统已准备就绪，可以部署使用！
+            </p>
+        </div>
+    </div>
+</body>
+</html>

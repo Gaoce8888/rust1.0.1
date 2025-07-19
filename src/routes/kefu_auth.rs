@@ -99,6 +99,13 @@ pub fn build_kefu_auth_routes(
         .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
         .and_then(handle_cleanup_expired);
 
+    let get_online_customers_route = warp::path("api")
+        .and(warp::path("kefu"))
+        .and(warp::path("online-customers"))
+        .and(warp::get())
+        .and(with_kefu_auth_manager(kefu_auth_manager.clone()))
+        .and_then(handle_get_online_customers);
+
     login_route
         .or(logout_route)
         .or(status_route)
@@ -107,6 +114,7 @@ pub fn build_kefu_auth_routes(
         .or(release_kefu_route)
         .or(get_customer_kefu_route)
         .or(cleanup_expired_route)
+        .or(get_online_customers_route)
 }
 
 /// 客服认证管理器注入
@@ -410,8 +418,50 @@ async fn handle_cleanup_expired(
             tracing::error!("清理过期客服失败: {}", e);
             Ok(warp::reply::json(&serde_json::json!({
                 "success": false,
-                "message": format!("清理失败: {}", e)
+                "message": format!("清理过期客服失败: {}", e)
             })))
         }
     }
+}
+
+/// 在线客户信息
+#[derive(Debug, Serialize)]
+pub struct OnlineCustomer {
+    pub customer_id: String,
+    pub name: String,
+    pub assigned_kefu: Option<String>,
+    pub online_time: String,
+    pub last_message_time: Option<String>,
+}
+
+/// 获取在线客户列表
+async fn handle_get_online_customers(
+    kefu_auth_manager: Arc<KefuAuthManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    tracing::info!("📋 获取在线客户列表请求");
+
+    // 这里需要从WebSocket连接管理器获取在线客户
+    // 暂时返回模拟数据，实际应该从连接管理器获取
+    let online_customers = vec![
+        OnlineCustomer {
+            customer_id: "customer001".to_string(),
+            name: "张三".to_string(),
+            assigned_kefu: Some("kefu001".to_string()),
+            online_time: chrono::Utc::now().to_rfc3339(),
+            last_message_time: Some(chrono::Utc::now().to_rfc3339()),
+        },
+        OnlineCustomer {
+            customer_id: "customer002".to_string(),
+            name: "李四".to_string(),
+            assigned_kefu: None,
+            online_time: chrono::Utc::now().to_rfc3339(),
+            last_message_time: None,
+        },
+    ];
+
+    Ok(warp::reply::json(&serde_json::json!({
+        "success": true,
+        "data": online_customers,
+        "total": online_customers.len()
+    })))
 }

@@ -34,7 +34,7 @@ export default function LoginPage({ onLoginSuccess }) {
     setIsLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:6006';
       
       const response = await fetch(`${baseUrl}/api/kefu/login`, {
         method: 'POST',

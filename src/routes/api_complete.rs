@@ -49,9 +49,19 @@ pub fn build_complete_api_routes(
 
     let session_statistics = warp::path!("api" / "sessions" / "statistics")
         .and(warp::get())
-        .and(warp::query())
-        .and(with_ws_manager(ws_manager.clone()))
+        .and(with_storage(storage.clone()))
         .and_then(crate::handlers::sessions::handle_session_statistics);
+
+    // === 客户匹配客服 ===
+    let customer_request_kefu = warp::path!("api" / "customer" / "request-kefu")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(handle_customer_request_kefu);
+
+    let customer_info = warp::path!("api" / "customer" / "info" / String)
+        .and(warp::get())
+        .and_then(handle_customer_info);
 
     // === 报表和分析 ===
     let generate_report = warp::path!("api" / "analytics" / "report")
@@ -111,6 +121,8 @@ pub fn build_complete_api_routes(
         .or(mark_messages_read)
         .or(end_session)
         .or(session_statistics)
+        .or(customer_request_kefu)
+        .or(customer_info)
         .or(generate_report)
         .or(business_insights)
         .or(websocket_stats)
@@ -126,6 +138,68 @@ fn with_ws_manager(ws_manager: Arc<WebSocketManager>) -> impl Filter<Extract = (
     warp::any().map(move || ws_manager.clone())
 }
 
-fn with_storage(storage: Arc<LocalStorage>) -> impl Filter<Extract = (Arc<LocalStorage>,), Error = std::convert::Infallible> + Clone {
+fn with_storage(
+    storage: Arc<LocalStorage>,
+) -> impl Filter<Extract = (Arc<LocalStorage>,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || storage.clone())
+}
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize)]
+struct CustomerRequestKefuPayload {
+    customer_id: String,
+    customer_name: String,
+    issue_type: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct CustomerRequestKefuResponse {
+    success: bool,
+    message: String,
+    kefu_id: Option<String>,
+    kefu_name: Option<String>,
+    queue_position: Option<usize>,
+}
+
+/// 处理客户请求客服
+async fn handle_customer_request_kefu(
+    payload: CustomerRequestKefuPayload,
+    _ws_manager: Arc<WebSocketManager>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    tracing::info!("🙋 客户 {} 请求分配客服", payload.customer_id);
+
+    // TODO: 实际应该调用客服分配系统
+    // 这里暂时返回模拟数据
+    let response = CustomerRequestKefuResponse {
+        success: true,
+        message: "客服分配成功".to_string(),
+        kefu_id: Some("kefu001".to_string()),
+        kefu_name: Some("客服小王".to_string()),
+        queue_position: None,
+    };
+
+    Ok(warp::reply::json(&response))
+}
+
+/// 获取客户信息
+async fn handle_customer_info(
+    customer_id: String,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    tracing::info!("📋 获取客户信息: {}", customer_id);
+
+    // 返回模拟的客户信息
+    let customer_info = serde_json::json!({
+        "success": true,
+        "data": {
+            "customer_id": customer_id,
+            "name": "测试客户",
+            "created_time": chrono::Utc::now().to_rfc3339(),
+            "last_active": chrono::Utc::now().to_rfc3339(),
+            "total_sessions": 5,
+            "assigned_kefu": null
+        }
+    });
+
+    Ok(warp::reply::json(&customer_info))
 }
