@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统架构 - 企业级客服系统技术文档</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>技术文档</h1>
+                <p>企业级客服系统 v1.0.0</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">系统架构</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#overview" class="nav-link active">架构概览</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#data-flow" class="nav-link">数据流设计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#security" class="nav-link">安全架构</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#scalability" class="nav-link">可扩展性</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#performance" class="nav-link">性能优化</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#deployment" class="nav-link">部署架构</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">其他文档</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link">项目概述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="api.html" class="nav-link">API 参考</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="modules.html" class="nav-link">模块详解</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deployment.html" class="nav-link">部署指南</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="header">
+                <button class="menu-toggle">☰</button>
+                <h1 class="header-title">系统架构设计</h1>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-secondary">返回首页</a>
+                    <button class="btn btn-primary print-btn">打印</button>
+                </div>
+            </header>
+
+            <div class="content fade-in">
+                <nav class="breadcrumb">
+                    <a href="../index.html" class="breadcrumb-item">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">系统架构</span>
+                </nav>
+
+                <div class="doc-content">
+                    <h1 class="doc-title">系统架构设计</h1>
+                    <p class="doc-subtitle">基于Rust的高性能、可扩展企业级客服系统架构设计</p>
+
+                    <div class="toc">
+                        <h3 class="toc-title">本页目录</h3>
+                        <ul class="toc-list">
+                            <li class="toc-item"><a href="#overview" class="toc-link">架构概览</a></li>
+                            <li class="toc-item"><a href="#data-flow" class="toc-link">数据流设计</a></li>
+                            <li class="toc-item"><a href="#security" class="toc-link">安全架构</a></li>
+                            <li class="toc-item"><a href="#scalability" class="toc-link">可扩展性</a></li>
+                            <li class="toc-item"><a href="#performance" class="toc-link">性能优化</a></li>
+                            <li class="toc-item"><a href="#deployment" class="toc-link">部署架构</a></li>
+                        </ul>
+                    </div>
+
+                    <section id="overview">
+                        <h2>架构概览</h2>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🏗️ 架构设计原则</div>
+                            <p>本系统采用微服务架构，基于Rust语言开发，具有高性能、高可用性和强类型安全的特点。</p>
+                        </div>
+
+                        <h3>整体架构图</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">系统组件</h4>
+                            <div class="card-content">
+                                <pre><code class="language-text">┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   前端应用层     │    │    API网关层     │    │   业务服务层     │
+│                 │    │                 │    │                 │
+│ • React SPA     │◄──►│ • 路由分发      │◄──►│ • 认证服务      │
+│ • WebSocket     │    │ • 负载均衡      │    │ • 消息服务      │
+│ • 实时通信      │    │ • 限流控制      │    │ • 文件服务      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                        │
+                                ▼                        ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │   数据存储层     │    │   外部服务层     │
+                       │                 │    │                 │
+                       │ • Redis缓存     │    │ • AI处理服务    │
+                       │ • Sled数据库    │    │ • 语音识别      │
+                       │ • 文件存储      │    │ • 翻译服务      │
+                       └─────────────────┘    └─────────────────┘</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>技术栈选择</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>层级</th>
+                                    <th>技术</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>后端语言</strong></td>
+                                    <td><code>Rust</code></td>
+                                    <td>高性能、内存安全、并发处理</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Web框架</strong></td>
+                                    <td><code>Actix-web</code></td>
+                                    <td>高性能异步Web框架</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>数据库</strong></td>
+                                    <td><code>Sled</code></td>
+                                    <td>嵌入式键值存储</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>缓存</strong></td>
+                                    <td><code>Redis</code></td>
+                                    <td>分布式缓存和会话存储</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>消息队列</strong></td>
+                                    <td><code>Redis Streams</code></td>
+                                    <td>实时消息处理</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>前端</strong></td>
+                                    <td><code>React + TypeScript</code></td>
+                                    <td>现代化前端框架</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section id="data-flow">
+                        <h2>数据流设计</h2>
+                        
+                        <h3>消息处理流程</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">实时消息流</h4>
+                            <div class="card-content">
+                                <pre><code class="language-text">1. 客户端发送消息
+   ↓
+2. WebSocket接收
+   ↓
+3. 消息验证和解析
+   ↓
+4. 业务逻辑处理
+   ↓
+5. 数据持久化
+   ↓
+6. 实时推送
+   ↓
+7. 客户端接收</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>数据存储策略</h3>
+                        
+                        <div class="alert alert-success">
+                            <div class="alert-title">💾 存储分层</div>
+                            <ul>
+                                <li><strong>热数据</strong>：Redis缓存，毫秒级访问</li>
+                                <li><strong>温数据</strong>：Sled数据库，秒级访问</li>
+                                <li><strong>冷数据</strong>：文件系统，归档存储</li>
+                            </ul>
+                        </div>
+
+                        <h3>缓存策略</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>数据类型</th>
+                                    <th>缓存策略</th>
+                                    <th>过期时间</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>用户会话</td>
+                                    <td>Redis</td>
+                                    <td>24小时</td>
+                                    <td>用户登录状态</td>
+                                </tr>
+                                <tr>
+                                    <td>消息缓存</td>
+                                    <td>Redis</td>
+                                    <td>7天</td>
+                                    <td>最近消息</td>
+                                </tr>
+                                <tr>
+                                    <td>配置信息</td>
+                                    <td>内存</td>
+                                    <td>重启前</td>
+                                    <td>系统配置</td>
+                                </tr>
+                                <tr>
+                                    <td>文件元数据</td>
+                                    <td>Redis</td>
+                                    <td>30天</td>
+                                    <td>文件信息</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section id="security">
+                        <h2>安全架构</h2>
+                        
+                        <div class="alert alert-warning">
+                            <div class="alert-title">🔒 安全设计</div>
+                            <p>系统采用多层安全防护，确保数据安全和用户隐私。</p>
+                        </div>
+
+                        <h3>认证与授权</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">认证流程</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 用户认证中间件
+pub async fn auth_middleware(
+    req: ServiceRequest,
+    srv: Service<srv::Request>,
+) -> Result<ServiceRequest, Error> {
+    let token = req.headers()
+        .get("Authorization")
+        .and_then(|h| h.to_str().ok())
+        .and_then(|s| s.strip_prefix("Bearer "));
+    
+    match token {
+        Some(token) => {
+            if validate_token(token).await {
+                Ok(req)
+            } else {
+                Err(actix_web::error::ErrorUnauthorized("Invalid token"))
+            }
+        }
+        None => Err(actix_web::error::ErrorUnauthorized("Missing token"))
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>数据安全</h3>
+                        
+                        <ul>
+                            <li><strong>传输加密</strong>：HTTPS/WSS协议</li>
+                            <li><strong>数据加密</strong>：敏感数据AES加密存储</li>
+                            <li><strong>密码安全</strong>：bcrypt哈希算法</li>
+                            <li><strong>SQL注入防护</strong>：参数化查询</li>
+                            <li><strong>XSS防护</strong>：输入验证和输出转义</li>
+                        </ul>
+
+                        <h3>API安全</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>安全措施</th>
+                                    <th>实现方式</th>
+                                    <th>防护目标</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Rate Limiting</td>
+                                    <td>Redis计数器</td>
+                                    <td>防止API滥用</td>
+                                </tr>
+                                <tr>
+                                    <td>CORS</td>
+                                    <td>跨域配置</td>
+                                    <td>防止跨站攻击</td>
+                                </tr>
+                                <tr>
+                                    <td>CSRF Token</td>
+                                    <td>表单令牌</td>
+                                    <td>防止跨站请求伪造</td>
+                                </tr>
+                                <tr>
+                                    <td>输入验证</td>
+                                    <td>Schema验证</td>
+                                    <td>防止恶意输入</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section id="scalability">
+                        <h2>可扩展性</h2>
+                        
+                        <h3>水平扩展</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">集群架构</h4>
+                            <div class="card-content">
+                                <pre><code class="language-text">┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   负载均衡器     │    │   负载均衡器     │    │   负载均衡器     │
+│   (Nginx)       │    │   (Nginx)       │    │   (Nginx)       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   应用服务器1    │    │   应用服务器2    │    │   应用服务器N    │
+│   (Rust App)    │    │   (Rust App)    │    │   (Rust App)    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 ▼
+                    ┌─────────────────────────┐
+                    │     共享存储层          │
+                    │   (Redis + Sled)       │
+                    └─────────────────────────┘</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>微服务拆分</h3>
+                        
+                        <div class="alert alert-info">
+                            <div class="alert-title">🔧 服务拆分策略</div>
+                            <ul>
+                                <li><strong>认证服务</strong>：用户管理和权限控制</li>
+                                <li><strong>消息服务</strong>：实时消息处理</li>
+                                <li><strong>文件服务</strong>：文件上传和管理</li>
+                                <li><strong>AI服务</strong>：智能处理和翻译</li>
+                                <li><strong>通知服务</strong>：消息推送和提醒</li>
+                            </ul>
+                        </div>
+
+                        <h3>数据库扩展</h3>
+                        
+                        <ul>
+                            <li><strong>读写分离</strong>：主库写，从库读</li>
+                            <li><strong>分片策略</strong>：按用户ID分片</li>
+                            <li><strong>缓存层</strong>：Redis集群</li>
+                            <li><strong>备份策略</strong>：定期备份和恢复</li>
+                        </ul>
+                    </section>
+
+                    <section id="performance">
+                        <h2>性能优化</h2>
+                        
+                        <h3>并发处理</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">异步处理架构</h4>
+                            <div class="card-content">
+                                <pre><code class="language-rust">// 异步消息处理
+pub async fn handle_message(msg: Message) -> Result<(), Error> {
+    // 1. 消息验证
+    let validated_msg = validate_message(msg).await?;
+    
+    // 2. 并发处理
+    let (save_result, notify_result) = tokio::join!(
+        save_message(validated_msg.clone()),
+        notify_users(validated_msg)
+    );
+    
+    // 3. 错误处理
+    save_result?;
+    notify_result?;
+    
+    Ok(())
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>性能指标</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>指标</th>
+                                    <th>目标值</th>
+                                    <th>优化措施</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>响应时间</td>
+                                    <td>&lt; 100ms</td>
+                                    <td>异步处理、缓存优化</td>
+                                </tr>
+                                <tr>
+                                    <td>并发用户</td>
+                                    <td>10,000+</td>
+                                    <td>连接池、负载均衡</td>
+                                </tr>
+                                <tr>
+                                    <td>消息延迟</td>
+                                    <td>&lt; 50ms</td>
+                                    <td>WebSocket优化</td>
+                                </tr>
+                                <tr>
+                                    <td>CPU使用率</td>
+                                    <td>&lt; 70%</td>
+                                    <td>代码优化、资源管理</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>缓存优化</h3>
+                        
+                        <ul>
+                            <li><strong>多级缓存</strong>：内存 → Redis → 数据库</li>
+                            <li><strong>缓存预热</strong>：系统启动时加载热点数据</li>
+                            <li><strong>缓存更新</strong>：异步更新，避免阻塞</li>
+                            <li><strong>缓存穿透</strong>：布隆过滤器防护</li>
+                        </ul>
+                    </section>
+
+                    <section id="deployment">
+                        <h2>部署架构</h2>
+                        
+                        <h3>容器化部署</h3>
+                        
+                        <div class="card">
+                            <h4 class="card-title">Docker部署</h4>
+                            <div class="card-content">
+                                <pre><code class="language-dockerfile"># Dockerfile
+FROM rust:1.70 as builder
+WORKDIR /app
+COPY . .
+RUN cargo build --release
+
+FROM debian:bullseye-slim
+RUN apt-get update && apt-get install -y ca-certificates
+COPY --from=builder /app/target/release/customer-service /usr/local/bin/
+EXPOSE 8080
+CMD ["customer-service"]</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>Kubernetes部署</h3>
+                        
+                        <div class="alert alert-success">
+                            <div class="alert-title">☸️ K8s配置</div>
+                            <ul>
+                                <li><strong>Deployment</strong>：应用部署和版本管理</li>
+                                <li><strong>Service</strong>：服务发现和负载均衡</li>
+                                <li><strong>Ingress</strong>：外部访问控制</li>
+                                <li><strong>ConfigMap</strong>：配置管理</li>
+                                <li><strong>Secret</strong>：敏感信息管理</li>
+                            </ul>
+                        </div>
+
+                        <h3>监控和日志</h3>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>监控项目</th>
+                                    <th>工具</th>
+                                    <th>用途</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>应用监控</td>
+                                    <td>Prometheus</td>
+                                    <td>性能指标收集</td>
+                                </tr>
+                                <tr>
+                                    <td>日志管理</td>
+                                    <td>ELK Stack</td>
+                                    <td>日志收集分析</td>
+                                </tr>
+                                <tr>
+                                    <td>链路追踪</td>
+                                    <td>Jaeger</td>
+                                    <td>请求链路追踪</td>
+                                </tr>
+                                <tr>
+                                    <td>告警通知</td>
+                                    <td>AlertManager</td>
+                                    <td>异常告警</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+<script src="../assets/js/mobile.js"></script>
+</body>
+</html> 
