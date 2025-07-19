@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "企业级客服系统",
+    "version": "2.1.0",
+    "environment": "production"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 6006,
+    "cors": {
+      "enabled": true,
+      "origins": ["http://localhost:6006", "http://localhost:6007", "http://localhost:6008", "https://b.ylqkf.com"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "headers": ["Content-Type", "Authorization"]
+    }
+  },
+  "frontend": {
+    "host": "localhost",
+    "port": 6006,
+    "apiUrl": "http://localhost:6006/api",
+    "wsUrl": "wss://b.ylqkf.com/ws",
+    "features": {
+      "imageUpload": true,
+      "audioNotifications": true,
+      "messageCompression": true,
+      "virtualScrolling": true,
+      "offlineSupport": true
+    },
+    "upload": {
+      "maxFileSize": 10485760,
+      "allowedTypes": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+      "compressionEnabled": true,
+      "compressionQuality": 0.8,
+      "maxWidth": 1920,
+      "maxHeight": 1080
+    }
+  },
+  "websocket": {
+    "heartbeatInterval": 30000,
+    "reconnectInterval": 5000,
+    "maxReconnectAttempts": 5,
+    "messageTimeout": 10000,
+    "maxMessageSize": 1048576
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": "",
+    "database": 0,
+    "pool": {
+      "maxSize": 20,
+      "minIdle": 5,
+      "maxLifetime": 3600,
+      "idleTimeout": 300
+    }
+  },
+  "storage": {
+    "dataDir": "./data",
+    "blobsDir": "./data/blobs",
+    "snapshotInterval": 300,
+    "maxSnapshotSize": 104857600
+  },
+  "security": {
+    "jwtSecret": "your-secret-key-here",
+    "jwtExpiry": 86400,
+    "bcryptRounds": 10,
+    "rateLimiting": {
+      "enabled": true,
+      "windowMs": 60000,
+      "maxRequests": 100
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "file": {
+      "enabled": true,
+      "path": "./logs/app.log",
+      "maxSize": 10485760,
+      "maxFiles": 5
+    }
+  },
+  "performance": {
+    "messageCache": {
+      "enabled": true,
+      "maxSize": 1000,
+      "ttl": 3600
+    },
+    "compression": {
+      "enabled": true,
+      "threshold": 1024
+    }
+  }
+} 
