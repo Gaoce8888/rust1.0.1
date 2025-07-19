@@ -1,0 +1,66 @@
+[2m2025-07-18T08:06:09.474308Z[0m [32m INFO[0m [2mkefu_system[0m[2m:[0m 启动企业级客服系统...
+[2m2025-07-18T08:06:09.474463Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 配置加载成功: 企业级客服系统 v2.1.0
+[2m2025-07-18T08:06:09.477472Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池初始化成功 - URL: redis://127.0.0.1:6379, 最大连接数: 32, 最小空闲: Some(8)
+[2m2025-07-18T08:06:09.477529Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m Redis连接池初始化成功: redis://127.0.0.1:6379
+[2m2025-07-18T08:06:09.477541Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 连接池配置: 最大连接数=0, 当前连接数=0
+[2m2025-07-18T08:06:09.477568Z[0m [32m INFO[0m [2mkefu_system::storage[0m[2m:[0m 🚀 企业级存储初始化: 基础路径=/root/gaoce8888/rust-chat-1.0.1/data, Sled路径=/root/gaoce8888/rust-chat-1.0.1/data/sled_db
+[2m2025-07-18T08:06:09.479679Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/1, 利用率: 0.0%
+[2m2025-07-18T08:06:09.482352Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 本地存储初始化成功: ./data
+[2m2025-07-18T08:06:09.482379Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 文件管理器初始化成功: ./data/blobs
+[2m2025-07-18T08:06:09.482578Z[0m [32m INFO[0m [2mkefu_system::html_template_manager[0m[2m:[0m 加载了 0 个HTML模板
+[2m2025-07-18T08:06:09.482591Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m HTML模板管理器初始化成功
+[2m2025-07-18T08:06:09.482638Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m ✅ 成功加载用户数据，共3个用户
+[2m2025-07-18T08:06:09.483413Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m ✅ Redis连接成功
+[2m2025-07-18T08:06:09.483438Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 用户管理器初始化成功
+[2m2025-07-18T08:06:09.483447Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🎤 语音消息管理器初始化成功
+[2m2025-07-18T08:06:09.565383Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🤖 AI管理器初始化成功
+[2m2025-07-18T08:06:09.565412Z[0m [32m INFO[0m [2mkefu_system::auth::kefu_auth[0m[2m:[0m 🔐 初始化默认客服账号
+[2m2025-07-18T08:06:09.565565Z[0m [32m INFO[0m [2mkefu_system::auth::kefu_auth[0m[2m:[0m ✅ 默认客服账号初始化完成
+[2m2025-07-18T08:06:09.565569Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🔐 客服认证管理器初始化成功
+[2m2025-07-18T08:06:09.565571Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🏢 企业级组件暂时禁用，正在修复编译错误...
+[2m2025-07-18T08:06:09.565608Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m ✅ 基于会话的在线状态检测已启用 - 基于活动时间判断
+[2m2025-07-18T08:06:09.565614Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🤖 AI处理器已启动，开始处理任务队列
+[2m2025-07-18T08:06:09.565617Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m ✅ 会话清理任务已启动，每小时清理一次过期会话
+[2m2025-07-18T08:06:09.565619Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🏢 企业级后台任务暂时禁用
+[2m2025-07-18T08:06:09.565649Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🚀 企业级客服系统启动成功！
+[2m2025-07-18T08:06:09.565651Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 📡 HTTP服务器地址: http://0.0.0.0:6006
+[2m2025-07-18T08:06:09.565653Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔌 WebSocket地址: ws://0.0.0.0:6006/ws
+[2m2025-07-18T08:06:09.565656Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 📚 API文档: http://0.0.0.0:6006/api-docs
+[2m2025-07-18T08:06:09.565669Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🎯 前端地址: http://0.0.0.0:6006
+[2m2025-07-18T08:06:09.565671Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 💡 如果浏览器没有自动打开，请手动访问上述地址
+[2m2025-07-18T08:06:09.565674Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🌐 正在打开浏览器: http://localhost:6006
+[2m2025-07-18T08:06:09.566817Z[0m [32m INFO[0m [2mkefu_system::server::components[0m[2m:[0m 🧹 开始定期清理过期会话...
+[2m2025-07-18T08:06:09.566827Z[0m [32m INFO[0m [2mkefu_system::user_manager[0m[2m:[0m 🧹 Redis自动处理过期会话，无需手动清理
+[2m2025-07-18T08:06:09.567839Z[0m [32m INFO[0m [1mServer::run[0m[1m{[0m[3maddr[0m[2m=[0m0.0.0.0:6006[1m}[0m[2m:[0m [2mwarp::server[0m[2m:[0m listening on http://0.0.0.0:6006
+/usr/bin/xdg-open: 882: x-www-browser: not found
+/usr/bin/xdg-open: 882: firefox: not found
+/usr/bin/xdg-open: 882: iceweasel: not found
+/usr/bin/xdg-open: 882: seamonkey: not found
+/usr/bin/xdg-open: 882: mozilla: not found
+/usr/bin/xdg-open: 882: epiphany: not found
+/usr/bin/xdg-open: 882: konqueror: not found
+/usr/bin/xdg-open: 882: chromium: not found
+/usr/bin/xdg-open: 882: chromium-browser: not found
+/usr/bin/xdg-open: 882: google-chrome: not found
+/usr/bin/xdg-open: 882: www-browser: not found
+/usr/bin/xdg-open: 882: links2: not found
+/usr/bin/xdg-open: 882: elinks: not found
+/usr/bin/xdg-open: 882: links: not found
+/usr/bin/xdg-open: 882: lynx: not found
+/usr/bin/xdg-open: 882: w3m: not found
+xdg-open: no method available for opening 'http://localhost:6006'
+[2m2025-07-18T08:06:39.478999Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T08:07:09.779855Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 1/2, 利用率: 3.1%
+[2m2025-07-18T08:07:39.479668Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T08:08:09.479670Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T08:08:18.653990Z[0m [32m INFO[0m [2mkefu_system::routes::swagger[0m[2m:[0m 📚 API文档访问: GET / -> 404 Not Found
+[2m2025-07-18T08:08:18.655619Z[0m [32m INFO[0m [2mkefu_system::routes::frontend[0m[2m:[0m 🏠 主页被访问
+[2m2025-07-18T08:08:18.655645Z[0m [31mERROR[0m [2mkefu_system::routes::frontend[0m[2m:[0m 读取主页失败: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+[2m2025-07-18T08:08:18.655990Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔍 路由调试: GET / -> 状态: 404 | 耗时: 2.770105ms | 来源: Some(127.0.0.1:58267)
+[2m2025-07-18T08:08:39.479542Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/2, 利用率: 0.0%
+[2m2025-07-18T08:09:09.784821Z[0m [32m INFO[0m [2mkefu_system::redis_pool[0m[2m:[0m Redis连接池健康检查通过 - 活跃连接: 0/3, 利用率: 0.0%
+[2m2025-07-18T08:09:21.492980Z[0m [32m INFO[0m [2mkefu_system::routes::swagger[0m[2m:[0m 📚 API文档访问: GET / -> 404 Not Found
+[2m2025-07-18T08:09:21.493126Z[0m [32m INFO[0m [2mkefu_system::routes::frontend[0m[2m:[0m 🏠 主页被访问
+[2m2025-07-18T08:09:21.493182Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔍 路由调试: GET / -> 状态: 200 | 耗时: 241.274µs | 来源: Some(127.0.0.1:55523)
+[2m2025-07-18T08:09:29.329933Z[0m [32m INFO[0m [2mkefu_system::routes::swagger[0m[2m:[0m 📚 API文档访问: GET /kefu/ -> 404 Not Found
+[2m2025-07-18T08:09:29.330443Z[0m [32m INFO[0m [2mkefu_system::server::startup[0m[2m:[0m 🔍 路由调试: GET /kefu/ -> 状态: 404 | 耗时: 536.426µs | 来源: Some(127.0.0.1:55539)
