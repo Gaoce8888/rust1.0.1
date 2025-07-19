@@ -48,7 +48,7 @@ pub struct SessionInfo {
 // 获取会话列表
 pub async fn handle_list_sessions(
     query: SessionListQuery,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     let page = query.page.unwrap_or(1);
     let limit = query.limit.unwrap_or(20);
@@ -101,7 +101,7 @@ pub async fn handle_list_sessions(
 // 获取会话详情
 pub async fn handle_get_session(
     session_id: String,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 从WebSocketManager获取会话详情
     let session = SessionInfo {
@@ -151,12 +151,12 @@ pub async fn handle_get_session(
 pub async fn handle_get_session_messages(
     session_id: String,
     query: SessionMessagesQuery,
-    ws_manager: Arc<WebSocketManager>,
-    storage: Arc<LocalStorage>,
+    _ws_manager: Arc<WebSocketManager>,
+    _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let page = query.page.unwrap_or(1);
     let limit = query.limit.unwrap_or(50);
-    let include_system = query.include_system.unwrap_or(false);
+    let _include_system = query.include_system.unwrap_or(false);
     
     // TODO: 从storage获取实际消息
     let messages = vec![
@@ -200,7 +200,7 @@ pub async fn handle_get_session_messages(
 pub async fn handle_transfer_session(
     session_id: String,
     request: TransferSessionRequest,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实现会话转接逻辑
     
@@ -223,7 +223,7 @@ pub async fn handle_transfer_session(
 // 结束会话
 pub async fn handle_end_session(
     session_id: String,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实现结束会话逻辑
     
@@ -244,7 +244,7 @@ pub async fn handle_end_session(
 // 获取会话统计
 pub async fn handle_session_statistics(
     session_id: String,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 计算实际统计数据
     
