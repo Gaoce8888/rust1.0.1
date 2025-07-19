@@ -1,0 +1,33 @@
+# Rust
+/target/
+Cargo.lock
+*.rs.bk
+
+# Frontend build outputs
+/static/kefu-build/
+/static/kehu-build/
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/

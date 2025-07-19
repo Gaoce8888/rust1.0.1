@@ -5,10 +5,7 @@ import {Avatar, Image, Button, Progress, Chip} from "@heroui/react";
 import {cn} from "@heroui/react";
 import {Icon} from "@iconify/react";
 
-/**
- * 消息类型枚举
- * 定义系统支持的所有消息类型
- */
+// 消息类型定义
 export const MessageType = {
   TEXT: 'text',           // 文本消息
   IMAGE: 'image',         // 图片消息
@@ -17,35 +14,24 @@ export const MessageType = {
   SYSTEM: 'system',       // 系统消息
 };
 
-/**
- * 聊天消息组件
- * 用于显示单条聊天消息，支持多种消息类型
- * 
- * 功能特点：
- * - 支持文本、图片、文件、语音、系统消息
- * - 消息状态显示（发送中、已发送、已送达、已读、失败）
- * - 响应式设计，支持左右对齐
- * - 文件下载功能
- * - 语音播放功能
- * - 图片预览功能
- * 
- * @param {Object} props - 组件属性
- * @param {string} props.avatar - 发送者头像URL
- * @param {string} props.name - 发送者名称
- * @param {string} props.time - 发送时间
- * @param {string} props.message - 消息内容
- * @param {string} props.messageType - 消息类型（text/image/file/voice/system）
- * @param {boolean} props.isRTL - 是否右对齐（通常发送的消息在右侧）
- * @param {string} props.imageUrl - 图片URL（图片消息）
- * @param {string} props.fileName - 文件名（文件消息）
- * @param {string} props.fileSize - 文件大小（文件消息）
- * @param {string} props.fileUrl - 文件下载URL（文件消息）
- * @param {number} props.voiceDuration - 语音时长（语音消息）
- * @param {string} props.voiceUrl - 语音URL（语音消息）
- * @param {string} props.status - 消息状态（sending/sent/delivered/read/failed）
- * @param {string} props.className - 自定义类名
- * @param {Object} props.classNames - 各部分的自定义类名
- */
+// 聊天消息组件
+// 用于显示单条聊天消息，支持多种消息类型
+// 参数说明：
+// - avatar: 发送者头像URL
+// - name: 发送者名称
+// - time: 发送时间
+// - message: 消息内容
+// - messageType: 消息类型（text/image/file/voice/system）
+// - isRTL: 是否右对齐（通常发送的消息在右侧）
+// - imageUrl: 图片URL（图片消息）
+// - fileName: 文件名（文件消息）
+// - fileSize: 文件大小（文件消息）
+// - fileUrl: 文件下载URL（文件消息）
+// - voiceDuration: 语音时长（语音消息）
+// - voiceUrl: 语音URL（语音消息）
+// - status: 消息状态（sending/sent/delivered/read/failed）
+// - className: 自定义类名
+// - classNames: 各部分的自定义类名
 const MessagingChatMessage = React.forwardRef(
   ({
     avatar, 

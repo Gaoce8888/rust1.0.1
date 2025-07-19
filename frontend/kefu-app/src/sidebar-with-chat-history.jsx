@@ -24,10 +24,7 @@ import {Icon} from "@iconify/react";
 import {AcmeIcon} from "./acme";
 import SidebarDrawer from "./sidebar-drawer";
 
-/**
- * 在线客户示例数据
- * 用于开发和测试，生产环境应从WebSocket获取
- */
+// 在线客户示例数据
 const onlineCustomers = [
   {
     id: "customer-1",
@@ -159,17 +156,8 @@ function AvatarDropdownIcon(props) {
   );
 }
 
-/**
- * 客户操作下拉菜单组件
- * 提供对客户的快捷操作功能
- * 
- * 功能选项：
- * - 开始聊天：与客户开始新会话
- * - 查看资料：查看客户详细信息
- * - 聊天记录：查看历史对话记录
- * - 转移会话：将客户转给其他客服
- * - 屏蔽客户：临时屏蔽该客户消息
- */
+// 客户操作下拉菜单
+// 提供开始聊天、查看资料、聊天记录等功能
 function CustomerActionDropdown() {
   return (
     <Dropdown>
@@ -257,28 +245,14 @@ function CustomerActionDropdown() {
 // 参数：
 // - children: 主内容区域
 // - header: 头部内容
-/**
- * 侧边栏主组件 - 包含客户列表和客服信息
- * 
- * 功能特点：
- * - 客服个人信息展示
- * - 在线客户列表
- * - 客户状态实时更新
- * - 客户搜索功能
- * - 响应式设计（移动端抽屉式）
- * - 客户操作快捷菜单
- * 
- * @param {ReactNode} children - 子组件
- * @param {ReactNode} header - 头部内容
- * @param {string} title - 标题
- * @param {string} subTitle - 副标题
- * @param {Object} classNames - 自定义样式类名
- */
+// - title: 标题
+// - subTitle: 副标题
+// - classNames: 自定义样式类名
 export default function Component({children, header, title, subTitle, classNames = {}}) {
   // 控制侧边栏开关状态
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-  // 侧边栏内容渲染
+  // 侧边栏内容
   const content = (
     <div className="relative flex h-full w-72 flex-1 flex-col p-6">
       <div className="flex items-center gap-2 px-2">

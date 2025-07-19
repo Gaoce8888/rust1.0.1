@@ -1,26 +1,12 @@
-/**
- * API 配置文件
- * 用于配置前后端通信的基础设置
- * 
- * 功能说明：
- * - WebSocket连接配置
- * - HTTP API基础地址配置
- * - 文件上传限制配置
- * - 请求超时配置
- * - API端点定义
- */
+ // API 配置文件
+// 用于配置前后端通信的基础设置
 
-/**
- * API 基础配置对象
- * 包含所有与后端通信相关的配置参数
- */
+// API 基础配置
 export const API_CONFIG = {
     // WebSocket 服务器地址
-    // 优先使用环境变量，默认连接本地开发服务器
     WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:6006/ws',
     
     // HTTP API 基础地址
-    // 用于文件上传、登录认证等HTTP请求
     API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:6006',
     
     // 文件上传配置
