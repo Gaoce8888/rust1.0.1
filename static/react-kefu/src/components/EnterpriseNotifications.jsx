@@ -7,7 +7,7 @@ import {
   PerformanceMonitor 
 } from './EnterpriseCore';
 
-// 通知类型枚举
+// 通知类型枚举 - 与后端SystemMessageType对应
 export const NotificationType = {
   INFO: 'info',
   SUCCESS: 'success',
@@ -15,15 +15,21 @@ export const NotificationType = {
   ERROR: 'error',
   CHAT: 'chat',
   SYSTEM: 'system',
-  ALERT: 'alert'
+  ALERT: 'alert',
+  USER_ACTION: 'user_action',      // 对应后端UserAction
+  SERVICE_STATUS: 'service_status', // 对应后端ServiceStatus
+  SECURITY: 'security',            // 对应后端Security
+  PERFORMANCE: 'performance',      // 对应后端Performance
+  CONFIGURATION: 'configuration',  // 对应后端Configuration
+  NOTIFICATION: 'notification'     // 对应后端Notification
 };
 
-// 通知优先级
+// 通知优先级 - 与后端MessagePriority对应
 export const NotificationPriority = {
-  LOW: 'low',
-  NORMAL: 'normal',
-  HIGH: 'high',
-  URGENT: 'urgent'
+  LOW: 'low',        // 对应后端Low
+  NORMAL: 'normal',  // 对应后端Normal
+  HIGH: 'high',      // 对应后端High
+  URGENT: 'urgent'   // 对应后端Critical
 };
 
 // 通知位置
@@ -36,6 +42,27 @@ export const NotificationPosition = {
   BOTTOM_CENTER: 'bottom-center'
 };
 
+// 后端消息类型映射
+const BACKEND_MESSAGE_TYPES = {
+  'UserAction': NotificationType.USER_ACTION,
+  'ServiceStatus': NotificationType.SERVICE_STATUS,
+  'Security': NotificationType.SECURITY,
+  'Performance': NotificationType.PERFORMANCE,
+  'Configuration': NotificationType.CONFIGURATION,
+  'Error': NotificationType.ERROR,
+  'Notification': NotificationType.NOTIFICATION,
+  'Chat': NotificationType.CHAT,
+  'System': NotificationType.SYSTEM
+};
+
+// 后端优先级映射
+const BACKEND_PRIORITY_MAP = {
+  1: NotificationPriority.LOW,      // Low
+  2: NotificationPriority.NORMAL,   // Normal
+  3: NotificationPriority.HIGH,     // High
+  4: NotificationPriority.URGENT    // Critical
+};
+
 // 通知管理器
 export class NotificationManager {
   constructor() {
@@ -45,6 +72,335 @@ export class NotificationManager {
     this.autoDismissDelay = 5000;
     this.soundEnabled = true;
     this.desktopNotificationsEnabled = false;
+    this.websocketClient = null;
+    this.userId = null;
+  }
+
+  // 设置WebSocket客户端
+  setWebSocketClient(client, userId) {
+    this.websocketClient = client;
+    this.userId = userId;
+  }
+
+  // 处理后端WebSocket消息
+  handleBackendMessage(message) {
+    try {
+      const data = typeof message === 'string' ? JSON.parse(message) : message;
+      
+      // 处理不同类型的后端消息
+      switch (data.type) {
+        case 'Chat':
+          this.handleChatMessage(data);
+          break;
+        case 'System':
+          this.handleSystemMessage(data);
+          break;
+        case 'Status':
+          this.handleStatusMessage(data);
+          break;
+        case 'UserJoined':
+          this.handleUserJoinedMessage(data);
+          break;
+        case 'UserLeft':
+          this.handleUserLeftMessage(data);
+          break;
+        case 'Error':
+          this.handleErrorMessage(data);
+          break;
+        case 'Welcome':
+          this.handleWelcomeMessage(data);
+          break;
+        case 'OnlineUsers':
+          this.handleOnlineUsersMessage(data);
+          break;
+        default:
+          // 处理其他消息类型
+          this.handleGenericMessage(data);
+      }
+    } catch (error) {
+      console.error('处理后端消息失败:', error);
+    }
+  }
+
+  // 处理聊天消息
+  handleChatMessage(data) {
+    if (data.from && data.from !== this.userId) {
+      this.add({
+        type: NotificationType.CHAT,
+        priority: NotificationPriority.NORMAL,
+        title: '新消息',
+        message: `${data.from}: ${data.content}`,
+        autoDismiss: true,
+        dismissDelay: 4000,
+        data: {
+          messageId: data.id,
+          fromUser: data.from,
+          toUser: data.to,
+          timestamp: data.timestamp
+        }
+      });
+    }
+  }
+
+  // 处理系统消息
+  handleSystemMessage(data) {
+    const systemType = data.system_type || 'System';
+    const notificationType = BACKEND_MESSAGE_TYPES[systemType] || NotificationType.SYSTEM;
+    const priority = BACKEND_PRIORITY_MAP[data.priority] || NotificationPriority.NORMAL;
+
+    this.add({
+      type: notificationType,
+      priority: priority,
+      title: '系统消息',
+      message: data.content,
+      autoDismiss: data.priority < 3, // 高优先级不自动关闭
+      dismissDelay: data.priority >= 3 ? 8000 : 5000,
+      data: {
+        systemType: systemType,
+        metadata: data.metadata,
+        additionalData: data.data
+      }
+    });
+  }
+
+  // 处理状态消息
+  handleStatusMessage(data) {
+    const status = data.status;
+    const priority = status === 'Online' ? NotificationPriority.LOW : NotificationPriority.NORMAL;
+
+    this.add({
+      type: NotificationType.SYSTEM,
+      priority: priority,
+      title: '状态更新',
+      message: `用户 ${data.user_id} 状态变更为: ${status}`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        userId: data.user_id,
+        status: status,
+        previousStatus: data.previous_status
+      }
+    });
+  }
+
+  // 处理用户加入消息
+  handleUserJoinedMessage(data) {
+    this.add({
+      type: NotificationType.USER_ACTION,
+      priority: NotificationPriority.LOW,
+      title: '用户上线',
+      message: `${data.user_name} (${data.user_type}) 已上线`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        userId: data.user_id,
+        userName: data.user_name,
+        userType: data.user_type
+      }
+    });
+  }
+
+  // 处理用户离开消息
+  handleUserLeftMessage(data) {
+    this.add({
+      type: NotificationType.USER_ACTION,
+      priority: NotificationPriority.LOW,
+      title: '用户离线',
+      message: `${data.user_name} (${data.user_type}) 已离线`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        userId: data.user_id,
+        userName: data.user_name,
+        userType: data.user_type
+      }
+    });
+  }
+
+  // 处理错误消息
+  handleErrorMessage(data) {
+    this.add({
+      type: NotificationType.ERROR,
+      priority: NotificationPriority.URGENT,
+      title: '系统错误',
+      message: data.message || '发生未知错误',
+      autoDismiss: false,
+      actions: [
+        {
+          label: '查看详情',
+          type: 'secondary',
+          handler: () => {
+            console.log('错误详情:', data);
+          }
+        },
+        {
+          label: '忽略',
+          type: 'secondary',
+          dismiss: true
+        }
+      ],
+      data: {
+        errorCode: data.code,
+        errorDetails: data.details
+      }
+    });
+  }
+
+  // 处理欢迎消息
+  handleWelcomeMessage(data) {
+    this.add({
+      type: NotificationType.SUCCESS,
+      priority: NotificationPriority.NORMAL,
+      title: '连接成功',
+      message: `欢迎 ${data.user_name}！系统连接已建立`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        userId: data.user_id,
+        userName: data.user_name,
+        userType: data.user_type
+      }
+    });
+  }
+
+  // 处理在线用户消息
+  handleOnlineUsersMessage(data) {
+    // 通常不需要显示通知，但可以记录日志
+    console.log('在线用户更新:', data.users?.length || 0, '个用户');
+  }
+
+  // 处理通用消息
+  handleGenericMessage(data) {
+    this.add({
+      type: NotificationType.INFO,
+      priority: NotificationPriority.NORMAL,
+      title: '系统通知',
+      message: data.content || JSON.stringify(data),
+      autoDismiss: true,
+      dismissDelay: 5000,
+      data: data
+    });
+  }
+
+  // 处理Redis通知频道消息
+  handleRedisNotification(channel, message) {
+    try {
+      const data = typeof message === 'string' ? JSON.parse(message) : message;
+      
+      // 根据频道类型处理不同的通知
+      if (channel.includes(':notifications')) {
+        this.handleNotificationChannel(data);
+      } else if (channel.includes(':messages')) {
+        this.handleMessageChannel(data);
+      } else if (channel === 'system:broadcasts') {
+        this.handleSystemBroadcast(data);
+      } else if (channel.includes(':events')) {
+        this.handleSessionEvent(data);
+      }
+    } catch (error) {
+      console.error('处理Redis通知失败:', error);
+    }
+  }
+
+  // 处理通知频道消息
+  handleNotificationChannel(data) {
+    const notificationType = data.notification_type || NotificationType.INFO;
+    const priority = BACKEND_PRIORITY_MAP[data.priority] || NotificationPriority.NORMAL;
+
+    this.add({
+      type: notificationType,
+      priority: priority,
+      title: data.title || '通知',
+      message: data.message || data.content,
+      autoDismiss: data.auto_dismiss !== false,
+      dismissDelay: data.dismiss_delay || this.autoDismissDelay,
+      actions: data.actions || [],
+      data: data
+    });
+  }
+
+  // 处理消息频道
+  handleMessageChannel(data) {
+    if (data.type === 'new_message') {
+      this.add({
+        type: NotificationType.CHAT,
+        priority: NotificationPriority.NORMAL,
+        title: '新消息',
+        message: `收到来自 ${data.from} 的新消息`,
+        autoDismiss: true,
+        dismissDelay: 4000,
+        data: {
+          messageId: data.message_id,
+          fromUser: data.from,
+          priority: data.priority
+        }
+      });
+    }
+  }
+
+  // 处理系统广播
+  handleSystemBroadcast(data) {
+    this.add({
+      type: NotificationType.SYSTEM,
+      priority: NotificationPriority.HIGH,
+      title: '系统广播',
+      message: data.message || data.content,
+      autoDismiss: data.auto_dismiss !== false,
+      dismissDelay: data.dismiss_delay || 6000,
+      data: data
+    });
+  }
+
+  // 处理会话事件
+  handleSessionEvent(data) {
+    const eventType = data.event_type;
+    
+    switch (eventType) {
+      case 'session_established':
+        this.add({
+          type: NotificationType.SUCCESS,
+          priority: NotificationPriority.NORMAL,
+          title: '会话建立',
+          message: `与 ${data.partner_name || data.partner_id} 的会话已建立`,
+          autoDismiss: true,
+          dismissDelay: 3000,
+          data: data
+        });
+        break;
+      case 'session_ended':
+        this.add({
+          type: NotificationType.INFO,
+          priority: NotificationPriority.NORMAL,
+          title: '会话结束',
+          message: `与 ${data.partner_name || data.partner_id} 的会话已结束`,
+          autoDismiss: true,
+          dismissDelay: 3000,
+          data: data
+        });
+        break;
+      case 'customer_assigned':
+        this.add({
+          type: NotificationType.INFO,
+          priority: NotificationPriority.HIGH,
+          title: '客户分配',
+          message: `新客户 ${data.customer_name || data.customer_id} 已分配给您`,
+          autoDismiss: false,
+          actions: [
+            {
+              label: '开始对话',
+              type: 'primary',
+              handler: () => {
+                // 触发开始对话逻辑
+                console.log('开始与客户对话:', data.customer_id);
+              }
+            }
+          ],
+          data: data
+        });
+        break;
+      default:
+        this.handleGenericMessage(data);
+    }
   }
 
   // 添加通知
@@ -166,7 +522,13 @@ export class NotificationManager {
       [NotificationType.ERROR]: '/sounds/notification-error.mp3',
       [NotificationType.CHAT]: '/sounds/notification-chat.mp3',
       [NotificationType.SYSTEM]: '/sounds/notification-system.mp3',
-      [NotificationType.ALERT]: '/sounds/notification-alert.mp3'
+      [NotificationType.ALERT]: '/sounds/notification-alert.mp3',
+      [NotificationType.USER_ACTION]: '/sounds/notification-user.mp3',
+      [NotificationType.SERVICE_STATUS]: '/sounds/notification-service.mp3',
+      [NotificationType.SECURITY]: '/sounds/notification-security.mp3',
+      [NotificationType.PERFORMANCE]: '/sounds/notification-performance.mp3',
+      [NotificationType.CONFIGURATION]: '/sounds/notification-config.mp3',
+      [NotificationType.NOTIFICATION]: '/sounds/notification-general.mp3'
     };
 
     const soundUrl = soundMap[type] || soundMap[NotificationType.INFO];
@@ -276,7 +638,13 @@ export const Notification = React.memo(({
       [NotificationType.ERROR]: '❌',
       [NotificationType.CHAT]: '💬',
       [NotificationType.SYSTEM]: '⚙️',
-      [NotificationType.ALERT]: '🚨'
+      [NotificationType.ALERT]: '🚨',
+      [NotificationType.USER_ACTION]: '👤',
+      [NotificationType.SERVICE_STATUS]: '🔧',
+      [NotificationType.SECURITY]: '🔒',
+      [NotificationType.PERFORMANCE]: '📊',
+      [NotificationType.CONFIGURATION]: '⚙️',
+      [NotificationType.NOTIFICATION]: '📢'
     };
     return iconMap[notification.type] || iconMap[NotificationType.INFO];
   };
@@ -734,7 +1102,13 @@ const getTypeIcon = (type) => {
     [NotificationType.ERROR]: '❌',
     [NotificationType.CHAT]: '💬',
     [NotificationType.SYSTEM]: '⚙️',
-    [NotificationType.ALERT]: '🚨'
+    [NotificationType.ALERT]: '🚨',
+    [NotificationType.USER_ACTION]: '👤',
+    [NotificationType.SERVICE_STATUS]: '🔧',
+    [NotificationType.SECURITY]: '🔒',
+    [NotificationType.PERFORMANCE]: '📊',
+    [NotificationType.CONFIGURATION]: '⚙️',
+    [NotificationType.NOTIFICATION]: '📢'
   };
   return iconMap[type] || iconMap[NotificationType.INFO];
 };

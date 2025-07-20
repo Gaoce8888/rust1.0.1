@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { useOptimizedCache, useDebounce, useThrottle } from './EnterpriseCore';
+import { notificationManager } from './EnterpriseNotifications';
 
 // WebSocket连接状态
 export const ConnectionStatus = {
@@ -38,252 +39,373 @@ export class EnterpriseWebSocketClient {
     this.ws = null;
     this.status = ConnectionStatus.DISCONNECTED;
     this.reconnectAttempts = 0;
-    this.messageQueue = [];
-    this.eventListeners = new Map();
-    this.heartbeatTimer = null;
-    this.reconnectTimer = null;
+    this.messageQueue = new MessageQueueManager(this.options.messageQueueSize);
+    this.heartbeatInterval = null;
+    this.listeners = new Map();
     this.lastMessageTime = Date.now();
-    this.messageId = 0;
+    this.stats = {
+      messagesSent: 0,
+      messagesReceived: 0,
+      connectionTime: 0,
+      lastMessageTime: 0
+    };
     
-    // 性能优化
-    this.messageCache = new Map();
-    this.batchTimer = null;
-    this.pendingMessages = [];
+    // 设置通知管理器
+    notificationManager.setWebSocketClient(this, options.userId);
   }
 
-  // 连接WebSocket
-  connect() {
-    if (this.status === ConnectionStatus.CONNECTING || 
-        this.status === ConnectionStatus.CONNECTED) {
-      return;
-    }
-
-    this.setStatus(ConnectionStatus.CONNECTING);
-    
+  // 连接方法
+  async connect() {
     try {
       this.ws = new WebSocket(this.url);
       this.setupEventHandlers();
+      this.status = ConnectionStatus.CONNECTING;
+      
+      // 发送连接通知
+      notificationManager.add({
+        type: 'info',
+        priority: 'normal',
+        title: '连接中',
+        message: '正在连接到服务器...',
+        autoDismiss: true,
+        dismissDelay: 2000
+      });
+      
+      return new Promise((resolve, reject) => {
+        this.ws.onopen = () => {
+          this.status = ConnectionStatus.CONNECTED;
+          this.reconnectAttempts = 0;
+          this.startHeartbeat();
+          this.stats.connectionTime = Date.now();
+          
+          // 发送连接成功通知
+          notificationManager.add({
+            type: 'success',
+            priority: 'normal',
+            title: '连接成功',
+            message: 'WebSocket连接已建立',
+            autoDismiss: true,
+            dismissDelay: 3000
+          });
+          
+          this.emit('connected');
+          resolve();
+        };
+        
+        this.ws.onerror = (error) => {
+          this.status = ConnectionStatus.ERROR;
+          
+          // 发送连接错误通知
+          notificationManager.add({
+            type: 'error',
+            priority: 'high',
+            title: '连接错误',
+            message: 'WebSocket连接失败',
+            autoDismiss: false,
+            actions: [
+              {
+                label: '重试',
+                type: 'primary',
+                handler: () => this.reconnect()
+              }
+            ]
+          });
+          
+          reject(error);
+        };
+      });
     } catch (error) {
       console.error('WebSocket连接失败:', error);
-      this.setStatus(ConnectionStatus.ERROR);
-      this.scheduleReconnect();
+      this.status = ConnectionStatus.ERROR;
+      throw error;
     }
   }
 
   // 设置事件处理器
   setupEventHandlers() {
-    this.ws.onopen = () => {
-      console.log('WebSocket连接成功');
-      this.setStatus(ConnectionStatus.CONNECTED);
-      this.reconnectAttempts = 0;
-      this.startHeartbeat();
-      this.processMessageQueue();
-      this.emit('connected');
+    this.ws.onmessage = (event) => {
+      try {
+        this.stats.messagesReceived++;
+        this.stats.lastMessageTime = Date.now();
+        
+        const message = JSON.parse(event.data);
+        
+        // 处理后端消息并发送通知
+        notificationManager.handleBackendMessage(message);
+        
+        // 触发消息事件
+        this.emit('message', message);
+        
+        // 处理特定消息类型
+        this.handleMessageType(message);
+        
+      } catch (error) {
+        console.error('解析WebSocket消息失败:', error);
+        
+        // 发送解析错误通知
+        notificationManager.add({
+          type: 'error',
+          priority: 'normal',
+          title: '消息解析错误',
+          message: '无法解析服务器消息',
+          autoDismiss: true,
+          dismissDelay: 5000
+        });
+      }
     };
 
     this.ws.onclose = (event) => {
-      console.log('WebSocket连接关闭:', event.code, event.reason);
-      this.setStatus(ConnectionStatus.DISCONNECTED);
+      this.status = ConnectionStatus.DISCONNECTED;
       this.stopHeartbeat();
+      
+      // 发送连接断开通知
+      notificationManager.add({
+        type: 'warning',
+        priority: 'high',
+        title: '连接断开',
+        message: 'WebSocket连接已断开，正在尝试重连...',
+        autoDismiss: false,
+        actions: [
+          {
+            label: '手动重连',
+            type: 'primary',
+            handler: () => this.reconnect()
+          }
+        ]
+      });
+      
       this.emit('disconnected', event);
       
-      if (!event.wasClean) {
-        this.scheduleReconnect();
+      // 自动重连
+      if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
+        this.reconnect();
+      } else {
+        // 重连失败通知
+        notificationManager.add({
+          type: 'error',
+          priority: 'urgent',
+          title: '重连失败',
+          message: '无法重新连接到服务器，请检查网络连接',
+          autoDismiss: false,
+          actions: [
+            {
+              label: '重试',
+              type: 'primary',
+              handler: () => {
+                this.reconnectAttempts = 0;
+                this.reconnect();
+              }
+            }
+          ]
+        });
       }
     };
 
     this.ws.onerror = (error) => {
+      this.status = ConnectionStatus.ERROR;
       console.error('WebSocket错误:', error);
-      this.setStatus(ConnectionStatus.ERROR);
+      
+      // 发送WebSocket错误通知
+      notificationManager.add({
+        type: 'error',
+        priority: 'high',
+        title: 'WebSocket错误',
+        message: '连接发生错误',
+        autoDismiss: false,
+        data: { error }
+      });
+      
       this.emit('error', error);
-    };
-
-    this.ws.onmessage = (event) => {
-      this.handleMessage(event.data);
     };
   }
 
-  // 处理接收到的消息
-  handleMessage(data) {
+  // 处理特定消息类型
+  handleMessageType(message) {
+    switch (message.type) {
+      case 'Chat':
+        this.emit('chat', message);
+        break;
+      case 'System':
+        this.emit('system', message);
+        break;
+      case 'Status':
+        this.emit('status', message);
+        break;
+      case 'UserJoined':
+        this.emit('userJoined', message);
+        break;
+      case 'UserLeft':
+        this.emit('userLeft', message);
+        break;
+      case 'Error':
+        this.emit('error', message);
+        break;
+      case 'Welcome':
+        this.emit('welcome', message);
+        break;
+      case 'OnlineUsers':
+        this.emit('onlineUsers', message);
+        break;
+      case 'History':
+        this.emit('history', message);
+        break;
+      case 'Typing':
+        this.emit('typing', message);
+        break;
+      case 'Heartbeat':
+        this.emit('heartbeat', message);
+        break;
+      default:
+        this.emit('unknown', message);
+    }
+  }
+
+  // 重连方法
+  async reconnect() {
+    if (this.status === ConnectionStatus.CONNECTING) return;
+    
+    this.reconnectAttempts++;
+    this.status = ConnectionStatus.RECONNECTING;
+    
+    // 发送重连通知
+    notificationManager.add({
+      type: 'info',
+      priority: 'normal',
+      title: '重新连接',
+      message: `正在尝试重新连接... (${this.reconnectAttempts}/${this.options.maxReconnectAttempts})`,
+      autoDismiss: true,
+      dismissDelay: 3000
+    });
+    
+    this.emit('reconnecting', this.reconnectAttempts);
+    
     try {
-      const message = JSON.parse(data);
-      this.lastMessageTime = Date.now();
+      await new Promise(resolve => setTimeout(resolve, this.options.reconnectInterval));
+      await this.connect();
       
-      // 缓存消息
-      const messageKey = `${message.type}-${message.id || Date.now()}`;
-      this.messageCache.set(messageKey, message);
+      // 发送重连成功通知
+      notificationManager.add({
+        type: 'success',
+        priority: 'normal',
+        title: '重连成功',
+        message: 'WebSocket连接已恢复',
+        autoDismiss: true,
+        dismissDelay: 3000
+      });
       
-      // 限制缓存大小
-      if (this.messageCache.size > this.options.messageQueueSize) {
-        const firstKey = this.messageCache.keys().next().value;
-        this.messageCache.delete(firstKey);
-      }
-      
-      // 触发事件
-      this.emit(message.type, message);
-      this.emit('message', message);
-      
+      this.emit('reconnected');
     } catch (error) {
-      console.error('消息解析失败:', error);
-      this.emit('error', { type: 'parse_error', error });
+      console.error('重连失败:', error);
+      
+      if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
+        // 继续重连
+        setTimeout(() => this.reconnect(), this.options.reconnectInterval);
+      }
     }
   }
 
   // 发送消息
   send(message) {
     if (this.status !== ConnectionStatus.CONNECTED) {
-      // 将消息加入队列
-      this.messageQueue.push(message);
-      if (this.messageQueue.length > this.options.messageQueueSize) {
-        this.messageQueue.shift();
-      }
+      // 消息加入队列
+      this.messageQueue.add(message);
+      
+      // 发送离线通知
+      notificationManager.add({
+        type: 'warning',
+        priority: 'normal',
+        title: '消息已缓存',
+        message: '连接断开，消息已加入发送队列',
+        autoDismiss: true,
+        dismissDelay: 3000
+      });
+      
       return false;
     }
 
     try {
-      const messageWithId = {
-        ...message,
-        id: this.generateMessageId(),
-        timestamp: new Date().toISOString()
-      };
+      const messageStr = typeof message === 'string' ? message : JSON.stringify(message);
+      this.ws.send(messageStr);
+      this.stats.messagesSent++;
+      this.lastMessageTime = Date.now();
       
-      this.ws.send(JSON.stringify(messageWithId));
+      this.emit('sent', message);
       return true;
     } catch (error) {
       console.error('发送消息失败:', error);
-      this.emit('error', { type: 'send_error', error });
-      return false;
-    }
-  }
-
-  // 批量发送消息
-  sendBatch(messages) {
-    if (this.status !== ConnectionStatus.CONNECTED) {
-      this.pendingMessages.push(...messages);
-      return false;
-    }
-
-    try {
-      const batchMessage = {
-        type: 'Batch',
-        messages: messages.map(msg => ({
-          ...msg,
-          id: this.generateMessageId(),
-          timestamp: new Date().toISOString()
-        }))
-      };
       
-      this.ws.send(JSON.stringify(batchMessage));
-      return true;
-    } catch (error) {
-      console.error('批量发送消息失败:', error);
+      // 发送发送失败通知
+      notificationManager.add({
+        type: 'error',
+        priority: 'normal',
+        title: '发送失败',
+        message: '消息发送失败',
+        autoDismiss: true,
+        dismissDelay: 5000
+      });
+      
       return false;
     }
   }
 
-  // 生成消息ID
-  generateMessageId() {
-    return `msg_${Date.now()}_${++this.messageId}`;
+  // 批量发送
+  sendBatch(messages) {
+    const results = messages.map(message => this.send(message));
+    const successCount = results.filter(Boolean).length;
+    
+    if (successCount < messages.length) {
+      // 发送批量发送结果通知
+      notificationManager.add({
+        type: 'info',
+        priority: 'normal',
+        title: '批量发送',
+        message: `成功发送 ${successCount}/${messages.length} 条消息`,
+        autoDismiss: true,
+        dismissDelay: 4000
+      });
+    }
+    
+    return results;
   }
 
-  // 设置连接状态
-  setStatus(status) {
-    this.status = status;
-    this.emit('statusChange', status);
+  // 断开连接
+  disconnect() {
+    if (this.ws) {
+      this.stopHeartbeat();
+      this.ws.close();
+      this.status = ConnectionStatus.DISCONNECTED;
+      
+      // 发送断开连接通知
+      notificationManager.add({
+        type: 'info',
+        priority: 'normal',
+        title: '连接断开',
+        message: 'WebSocket连接已手动断开',
+        autoDismiss: true,
+        dismissDelay: 3000
+      });
+      
+      this.emit('disconnected');
+    }
   }
 
   // 开始心跳
   startHeartbeat() {
-    this.stopHeartbeat();
-    this.heartbeatTimer = setInterval(() => {
+    this.heartbeatInterval = setInterval(() => {
       if (this.status === ConnectionStatus.CONNECTED) {
-        this.send({ type: WSMessageType.PING });
+        this.send({
+          type: 'Heartbeat',
+          timestamp: new Date().toISOString()
+        });
       }
     }, this.options.heartbeatInterval);
   }
 
   // 停止心跳
   stopHeartbeat() {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-  }
-
-  // 处理消息队列
-  processMessageQueue() {
-    while (this.messageQueue.length > 0) {
-      const message = this.messageQueue.shift();
-      this.send(message);
-    }
-  }
-
-  // 安排重连
-  scheduleReconnect() {
-    if (this.reconnectAttempts >= this.options.maxReconnectAttempts) {
-      console.log('达到最大重连次数');
-      return;
-    }
-
-    this.setStatus(ConnectionStatus.RECONNECTING);
-    this.reconnectAttempts++;
-    
-    const delay = Math.min(
-      this.options.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1),
-      30000
-    );
-    
-    this.reconnectTimer = setTimeout(() => {
-      console.log(`尝试重连 (${this.reconnectAttempts}/${this.options.maxReconnectAttempts})`);
-      this.connect();
-    }, delay);
-  }
-
-  // 断开连接
-  disconnect() {
-    this.stopHeartbeat();
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    
-    if (this.ws) {
-      this.ws.close(1000, '正常关闭');
-      this.ws = null;
-    }
-    
-    this.setStatus(ConnectionStatus.DISCONNECTED);
-  }
-
-  // 事件监听
-  on(event, callback) {
-    if (!this.eventListeners.has(event)) {
-      this.eventListeners.set(event, []);
-    }
-    this.eventListeners.get(event).push(callback);
-  }
-
-  // 移除事件监听
-  off(event, callback) {
-    if (this.eventListeners.has(event)) {
-      const listeners = this.eventListeners.get(event);
-      const index = listeners.indexOf(callback);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
-    }
-  }
-
-  // 触发事件
-  emit(event, data) {
-    if (this.eventListeners.has(event)) {
-      this.eventListeners.get(event).forEach(callback => {
-        try {
-          callback(data);
-        } catch (error) {
-          console.error(`事件处理器错误 (${event}):`, error);
-        }
-      });
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
     }
   }
 
@@ -295,12 +417,43 @@ export class EnterpriseWebSocketClient {
   // 获取统计信息
   getStats() {
     return {
+      ...this.stats,
       status: this.status,
       reconnectAttempts: this.reconnectAttempts,
-      messageQueueSize: this.messageQueue.length,
-      cacheSize: this.messageCache.size,
-      lastMessageTime: this.lastMessageTime
+      queueSize: this.messageQueue.size()
     };
+  }
+
+  // 事件监听
+  on(event, callback) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event).push(callback);
+  }
+
+  // 移除事件监听
+  off(event, callback) {
+    if (this.listeners.has(event)) {
+      const listeners = this.listeners.get(event);
+      const index = listeners.indexOf(callback);
+      if (index > -1) {
+        listeners.splice(index, 1);
+      }
+    }
+  }
+
+  // 触发事件
+  emit(event, data) {
+    if (this.listeners.has(event)) {
+      this.listeners.get(event).forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error(`WebSocket事件处理器错误 (${event}):`, error);
+        }
+      });
+    }
   }
 }
 
@@ -310,77 +463,83 @@ export const useEnterpriseWebSocket = (url, options = {}) => {
   const [lastMessage, setLastMessage] = useState(null);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({});
-  
-  const clientRef = useRef(null);
-  const { getCached, setCached } = useOptimizedCache(100);
+  const wsRef = useRef(null);
 
-  // 创建WebSocket客户端
   useEffect(() => {
     if (!url) return;
 
-    clientRef.current = new EnterpriseWebSocketClient(url, options);
-    
-    // 设置事件监听
-    clientRef.current.on('statusChange', setStatus);
-    clientRef.current.on('message', setLastMessage);
-    clientRef.current.on('error', setError);
-    
-    // 定期更新统计信息
-    const statsInterval = setInterval(() => {
-      if (clientRef.current) {
-        setStats(clientRef.current.getStats());
-      }
-    }, 5000);
+    const ws = new EnterpriseWebSocketClient(url, options);
+    wsRef.current = ws;
 
-    return () => {
-      clearInterval(statsInterval);
-      if (clientRef.current) {
-        clientRef.current.disconnect();
-      }
+    // 设置状态监听
+    const handleStatusChange = () => {
+      setStatus(ws.getStatus());
+      setStats(ws.getStats());
     };
-  }, [url]);
 
-  // 连接
+    // 设置消息监听
+    const handleMessage = (message) => {
+      setLastMessage(message);
+      setError(null);
+    };
+
+    // 设置错误监听
+    const handleError = (error) => {
+      setError(error);
+    };
+
+    // 监听事件
+    ws.on('statusChange', handleStatusChange);
+    ws.on('message', handleMessage);
+    ws.on('error', handleError);
+
+    // 连接
+    ws.connect().catch(setError);
+
+    // 清理函数
+    return () => {
+      ws.off('statusChange', handleStatusChange);
+      ws.off('message', handleMessage);
+      ws.off('error', handleError);
+      ws.disconnect();
+    };
+  }, [url, JSON.stringify(options)]);
+
   const connect = useCallback(() => {
-    if (clientRef.current) {
-      clientRef.current.connect();
+    if (wsRef.current) {
+      return wsRef.current.connect();
     }
   }, []);
 
-  // 断开连接
   const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      clientRef.current.disconnect();
+    if (wsRef.current) {
+      wsRef.current.disconnect();
     }
   }, []);
 
-  // 发送消息
   const send = useCallback((message) => {
-    if (clientRef.current) {
-      return clientRef.current.send(message);
+    if (wsRef.current) {
+      return wsRef.current.send(message);
     }
     return false;
   }, []);
 
-  // 批量发送
   const sendBatch = useCallback((messages) => {
-    if (clientRef.current) {
-      return clientRef.current.sendBatch(messages);
+    if (wsRef.current) {
+      return wsRef.current.sendBatch(messages);
     }
-    return false;
+    return [];
   }, []);
 
-  // 事件监听
   const on = useCallback((event, callback) => {
-    if (clientRef.current) {
-      clientRef.current.on(event, callback);
+    if (wsRef.current) {
+      wsRef.current.on(event, callback);
     }
   }, []);
 
-  // 移除事件监听
   const off = useCallback((event, callback) => {
-    if (clientRef.current) {
-      clientRef.current.off(event, callback);
+    if (wsRef.current) {
+      wsRef.current.off(event, callback);
     }
   }, []);
 
@@ -394,8 +553,7 @@ export const useEnterpriseWebSocket = (url, options = {}) => {
     send,
     sendBatch,
     on,
-    off,
-    client: clientRef.current
+    off
   };
 };
 
@@ -463,7 +621,7 @@ export class MessageQueueManager {
   }
 }
 
-// 导出所有组件和类
+// 导出所有组件和工具
 export default {
   EnterpriseWebSocketClient,
   useEnterpriseWebSocket,

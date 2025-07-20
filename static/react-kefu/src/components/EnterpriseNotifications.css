@@ -52,6 +52,88 @@
   pointer-events: auto;
 }
 
+/* 连接状态指示器 */
+.connection-status-indicator {
+  position: fixed;
+  top: var(--spacing-lg);
+  left: var(--spacing-lg);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  font-size: var(--font-size-xs);
+  color: var(--gray-600);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.connected {
+  background: var(--success-color);
+}
+
+.status-dot.connecting {
+  background: var(--warning-color);
+  animation: connecting-pulse 1s infinite;
+}
+
+.status-dot.disconnected {
+  background: var(--error-color);
+}
+
+.status-dot.reconnecting {
+  background: var(--warning-color);
+  animation: reconnecting-pulse 1.5s infinite;
+}
+
+.status-dot.error {
+  background: var(--error-color);
+  animation: error-pulse 1s infinite;
+}
+
+.status-text {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+@keyframes connecting-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes reconnecting-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes error-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 /* 单个通知 */
 .enterprise-notification {
   background: white;
@@ -717,6 +799,13 @@
     top: var(--spacing-sm);
     right: var(--spacing-sm);
   }
+  
+  .connection-status-indicator {
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs);
+  }
 }
 
 @media (max-width: 480px) {
@@ -811,6 +900,12 @@
   .header-actions button:hover {
     background: var(--gray-600);
   }
+  
+  .connection-status-indicator {
+    background: var(--gray-800);
+    color: var(--gray-100);
+    border-color: var(--gray-600);
+  }
 }
 
 /* 高对比度模式 */
@@ -826,13 +921,18 @@
   .reminder-item {
     border: 2px solid var(--gray-900);
   }
+  
+  .connection-status-indicator {
+    border: 2px solid var(--gray-900);
+  }
 }
 
 /* 减少动画模式 */
 @media (prefers-reduced-motion: reduce) {
   .enterprise-notification,
   .notification-badge,
-  .reminder-item {
+  .reminder-item,
+  .status-dot {
     animation: none;
     transition: none;
   }
