@@ -1,37 +1,51 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      '@components': resolve(__dirname, './src/components'),
+      '@hooks': resolve(__dirname, './src/hooks'),
+      '@services': resolve(__dirname, './src/services'),
+      '@store': resolve(__dirname, './src/store'),
+      '@types': resolve(__dirname, './src/types'),
+      '@utils': resolve(__dirname, './src/utils'),
+    },
+  },
   server: {
-    port: 3002,
+    port: 6006,
+    host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:6006',
+        target: 'http://localhost:3030',
         changeOrigin: true,
+        secure: false,
       },
       '/ws': {
-        target: 'ws://localhost:6006',
+        target: 'ws://localhost:3030',
         ws: true,
+        changeOrigin: true,
       },
     },
   },
-  
   build: {
-    outDir: '../../static/kehu-build',
-    emptyOutDir: true,
-    assetsDir: 'assets',
-    
+    outDir: 'dist',
+    sourcemap: false,
     rollupOptions: {
       output: {
-        chunkFileNames: 'js/[name]-[hash].js',
-        entryFileNames: 'js/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@heroui/react', 'framer-motion'],
+          utils: ['axios', '@tanstack/react-query', 'zustand'],
+        },
       },
     },
-    
-    minify: 'terser',
-    sourcemap: false,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@heroui/react', 'framer-motion'],
   },
 })
