@@ -4,32 +4,27 @@ use tracing::info;
 use warp::Filter;
 use crate::config::AppConfig;
 use crate::errors::handle_rejection;
-use crate::routes::build_all_routes;
+use crate::routes::{build_all_routes, RouteBuilderConfig};
 use crate::server::components::SystemComponents;
 
 /// 启动服务器
 pub async fn start_server(components: SystemComponents) -> Result<()> {
     let config = AppConfig::get();
 
+    // 构建路由配置
+    let route_config = RouteBuilderConfig {
+        ws_manager: components.ws_manager.clone(),
+        file_manager: components.file_manager.clone(),
+        html_manager: components.html_manager.clone(),
+        user_manager: components.user_manager.clone(),
+        voice_manager: components.voice_manager.clone(),
+        storage: Arc::new(components.storage.clone()),
+        ai_manager: components.ai_manager.clone(),
+        kefu_auth_manager: components.kefu_auth_manager.clone(),
+    };
+
     // 构建路由
-    let routes = build_all_routes(
-        components.ws_manager.clone(),
-        components.file_manager.clone(),
-        components.html_manager.clone(),
-        components.user_manager.clone(),
-        components.voice_manager.clone(),
-        Arc::new(components.storage.clone()),
-        components.ai_manager.clone(),
-        components.kefu_auth_manager.clone(),
-        None, // components.load_balancer.clone(),
-        None, // components.websocket_pool.clone(),
-        None, // components.api_routes.clone(),
-        None, // components.http_fallback.clone(),
-        None, // components.auto_upgrade.clone(),
-        None, // components.performance_optimizer.clone(),
-        None, // components.health_monitor.clone(),
-        None, // components.failover_manager.clone(),
-    );
+    let routes = build_all_routes(route_config);
 
     // 配置CORS - 简化实现
     let cors = warp::cors()

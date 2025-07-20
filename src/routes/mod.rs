@@ -27,6 +27,18 @@ use crate::storage::LocalStorage;
 use crate::ai::AIManager;
 use crate::handlers::ai::AIHandler;
 use crate::auth::kefu_auth::KefuAuthManager;
+
+/// 路由构建器配置结构体
+pub struct RouteBuilderConfig {
+    pub ws_manager: Arc<WebSocketManager>,
+    pub file_manager: Arc<FileManager>,
+    pub html_manager: Arc<HtmlTemplateManager>,
+    pub user_manager: Arc<UserManager>,
+    pub voice_manager: Arc<VoiceMessageManager>,
+    pub storage: Arc<LocalStorage>,
+    pub ai_manager: Arc<AIManager>,
+    pub kefu_auth_manager: Arc<KefuAuthManager>,
+}
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::LoadBalancer;
 // use crate::websocket_pool::WebSocketConnectionPool;
@@ -38,54 +50,37 @@ use crate::auth::kefu_auth::KefuAuthManager;
 // use crate::failover_manager::FailoverManager;
 
 /// 构建所有路由
-pub fn build_all_routes(
-    ws_manager: Arc<WebSocketManager>,
-    file_manager: Arc<FileManager>,
-    html_manager: Arc<HtmlTemplateManager>,
-    user_manager: Arc<UserManager>,
-    voice_manager: Arc<VoiceMessageManager>,
-    storage: Arc<LocalStorage>,
-    ai_manager: Arc<AIManager>,
-    kefu_auth_manager: Arc<KefuAuthManager>,
-    _load_balancer: Option<()>, // placeholder
-    _websocket_pool: Option<()>, // placeholder
-    _api_routes: Option<()>, // placeholder
-    _http_fallback: Option<()>, // placeholder
-    _auto_upgrade: Option<()>, // placeholder
-    _performance_optimizer: Option<()>, // placeholder
-    _health_monitor: Option<()>, // placeholder
-    _failover_manager: Option<()>, // placeholder
-) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
     // 构建各个路由模块（使用简化版本）
-    let auth_routes = auth_simple::build_auth_routes(user_manager.clone());
-    let simple_api_routes = api_simple::build_api_routes(ws_manager.clone(), file_manager.clone(), html_manager.clone(), voice_manager.clone(), storage.clone());
+    let auth_routes = auth_simple::build_auth_routes(config.user_manager.clone());
+    let simple_api_routes = api_simple::build_api_routes(config.ws_manager.clone(), config.file_manager.clone(), config.html_manager.clone(), config.voice_manager.clone(), config.storage.clone());
     
     // 扩展的API路由
     let extended_api_routes = api_extended::build_extended_api_routes(
-        ws_manager.clone(),
-        user_manager.clone(),
-        storage.clone(),
-        file_manager.clone(),
+        config.ws_manager.clone(),
+        config.user_manager.clone(),
+        config.storage.clone(),
+        config.file_manager.clone(),
     );
     
     // 真实的文件管理API路由
     let real_file_api_routes = api_real::build_real_file_api_routes(
-        file_manager.clone(),
+        config.file_manager.clone(),
     );
     
-    let websocket_routes = websocket::build_websocket_routes(ws_manager.clone(), kefu_auth_manager.clone());
+    let websocket_routes = websocket::build_websocket_routes(config.ws_manager.clone(), config.kefu_auth_manager.clone());
     let frontend_routes = frontend::build_frontend_routes();
     
     // Swagger路由应该在最前面，避免被其他路由拦截
     let swagger_routes = swagger::build_swagger_routes();
     
     // AI路由
-    let ai_handler = AIHandler::new(ai_manager.clone());
+    let ai_handler = AIHandler::new(config.ai_manager.clone());
     let ai_routes = ai_handler.routes();
     
     // 客服认证路由
-    let kefu_auth_routes = kefu_auth::build_kefu_auth_routes(kefu_auth_manager.clone());
+    let kefu_auth_routes = kefu_auth::build_kefu_auth_routes(config.kefu_auth_manager.clone());
     
     // 企业级路由 - 暂时禁用
     // let enterprise_routes = None;

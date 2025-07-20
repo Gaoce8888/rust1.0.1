@@ -273,12 +273,10 @@ impl IntentProcessor {
             }
         }
         
-        if positive_count > negative_count {
-            Some("positive".to_string())
-        } else if negative_count > positive_count {
-            Some("negative".to_string())
-        } else {
-            Some("neutral".to_string())
+        match positive_count.cmp(&negative_count) {
+            std::cmp::Ordering::Greater => Some("positive".to_string()),
+            std::cmp::Ordering::Less => Some("negative".to_string()),
+            std::cmp::Ordering::Equal => Some("neutral".to_string()),
         }
     }
 }

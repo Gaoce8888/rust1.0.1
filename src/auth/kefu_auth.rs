@@ -200,7 +200,7 @@ impl KefuAuthManager {
         let mut conn = self.redis_pool.get_connection().await?;
         let online_list_key = "kefu:online:list";
         
-        let kefu_ids: Vec<String> = conn.smembers(&online_list_key).await?;
+        let kefu_ids: Vec<String> = conn.smembers(online_list_key).await?;
         let mut online_kefu = Vec::new();
         
         for kefu_id in kefu_ids {
@@ -224,10 +224,8 @@ impl KefuAuthManager {
         let mut best_kefu: Option<&KefuOnlineStatus> = None;
         
         for kefu in &online_kefu {
-            if kefu.current_customers < kefu.max_customers {
-                if best_kefu.is_none() || kefu.current_customers < best_kefu.unwrap().current_customers {
-                    best_kefu = Some(kefu);
-                }
+            if kefu.current_customers < kefu.max_customers && (best_kefu.is_none() || kefu.current_customers < best_kefu.unwrap().current_customers) {
+                best_kefu = Some(kefu);
             }
         }
         
@@ -314,7 +312,7 @@ impl KefuAuthManager {
         let mut conn = self.redis_pool.get_connection().await?;
         let online_list_key = "kefu:online:list";
         
-        let kefu_ids: Vec<String> = conn.smembers(&online_list_key).await?;
+        let kefu_ids: Vec<String> = conn.smembers(online_list_key).await?;
         let now = chrono::Utc::now();
         
         for kefu_id in kefu_ids {

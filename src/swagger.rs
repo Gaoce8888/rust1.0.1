@@ -76,7 +76,7 @@ impl Modify for SecurityAddon {
 #[allow(dead_code)]
 pub fn get_openapi_spec() -> utoipa::openapi::OpenApi {
     // 使用更简单的方式创建OpenAPI文档
-    let openapi = OpenApiBuilder::new()
+    OpenApiBuilder::new()
         .info(InfoBuilder::new()
             .title("企业级客服系统 API")
             .description(Some("提供完整的企业级客服系统 API 文档"))
@@ -108,9 +108,7 @@ pub fn get_openapi_spec() -> utoipa::openapi::OpenApi {
         ]))
         .paths(PathsBuilder::new().build())
         .components(Some(ComponentsBuilder::new().build()))
-        .build();
-    
-    openapi
+        .build()
 }
 
 /// 获取简化的OpenAPI规范JSON（用于测试）

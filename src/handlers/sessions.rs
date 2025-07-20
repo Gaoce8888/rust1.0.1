@@ -465,10 +465,7 @@ pub async fn handle_session_statistics(
     let kefu_id = parts[1];
     
     // 获取会话消息
-    let messages = match ws_manager.storage.get_recent_messages(kefu_id, kehu_id, 10000) {
-        Ok(msgs) => msgs,
-        Err(_) => vec![],
-    };
+    let messages = ws_manager.storage.get_recent_messages(kefu_id, kehu_id, 10000).unwrap_or_default();
     
     // 计算统计信息
     let total_messages = messages.len();
