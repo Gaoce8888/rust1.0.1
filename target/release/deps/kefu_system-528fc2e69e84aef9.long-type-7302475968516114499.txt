@@ -1,0 +1,1 @@
+fn(Arc<UserManager>) -> impl futures_util::Future<Output = Result<impl Reply, Rejection>> {handle_list_users}

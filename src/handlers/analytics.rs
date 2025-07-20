@@ -18,11 +18,11 @@ pub struct AnalyticsDateRange {
 
 // 系统概览统计
 pub async fn handle_analytics_overview(
-    _ws_manager: Arc<WebSocketManager>,
+    ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     // 获取当前连接统计
-    let _connection_stats = ws_manager.get_connection_stats().await;
+    let connection_stats = ws_manager.get_connection_stats().await;
     
     // TODO: 从storage获取更多统计数据
     let overview = serde_json::json!({
@@ -66,7 +66,7 @@ pub async fn handle_analytics_overview(
 
 // 消息统计
 pub async fn handle_analytics_messages(
-    _query: AnalyticsDateRange,
+    query: AnalyticsDateRange,
     _storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let _group_by = query.group_by.unwrap_or_else(|| "day".to_string());
@@ -176,7 +176,7 @@ pub async fn handle_analytics_users(
 pub async fn handle_analytics_performance(
     _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
-    let _connection_stats = ws_manager.get_connection_stats().await;
+    let _connection_stats = _ws_manager.get_connection_stats().await;
     
     let performance = serde_json::json!({
         "response_times": {
@@ -226,6 +226,7 @@ pub async fn handle_analytics_performance(
 }
 
 // 生成分析报告
+#[allow(dead_code)]
 pub async fn handle_generate_report(
     _request: GenerateReportRequest,
     _ws_manager: Arc<WebSocketManager>,
@@ -257,6 +258,7 @@ pub struct GenerateReportRequest {
 }
 
 // 业务洞察
+#[allow(dead_code)]
 pub async fn handle_business_insights(
     _ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,

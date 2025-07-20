@@ -216,6 +216,7 @@ impl KefuAuthManager {
     }
 
     /// 为客户分配客服
+    #[allow(dead_code)]
     pub async fn assign_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
         let online_kefu = self.get_online_kefu_list().await?;
         
@@ -239,7 +240,7 @@ impl KefuAuthManager {
             // 记录客户-客服关系
             let mut conn = self.redis_pool.get_connection().await?;
             let customer_key = format!("customer:kefu:{}", customer_id);
-            conn.set_ex::<_, _, ()>(conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;customer_key, conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;kefu.kefu_id, 3600).await?;
+            conn.set_ex::<_, _, ()>(&customer_key, &kefu.kefu_id, 3600).await?;
             
             return Ok(Some(kefu.kefu_id.clone()));
         }
@@ -249,6 +250,7 @@ impl KefuAuthManager {
     }
 
     /// 更新客服的客户数量
+    #[allow(dead_code)]
     async fn increment_kefu_customers(&self, kefu_id: &str, increment: i32) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
         let key = format!("kefu:online:{}", kefu_id);
@@ -262,7 +264,7 @@ impl KefuAuthManager {
                 }
                 
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex::<_, _, ()>(conn.set_ex(&key, updated_json, 3600).await?;key, updated_json, 3600).await?;
+                conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
             }
         }
         
@@ -270,13 +272,14 @@ impl KefuAuthManager {
     }
 
     /// 客户断开连接时释放客服
+    #[allow(dead_code)]
     pub async fn release_kefu_for_customer(&self, customer_id: &str) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
         let customer_key = format!("customer:kefu:{}", customer_id);
         
         if let Ok(Some(kefu_id)) = conn.get::<_, Option<String>>(&customer_key).await {
             self.increment_kefu_customers(&kefu_id, -1).await?;
-            conn.del::<_, ()>(conn.del(&customer_key).await?;customer_key).await?;
+            conn.del::<_, ()>(&customer_key).await?;
             info!("✅ 为客户 {} 释放客服: {}", customer_id, kefu_id);
         }
         
@@ -284,6 +287,7 @@ impl KefuAuthManager {
     }
 
     /// 获取客户对应的客服
+    #[allow(dead_code)]
     pub async fn get_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
         let mut conn = self.redis_pool.get_connection().await?;
         let customer_key = format!("customer:kefu:{}", customer_id);
@@ -305,6 +309,7 @@ impl KefuAuthManager {
     }
 
     /// 清理过期的客服连接
+    #[allow(dead_code)]
     pub async fn cleanup_expired_kefu(&self) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
         let online_list_key = "kefu:online:list";

@@ -17,6 +17,7 @@ use crate::storage::LocalStorage;
     ),
     tag = "系统"
 )]
+#[allow(dead_code)]
 pub async fn handle_system_info(
     ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
@@ -53,6 +54,7 @@ pub async fn handle_system_info(
     ),
     tag = "系统"
 )]
+#[allow(dead_code)]
 pub async fn handle_system_health(
     _ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,
@@ -95,6 +97,7 @@ pub async fn handle_system_health(
     ),
     tag = "系统"
 )]
+#[allow(dead_code)]
 pub async fn handle_online_users(
     ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {

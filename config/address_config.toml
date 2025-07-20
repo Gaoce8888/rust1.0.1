@@ -1,0 +1,331 @@
+# 统一地址配置文件
+# 此文件定义了系统中所有的地址、域名和网络相关配置
+
+[domains]
+# 主域名配置
+primary_domain = "ylqkf.com"
+api_subdomain = "a.ylqkf.com"
+web_subdomain = "b.ylqkf.com"
+admin_subdomain = "admin.ylqkf.com"
+
+# 开发环境域名
+dev_domain = "localhost"
+dev_api_domain = "localhost"
+dev_web_domain = "localhost"
+
+# 测试环境域名
+test_domain = "test.ylqkf.com"
+test_api_domain = "api.test.ylqkf.com"
+test_web_domain = "web.test.ylqkf.com"
+
+# 生产环境域名
+prod_domain = "ylqkf.com"
+prod_api_domain = "a.ylqkf.com"
+prod_web_domain = "b.ylqkf.com"
+
+[ports]
+# 服务器端口配置
+server_port = 6006
+api_port = 6006
+websocket_port = 6006
+admin_port = 6007
+dev_port = 6007
+test_port = 6008
+
+# 前端端口
+frontend_port = 3000
+react_dev_port = 3000
+vue_dev_port = 8080
+
+# 其他服务端口
+redis_port = 6379
+postgres_port = 5432
+nginx_port = 80
+nginx_ssl_port = 443
+
+[protocols]
+# 协议配置
+http_protocol = "http"
+https_protocol = "https"
+ws_protocol = "ws"
+wss_protocol = "wss"
+
+# 默认协议（根据环境自动选择）
+dev_default_protocol = "http"
+test_default_protocol = "https"
+prod_default_protocol = "https"
+
+[urls]
+# 统一URL配置
+# 开发环境
+dev_api_url = "http://localhost:6006/api"
+dev_ws_url = "ws://localhost:6006/ws"
+dev_web_url = "http://localhost:3000"
+dev_admin_url = "http://localhost:6007"
+
+# 测试环境
+test_api_url = "https://api.test.ylqkf.com"
+test_ws_url = "wss://api.test.ylqkf.com/ws"
+test_web_url = "https://web.test.ylqkf.com"
+test_admin_url = "https://admin.test.ylqkf.com"
+
+# 生产环境
+prod_api_url = "https://a.ylqkf.com"
+prod_ws_url = "wss://a.ylqkf.com/ws"
+prod_web_url = "https://b.ylqkf.com"
+prod_admin_url = "https://admin.ylqkf.com"
+
+# 备用地址
+fallback_api_url = "http://127.0.0.1:6006/api"
+fallback_ws_url = "ws://127.0.0.1:6006/ws"
+
+[paths]
+# 路径配置
+api_base_path = "/api"
+websocket_path = "/ws"
+admin_path = "/admin"
+static_path = "/static"
+upload_path = "/upload"
+download_path = "/download"
+
+# 特定API路径
+auth_path = "/api/auth"
+user_path = "/api/user"
+message_path = "/api/message"
+session_path = "/api/session"
+kefu_path = "/api/kefu"
+file_path = "/api/file"
+voice_path = "/api/voice"
+
+# 文档路径
+docs_path = "/api-docs"
+swagger_path = "/swagger"
+redoc_path = "/redoc"
+rapidoc_path = "/rapidoc"
+
+[cors]
+# CORS配置
+enabled = true
+allow_credentials = true
+
+# 允许的源（开发环境）
+dev_origins = [
+    "http://localhost:6006",
+    "http://localhost:6007", 
+    "http://localhost:6008",
+    "http://localhost:3000",
+    "http://127.0.0.1:6006",
+    "http://127.0.0.1:6007",
+    "http://127.0.0.1:3000"
+]
+
+# 允许的源（测试环境）
+test_origins = [
+    "https://web.test.ylqkf.com",
+    "https://admin.test.ylqkf.com",
+    "https://api.test.ylqkf.com"
+]
+
+# 允许的源（生产环境）
+prod_origins = [
+    "https://b.ylqkf.com",
+    "https://admin.ylqkf.com",
+    "https://a.ylqkf.com"
+]
+
+# 允许的方法
+allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+
+# 允许的头部
+allowed_headers = [
+    "Content-Type",
+    "Authorization", 
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers"
+]
+
+# 暴露的头部
+exposed_headers = [
+    "Content-Length",
+    "Content-Range",
+    "X-Total-Count"
+]
+
+# 预检请求缓存时间
+max_age = 86400
+
+[ssl]
+# SSL/TLS配置
+enabled = true
+cert_path = "/etc/ssl/certs/ylqkf.com.crt"
+key_path = "/etc/ssl/private/ylqkf.com.key"
+ca_path = "/etc/ssl/certs/ca-bundle.crt"
+
+# 开发环境SSL（可选）
+dev_ssl_enabled = false
+dev_cert_path = "./certs/dev.crt"
+dev_key_path = "./certs/dev.key"
+
+# SSL配置
+ssl_protocols = ["TLSv1.2", "TLSv1.3"]
+ssl_ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
+ssl_prefer_server_ciphers = true
+
+[proxy]
+# 代理配置
+enabled = false
+proxy_host = "127.0.0.1"
+proxy_port = 8080
+proxy_username = ""
+proxy_password = ""
+
+# 反向代理配置
+reverse_proxy_enabled = true
+nginx_config_path = "/etc/nginx/sites-available/ylqkf.com"
+nginx_ssl_config_path = "/etc/nginx/sites-available/ylqkf.com-ssl"
+
+[cdn]
+# CDN配置
+enabled = true
+cdn_domain = "cdn.ylqkf.com"
+cdn_protocol = "https"
+cdn_path = "/static"
+
+# 静态资源CDN
+static_cdn_url = "https://cdn.ylqkf.com/static"
+image_cdn_url = "https://cdn.ylqkf.com/images"
+js_cdn_url = "https://cdn.ylqkf.com/js"
+css_cdn_url = "https://cdn.ylqkf.com/css"
+
+[monitoring]
+# 监控地址配置
+health_check_url = "/health"
+metrics_url = "/metrics"
+status_url = "/status"
+ping_url = "/ping"
+
+# 外部监控服务
+uptime_robot_url = "https://uptimerobot.com"
+pingdom_url = "https://pingdom.com"
+newrelic_url = "https://newrelic.com"
+
+[external_apis]
+# 外部API配置
+openai_api_url = "https://api.openai.com/v1"
+google_translate_url = "https://translation.googleapis.com/language/translate/v2"
+microsoft_speech_url = "https://speech.microsoft.com/cognitiveservices/v1"
+huggingface_api_url = "https://api.huggingface.co/models"
+
+# 第三方服务
+redis_url = "redis://127.0.0.1:6379"
+postgres_url = "postgresql://user:password@127.0.0.1:5432/dbname"
+
+[websocket]
+# WebSocket配置
+heartbeat_interval = 30000
+reconnect_interval = 5000
+max_reconnect_attempts = 5
+message_timeout = 10000
+max_message_size = 1048576
+
+# WebSocket路径
+ws_path = "/ws"
+ws_upgrade_path = "/ws/upgrade"
+ws_fallback_path = "/ws/fallback"
+
+# WebSocket子协议
+subprotocols = ["chat", "notification", "file-transfer"]
+
+[load_balancing]
+# 负载均衡配置
+enabled = true
+algorithm = "round_robin"  # round_robin, least_connections, ip_hash
+
+# 后端服务器
+backend_servers = [
+    "http://127.0.0.1:6006",
+    "http://127.0.0.1:6007", 
+    "http://127.0.0.1:6008"
+]
+
+# 健康检查
+health_check_interval = 30
+health_check_timeout = 5
+health_check_path = "/health"
+
+[failover]
+# 故障转移配置
+enabled = true
+primary_endpoint = "https://a.ylqkf.com"
+backup_endpoints = [
+    "https://backup1.ylqkf.com",
+    "https://backup2.ylqkf.com"
+]
+
+# 故障检测
+failover_check_interval = 10
+failover_timeout = 3
+max_failover_attempts = 3
+
+[security]
+# 安全配置
+rate_limiting_enabled = true
+rate_limit_window = 60000
+rate_limit_max_requests = 100
+
+# 防火墙配置
+allowed_ips = [
+    "127.0.0.1",
+    "::1",
+    "192.168.1.0/24"
+]
+
+blocked_ips = [
+    "10.0.0.1",
+    "172.16.0.1"
+]
+
+# 请求头验证
+required_headers = ["User-Agent", "Accept"]
+blocked_user_agents = ["bot", "crawler", "spider"]
+
+[logging]
+# 日志配置
+log_level = "info"
+log_format = "json"
+log_file_path = "./logs/app.log"
+access_log_path = "./logs/access.log"
+error_log_path = "./logs/error.log"
+
+# 日志轮转
+max_log_size = 10485760  # 10MB
+max_log_files = 5
+log_retention_days = 30
+
+[environment]
+# 环境特定配置
+current_environment = "development"  # development, test, production
+
+# 环境变量映射
+env_vars = [
+    "APP_ENV",
+    "SERVER_HOST", 
+    "SERVER_PORT",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "REDIS_PASSWORD",
+    "JWT_SECRET",
+    "API_URL",
+    "WS_URL"
+]
+
+# 配置优先级
+config_priority = [
+    "environment_variables",
+    "address_config.toml", 
+    "app-config.json",
+    "default_values"
+]
