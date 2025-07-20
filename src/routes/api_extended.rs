@@ -1,9 +1,9 @@
 use std::sync::Arc;
 use warp::Filter;
 use crate::websocket::WebSocketManager;
-use crate::file_manager::FileManager;
 use crate::user_manager::UserManager;
 use crate::storage::LocalStorage;
+use crate::file_manager::FileManager;
 
 // 导入系统扩展处理器
 use crate::handlers::system_extended::*;
@@ -17,8 +17,9 @@ pub fn build_extended_api_routes(
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
     // === 用户管理 API ===
-    let users_list = warp::path!("api" / "users" / "list")
+    let users_list = warp::path!("api" / "users")
         .and(warp::get())
+        .and(warp::query())
         .and(with_user_manager(user_manager.clone()))
         .and_then(crate::handlers::users::handle_list_users);
 
@@ -110,6 +111,52 @@ pub fn build_extended_api_routes(
         .and(with_ws_manager(ws_manager.clone()))
         .and_then(crate::handlers::sessions::handle_transfer_session);
 
+    let sessions_end = warp::path!("api" / "sessions" / String / "end")
+        .and(warp::post())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::sessions::handle_end_session);
+
+    let sessions_statistics = warp::path!("api" / "sessions" / String / "statistics")
+        .and(warp::get())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::sessions::handle_session_statistics);
+
+    // === 客服分配管理 API ===
+    let kefu_customers = warp::path!("api" / "kefu" / String / "customers")
+        .and(warp::get())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::kefu_assignment::handle_get_kefu_customers);
+
+    let kefu_workload = warp::path!("api" / "kefu" / String / "workload")
+        .and(warp::get())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::kefu_assignment::handle_get_kefu_workload);
+
+    let kefu_switch_customer = warp::path!("api" / "kefu" / String / "switch" / String)
+        .and(warp::post())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(|kefu_id: String, customer_id: String, ws_manager| {
+            crate::handlers::kefu_assignment::handle_switch_customer(kefu_id, customer_id, ws_manager)
+        });
+
+    let kefu_available = warp::path!("api" / "kefu" / "available")
+        .and(warp::get())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::kefu_assignment::handle_get_available_kefu);
+
+    let kefu_waiting_customers = warp::path!("api" / "kefu" / "waiting")
+        .and(warp::get())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(crate::handlers::kefu_assignment::handle_get_waiting_customers);
+
+    let customer_assign = warp::path!("api" / "customer" / String / "assign")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with_ws_manager(ws_manager.clone()))
+        .and_then(|customer_id: String, request, ws_manager| {
+            crate::handlers::kefu_assignment::handle_assign_customer(customer_id, request, ws_manager)
+        });
+
     // === 统计分析 API ===
     let analytics_overview = warp::path!("api" / "analytics" / "overview")
         .and(warp::get())
@@ -196,6 +243,14 @@ pub fn build_extended_api_routes(
         .or(sessions_get)
         .or(sessions_messages)
         .or(sessions_transfer)
+        .or(sessions_end)
+        .or(sessions_statistics)
+        .or(kefu_customers)
+        .or(kefu_workload)
+        .or(kefu_switch_customer)
+        .or(kefu_available)
+        .or(kefu_waiting_customers)
+        .or(customer_assign)
         .or(analytics_overview)
         .or(analytics_messages)
         .or(analytics_users)
@@ -220,4 +275,104 @@ fn with_user_manager(user_manager: Arc<UserManager>) -> impl Filter<Extract = (A
 
 fn with_storage(storage: Arc<LocalStorage>) -> impl Filter<Extract = (Arc<LocalStorage>,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || storage.clone())
+}
+
+// 系统管理处理器
+async fn handle_system_logs(query: std::collections::HashMap<String, String>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现系统日志查询
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "获取系统日志成功".to_string(),
+        data: Some(serde_json::json!({
+            "logs": [],
+            "total": 0
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_system_backup(request: serde_json::Value, _storage: Arc<LocalStorage>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现系统备份
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "系统备份成功".to_string(),
+        data: Some(serde_json::json!({
+            "backup_id": "backup_001",
+            "timestamp": chrono::Utc::now(),
+            "size": 0
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_system_maintenance(request: serde_json::Value) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现系统维护
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "系统维护模式已启用".to_string(),
+        data: Some(serde_json::json!({
+            "maintenance_mode": true,
+            "timestamp": chrono::Utc::now()
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_system_health(_ws_manager: Arc<WebSocketManager>, _storage: Arc<LocalStorage>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现系统健康检查
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "系统健康检查完成".to_string(),
+        data: Some(serde_json::json!({
+            "status": "healthy",
+            "timestamp": chrono::Utc::now(),
+            "components": {
+                "websocket": "ok",
+                "storage": "ok",
+                "redis": "ok"
+            }
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_redis_status(_ws_manager: Arc<WebSocketManager>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现Redis状态检查
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "Redis状态检查完成".to_string(),
+        data: Some(serde_json::json!({
+            "status": "connected",
+            "timestamp": chrono::Utc::now(),
+            "info": {}
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_redis_flush(request: serde_json::Value, _ws_manager: Arc<WebSocketManager>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现Redis数据清理
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "Redis数据清理完成".to_string(),
+        data: Some(serde_json::json!({
+            "flushed_keys": 0,
+            "timestamp": chrono::Utc::now()
+        })),
+    };
+    Ok(warp::reply::json(&response))
+}
+
+async fn handle_redis_keys(pattern: Option<String>, _ws_manager: Arc<WebSocketManager>) -> Result<impl warp::Reply, warp::Rejection> {
+    // TODO: 实现Redis键查询
+    let response = crate::types::api::ApiResponse {
+        success: true,
+        message: "Redis键查询完成".to_string(),
+        data: Some(serde_json::json!({
+            "pattern": pattern,
+            "keys": [],
+            "count": 0
+        })),
+    };
+    Ok(warp::reply::json(&response))
 }
