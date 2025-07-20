@@ -1,29 +1,55 @@
 {
-  "name": "kefu-frontend",
+  "name": "kefu-app",
   "version": "1.0.0",
+  "description": "客服端应用 - 企业级客服系统",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 6005",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 6005"
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@heroui/react": "latest",
-    "@iconify/react": "4.1.1",
-    "clsx": "^2.1.0",
-    "framer-motion": "11.1.7",
-    "fs-extra": "^11.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "tailwind-merge": "^2.2.0",
-    "usehooks-ts": "^3.1.1"
+    "@enterprise/shared-components": "file:../shared-components",
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.6.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "framer-motion": "^10.16.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.0",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.5.0",
+    "react-virtualized-auto-sizer": "^1.0.20",
+    "react-window": "^1.8.8",
+    "recharts": "^2.8.0",
+    "socket.io-client": "^4.7.0",
+    "tailwind-merge": "^2.0.0",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
-    "puppeteer": "^24.14.0",
-    "tailwindcss": "^3.4.3",
-    "vite": "^4.4.0"
-  }
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^4.0.0"
+  },
+  "keywords": [
+    "react",
+    "kefu",
+    "customer-service",
+    "enterprise",
+    "typescript",
+    "tailwindcss"
+  ],
+  "author": "Enterprise Team",
+  "license": "MIT"
 }
