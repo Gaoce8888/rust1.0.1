@@ -44,11 +44,26 @@ export {
   MetricType
 } from './EnterpriseDashboard';
 
+// 通知/提醒组件
+export {
+  Notification,
+  NotificationContainer,
+  NotificationCenter,
+  NotificationBadge,
+  SmartReminder,
+  useNotifications,
+  notificationManager,
+  NotificationType,
+  NotificationPriority,
+  NotificationPosition
+} from './EnterpriseNotifications';
+
 // 主应用组件
 export { default as EnterpriseKefuApp } from './EnterpriseApp';
 
 // 样式文件
 import './EnterpriseStyles.css';
+import './EnterpriseNotifications.css';
 
 // 默认导出主应用
 export { default } from './EnterpriseApp';
