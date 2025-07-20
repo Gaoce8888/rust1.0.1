@@ -69,6 +69,44 @@ pub fn build_api_routes(
             }
         });
 
+    // 用户信息API
+    let user_info_route = warp::path!("api" / "user" / "info")
+        .and(warp::get())
+        .and_then(|| async {
+            let response = ApiResponse {
+                success: true,
+                message: "获取用户信息成功".to_string(),
+                data: Some(serde_json::json!({
+                    "id": "current_user_id",
+                    "username": "current_user",
+                    "display_name": "当前用户",
+                    "role": "kefu",
+                    "avatar": "https://via.placeholder.com/150",
+                    "status": "online",
+                    "permissions": ["chat", "view_users", "manage_files"],
+                    "last_login": chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string()
+                })),
+            };
+            Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+        });
+
+    // 用户状态更新API
+    let user_status_route = warp::path!("api" / "user" / "status")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and_then(|status_data: serde_json::Value| async move {
+            let response = ApiResponse {
+                success: true,
+                message: "用户状态更新成功".to_string(),
+                data: Some(serde_json::json!({
+                    "user_id": "current_user_id",
+                    "status": status_data.get("status").unwrap_or(&serde_json::json!("online")),
+                    "updated_at": chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string()
+                })),
+            };
+            Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+        });
+
     // WebSocket统计路由（无需认证）
     let ws_manager_stats = ws_manager.clone();
     let websocket_stats_route = warp::path!("api" / "websocket" / "stats")
@@ -143,6 +181,24 @@ pub fn build_api_routes(
             Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
         });
 
+    // 兼容的文件上传路径（前端使用/api/upload）
+    let file_upload_compat_route = warp::path!("api" / "upload")
+        .and(warp::post())
+        .and_then(|| async {
+            let response = ApiResponse {
+                success: true,
+                message: "文件上传成功".to_string(),
+                data: Some(serde_json::json!({
+                    "file_id": "mock_file_id_002",
+                    "filename": "uploaded_file_compat.txt",
+                    "size": 1024,
+                    "upload_time": "2025-07-14T22:30:00Z",
+                    "access_url": "http://localhost:6006/api/file/download/mock_file_id_002"
+                })),
+            };
+            Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+        });
+
     let file_download_route = warp::path!("api" / "file" / "download" / String)
         .and(warp::get())
         .and_then(|file_id: String| async move {
@@ -165,6 +221,81 @@ pub fn build_api_routes(
                 data: Some(serde_json::json!({
                     "file_id": file_id,
                     "deleted_at": chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string()
+                })),
+            };
+            Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+        });
+
+    // 消息历史API
+    let messages_route = warp::path!("api" / "messages" / String)
+        .and(warp::get())
+        .and_then(|user_id: String| async move {
+            let response = ApiResponse {
+                success: true,
+                message: "获取消息历史成功".to_string(),
+                data: Some(serde_json::json!({
+                    "messages": [
+                        {
+                            "id": "msg_001",
+                            "senderId": "user_001",
+                            "receiverId": user_id,
+                            "text": "你好，有什么可以帮助您的吗？",
+                            "type": "text",
+                            "time": "2025-01-14T10:00:00Z",
+                            "status": "read"
+                        },
+                        {
+                            "id": "msg_002",
+                            "senderId": user_id,
+                            "receiverId": "user_001",
+                            "text": "我想咨询一下产品信息",
+                            "type": "text",
+                            "time": "2025-01-14T10:01:00Z",
+                            "status": "read"
+                        }
+                    ],
+                    "total": 2,
+                    "user_id": user_id
+                })),
+            };
+            Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+        });
+
+    // 消息列表API
+    let messages_list_route = warp::path!("api" / "messages")
+        .and(warp::get())
+        .and_then(|| async {
+            let response = ApiResponse {
+                success: true,
+                message: "获取消息列表成功".to_string(),
+                data: Some(serde_json::json!({
+                    "conversations": [
+                        {
+                            "id": "conv_001",
+                            "participants": [
+                                {
+                                    "id": "user_001",
+                                    "name": "客服001",
+                                    "role": "support",
+                                    "status": "online"
+                                },
+                                {
+                                    "id": "user_002",
+                                    "name": "客户001",
+                                    "role": "customer",
+                                    "status": "online"
+                                }
+                            ],
+                            "lastMessage": {
+                                "id": "msg_001",
+                                "text": "你好，有什么可以帮助您的吗？",
+                                "time": "2025-01-14T10:00:00Z",
+                                "senderId": "user_001"
+                            },
+                            "unreadCount": 0
+                        }
+                    ],
+                    "total": 1
                 })),
             };
             Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
@@ -359,11 +490,16 @@ pub fn build_api_routes(
         .or(users_route)
         .or(public_users_route)
         .or(realtime_users_route)
+        .or(user_info_route)
+        .or(user_status_route)
         .or(websocket_stats_route)
         .or(file_list_route)
         .or(file_upload_route)
+        .or(file_upload_compat_route)
         .or(file_download_route)
         .or(file_delete_route)  // 添加文件删除路由
+        .or(messages_route)
+        .or(messages_list_route)
         .or(voice_list_route)
         .or(voice_upload_route)
         .or(voice_download_route)  // 添加语音下载路由

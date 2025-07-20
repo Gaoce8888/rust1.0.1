@@ -192,7 +192,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
     
-    const response = await fetch(`${this.config.apiUrl}/api/upload`, {
+    const response = await fetch(`${this.config.apiUrl}/api/file/upload`, {
       method: 'POST',
       body: formData,
     });

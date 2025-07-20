@@ -9,7 +9,7 @@ pub fn build_auth_routes(
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
     // 登录路由
-    let login_route = warp::path!("auth" / "login")
+    let login_route = warp::path!("api" / "auth" / "login")
         .and(warp::post())
         .and(warp::body::json())
         .and_then(move |login_req: LoginRequest| {
@@ -33,7 +33,7 @@ pub fn build_auth_routes(
         });
 
     // 强制登录路由
-    let force_login_route = warp::path!("auth" / "force-login")
+    let force_login_route = warp::path!("api" / "auth" / "force-login")
         .and(warp::post())
         .and(warp::body::json())
         .and_then(move |login_req: LoginRequest| {
@@ -57,7 +57,7 @@ pub fn build_auth_routes(
         });
 
     // 登出路由
-    let logout_route = warp::path!("auth" / "logout")
+    let logout_route = warp::path!("api" / "auth" / "logout")
         .and(warp::post())
         .and_then(|| async {
             let response = SuccessResponse {
@@ -68,7 +68,7 @@ pub fn build_auth_routes(
         });
 
     // 会话验证路由
-    let validate_route = warp::path!("auth" / "validate")
+    let validate_route = warp::path!("api" / "auth" / "validate")
         .and(warp::get())
         .and_then(|| async {
             let response = ApiResponse {
@@ -89,7 +89,7 @@ pub fn build_auth_routes(
         });
 
     // 心跳检测路由
-    let heartbeat_route = warp::path!("auth" / "heartbeat")
+    let heartbeat_route = warp::path!("api" / "auth" / "heartbeat")
         .and(warp::post())
         .and_then(|| async {
             let response = SuccessResponse {
@@ -100,7 +100,7 @@ pub fn build_auth_routes(
         });
 
     // 会话列表路由
-    let sessions_route = warp::path!("auth" / "sessions")
+    let sessions_route = warp::path!("api" / "auth" / "sessions")
         .and(warp::get())
         .and_then(|| async {
             let response = ApiResponse {
@@ -112,7 +112,7 @@ pub fn build_auth_routes(
         });
 
     // 实时检查路由
-    let realtime_check_route = warp::path!("auth" / "realtime-check" / String)
+    let realtime_check_route = warp::path!("api" / "auth" / "realtime-check" / String)
         .and(warp::get())
         .and_then(|username: String| async move {
             let response = serde_json::json!({
@@ -127,7 +127,7 @@ pub fn build_auth_routes(
         });
 
     // 用户在线信息路由（简化实现，不需要认证）
-    let user_online_info_route = warp::path!("auth" / "user-online-info" / String)
+    let user_online_info_route = warp::path!("api" / "auth" / "user-online-info" / String)
         .and(warp::get())
         .and_then(|username: String| async move {
             let response = serde_json::json!({

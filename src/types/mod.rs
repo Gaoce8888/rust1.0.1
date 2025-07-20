@@ -18,6 +18,7 @@ pub mod api;
 pub mod auth;
 pub mod config;
 pub mod websocket;
+pub mod frontend_compatibility;
 
 // 重新导出常用类型，方便其他模块使用
 pub use api::ApiResponse;

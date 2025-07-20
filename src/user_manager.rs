@@ -72,6 +72,8 @@ pub struct LoginRequest {
     pub username: String,
     /// 密码
     pub password: String,
+    /// 角色（可选）
+    pub role: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

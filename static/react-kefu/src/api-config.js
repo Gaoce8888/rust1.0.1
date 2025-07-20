@@ -43,6 +43,8 @@ export const API_CONFIG = {
     UPLOAD_FILE: '/api/file/upload',
     UPLOAD_IMAGE: '/api/file/upload',
     UPLOAD_VOICE: '/api/file/upload',
+    // 兼容旧版本路径
+    UPLOAD_COMPAT: '/api/upload',
     
     // 消息相关 - 仅用于历史记录查询
     // 消息发送通过 WebSocket 进行，不使用 HTTP API
