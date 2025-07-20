@@ -6,6 +6,7 @@ import {
   useThrottle,
   PerformanceMonitor 
 } from './EnterpriseCore';
+import { EnterpriseAIExample } from './EnterpriseAIExample';
 
 // 性能指标类型
 export const MetricType = {
@@ -456,7 +457,8 @@ export const EnterpriseDashboard = React.memo(({
     { id: 'overview', label: '概览', component: RealTimeMetrics },
     { id: 'connections', label: '连接', component: ConnectionMonitor },
     { id: 'messages', label: '消息', component: MessageStatistics },
-    { id: 'health', label: '健康', component: SystemHealthCheck }
+    { id: 'health', label: '健康', component: SystemHealthCheck },
+    { id: 'ai', label: '🤖 AI功能', component: EnterpriseAIExample }
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
@@ -511,5 +513,6 @@ export default {
   MessageStatistics,
   SystemHealthCheck,
   EnterpriseDashboard,
+  EnterpriseAIExample,
   MetricType
 };

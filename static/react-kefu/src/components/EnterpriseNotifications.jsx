@@ -113,6 +113,25 @@ export class NotificationManager {
         case 'OnlineUsers':
           this.handleOnlineUsersMessage(data);
           break;
+        // AI相关消息处理
+        case 'AITaskSubmitted':
+          this.handleAITaskSubmittedMessage(data);
+          break;
+        case 'AITaskStarted':
+          this.handleAITaskStartedMessage(data);
+          break;
+        case 'AITaskCompleted':
+          this.handleAITaskCompletedMessage(data);
+          break;
+        case 'AITaskFailed':
+          this.handleAITaskFailedMessage(data);
+          break;
+        case 'AITaskCancelled':
+          this.handleAITaskCancelledMessage(data);
+          break;
+        case 'AIResult':
+          this.handleAIResultMessage(data);
+          break;
         default:
           // 处理其他消息类型
           this.handleGenericMessage(data);
@@ -279,6 +298,123 @@ export class NotificationManager {
       autoDismiss: true,
       dismissDelay: 5000,
       data: data
+    });
+  }
+
+  // AI任务相关消息处理方法
+  handleAITaskSubmittedMessage(data) {
+    this.add({
+      type: NotificationType.INFO,
+      priority: NotificationPriority.NORMAL,
+      title: 'AI任务提交',
+      message: `AI任务已提交: ${data.task_type || '未知类型'}`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id
+      }
+    });
+  }
+
+  handleAITaskStartedMessage(data) {
+    this.add({
+      type: NotificationType.INFO,
+      priority: NotificationPriority.NORMAL,
+      title: 'AI任务开始',
+      message: `AI任务开始处理: ${data.task_type || '未知类型'}`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id
+      }
+    });
+  }
+
+  handleAITaskCompletedMessage(data) {
+    this.add({
+      type: NotificationType.SUCCESS,
+      priority: NotificationPriority.NORMAL,
+      title: 'AI任务完成',
+      message: `AI任务已完成: ${data.task_type || '未知类型'}`,
+      autoDismiss: true,
+      dismissDelay: 4000,
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id,
+        result: data.result
+      }
+    });
+  }
+
+  handleAITaskFailedMessage(data) {
+    this.add({
+      type: NotificationType.ERROR,
+      priority: NotificationPriority.HIGH,
+      title: 'AI任务失败',
+      message: `AI任务失败: ${data.error_message || '未知错误'}`,
+      autoDismiss: false,
+      actions: [
+        {
+          label: '重试',
+          type: 'primary',
+          handler: () => {
+            // 触发重试逻辑
+            console.log('重试AI任务:', data.task_id);
+          }
+        },
+        {
+          label: '查看详情',
+          type: 'secondary',
+          handler: () => {
+            console.log('AI任务失败详情:', data);
+          }
+        }
+      ],
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id,
+        error: data.error_message
+      }
+    });
+  }
+
+  handleAITaskCancelledMessage(data) {
+    this.add({
+      type: NotificationType.WARNING,
+      priority: NotificationPriority.NORMAL,
+      title: 'AI任务取消',
+      message: `AI任务已取消: ${data.task_type || '未知类型'}`,
+      autoDismiss: true,
+      dismissDelay: 3000,
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id
+      }
+    });
+  }
+
+  handleAIResultMessage(data) {
+    this.add({
+      type: NotificationType.SUCCESS,
+      priority: NotificationPriority.NORMAL,
+      title: 'AI处理结果',
+      message: `AI处理完成: ${data.task_type || '未知类型'}`,
+      autoDismiss: true,
+      dismissDelay: 5000,
+      data: {
+        taskId: data.task_id,
+        taskType: data.task_type,
+        userId: data.user_id,
+        result: data.result,
+        confidence: data.confidence
+      }
     });
   }
 

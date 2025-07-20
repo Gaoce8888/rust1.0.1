@@ -58,12 +58,34 @@ export {
   NotificationPosition
 } from './EnterpriseNotifications';
 
+// AI功能组件
+export {
+  AITaskComponent,
+  AIControlPanel,
+  AIConfigModal,
+  useAI,
+  aiManager,
+  AITaskType,
+  AITaskStatus,
+  AITask,
+  AIResult,
+  AIManager,
+  AIConfig,
+  AIProvider
+} from './EnterpriseAI';
+
+export { default as EnterpriseAIExample } from './EnterpriseAIExample';
+
+// AI集成测试组件
+export { default as AIIntegrationTest } from '../AIIntegrationTest';
+
 // 主应用组件
 export { default as EnterpriseKefuApp } from './EnterpriseApp';
 
 // 样式文件
 import './EnterpriseStyles.css';
 import './EnterpriseNotifications.css';
+import './EnterpriseAI.css';
 
 // 默认导出主应用
 export { default } from './EnterpriseApp';

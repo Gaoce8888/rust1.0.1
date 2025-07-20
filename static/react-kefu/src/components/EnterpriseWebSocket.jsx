@@ -21,7 +21,14 @@ export const WSMessageType = {
   USER_LEFT: 'UserLeft',
   PING: 'Ping',
   PONG: 'Pong',
-  ERROR: 'Error'
+  ERROR: 'Error',
+  // AI相关消息类型
+  AI_TASK_SUBMITTED: 'AITaskSubmitted',
+  AI_TASK_STARTED: 'AITaskStarted',
+  AI_TASK_COMPLETED: 'AITaskCompleted',
+  AI_TASK_FAILED: 'AITaskFailed',
+  AI_TASK_CANCELLED: 'AITaskCancelled',
+  AI_RESULT: 'AIResult'
 };
 
 // 高性能WebSocket客户端
@@ -254,6 +261,25 @@ export class EnterpriseWebSocketClient {
         break;
       case 'Heartbeat':
         this.emit('heartbeat', message);
+        break;
+      // AI相关消息处理
+      case 'AITaskSubmitted':
+        this.emit('aiTaskSubmitted', message);
+        break;
+      case 'AITaskStarted':
+        this.emit('aiTaskStarted', message);
+        break;
+      case 'AITaskCompleted':
+        this.emit('aiTaskCompleted', message);
+        break;
+      case 'AITaskFailed':
+        this.emit('aiTaskFailed', message);
+        break;
+      case 'AITaskCancelled':
+        this.emit('aiTaskCancelled', message);
+        break;
+      case 'AIResult':
+        this.emit('aiResult', message);
         break;
       default:
         this.emit('unknown', message);
