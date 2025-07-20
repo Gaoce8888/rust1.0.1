@@ -23,53 +23,32 @@ import {Icon} from "@iconify/react";
 
 import SidebarContainer from "./sidebar-with-chat-history";
 import MessagingChatMessage, { MessageType } from "./messaging-chat-message";
+import messagingChatAIConversations from "./messaging-chat-ai-conversations";
+
 import EnhancedPromptInput from "./enhanced-prompt-input";
 import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
 
-/**
- * 主应用组件 - 企业级客服聊天系统界面
- * 
- * 功能特点：
- * - WebSocket 实时通信
- * - 多客户会话管理
- * - 消息历史记录
- * - 自动回复功能
- * - 声音通知
- * - 响应式设计（支持移动端）
- * - 客服设置管理
- * - 在线状态显示
- */
+// 主应用组件 - 客服聊天界面
 export default function Component() {
-  // ========== 状态管理 ==========
-  
-  // 消息相关状态
-  const [messages, setMessages] = React.useState([]);  // 当前会话的消息列表
-  const [currentCustomer, setCurrentCustomer] = React.useState(null);  // 当前选中的客户
-  const [customerMessages, setCustomerMessages] = React.useState({});  // 所有客户的消息记录
-  
-  // WebSocket 相关状态
-  const [wsClient, setWsClient] = React.useState(null);  // WebSocket 客户端实例
-  const [connectionStatus, setConnectionStatus] = React.useState('disconnected');  // 连接状态
-  
-  // UI 相关状态
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);  // 侧边栏开关状态
-  const [isMobile, setIsMobile] = React.useState(false);  // 是否为移动设备
-  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);  // 设置弹窗开关状态
-  
-  // 用户认证相关状态
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);  // 登录状态
-  const [currentUser, setCurrentUser] = React.useState(null);  // 当前登录的客服信息
-  const [customers, setCustomers] = React.useState([]);  // 客户列表
-  
-  // 客服设置配置
+  const [messages, setMessages] = React.useState([]);
+  const [currentCustomer, setCurrentCustomer] = React.useState(null);
+  const [customerMessages, setCustomerMessages] = React.useState({});
+  const [wsClient, setWsClient] = React.useState(null);
+  const [connectionStatus, setConnectionStatus] = React.useState('disconnected');
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [currentUser, setCurrentUser] = React.useState(null);
+  const [customers, setCustomers] = React.useState([]);
   const [settings, setSettings] = React.useState({
-    soundNotifications: true,  // 声音通知开关
-    autoReply: false,  // 自动回复开关
-    showTypingIndicator: true,  // 显示输入状态指示器
-    onlineStatus: true,  // 显示在线状态
-    welcomeMessage: '您好！欢迎咨询，我是专业客服，很高兴为您服务。请问有什么可以帮助您的吗？',  // 欢迎消息
-    quickReplies: [  // 快捷回复列表
+    soundNotifications: true,
+    autoReply: false,
+    showTypingIndicator: true,
+    onlineStatus: true,
+    welcomeMessage: '您好！欢迎咨询，我是专业客服，很高兴为您服务。请问有什么可以帮助您的吗？',
+    quickReplies: [
       '您好！欢迎咨询，我是专业客服。',
       '请问有什么可以帮助您的吗？',
       '请稍候，我正在为您查询...',
@@ -78,13 +57,7 @@ export default function Component() {
     ]
   });
 
-  // ========== 副作用处理 ==========
-  
-  /**
-   * 检查登录状态
-   * 优先从 localStorage 读取（记住我功能）
-   * 如果没有则从 sessionStorage 读取（临时会话）
-   */
+  // 检查登录状态
   React.useEffect(() => {
     // 优先检查localStorage（记住我）
     let savedUser = localStorage.getItem('kefu_user');
@@ -103,7 +76,6 @@ export default function Component() {
         setIsLoggedIn(true);
       } catch (error) {
         console.error('解析用户信息失败:', error);
-        // 清理无效的存储数据
         localStorage.removeItem('kefu_user');
         localStorage.removeItem('kefu_session_token');
         sessionStorage.removeItem('kefu_user');
@@ -112,10 +84,7 @@ export default function Component() {
     }
   }, []);
 
-  /**
-   * 响应式设计检测
-   * 监听窗口大小变化，自动切换移动端/桌面端布局
-   */
+  // 检测移动端
   React.useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -127,10 +96,7 @@ export default function Component() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  /**
-   * 初始化 WebSocket 连接
-   * 建立与服务器的实时通信通道
-   */
+  // 初始化WebSocket连接
   React.useEffect(() => {
     if (!isLoggedIn || !currentUser) return;
 
@@ -235,25 +201,19 @@ export default function Component() {
     };
   }, [isLoggedIn, currentUser]);
 
-  // ========== 消息处理函数 ==========
-  
-  /**
-   * 处理接收到的消息
-   * 将消息格式化并添加到对应客户的消息列表中
-   * @param {Object} data - 接收到的消息数据
-   */
+  // 处理接收到的消息
   const handleReceiveMessage = (data) => {
     const newMessage = {
       id: data.id,
-      type: data.messageType || MessageType.TEXT,  // 消息类型：文本、图片、文件等
-      content: data.content,  // 消息内容
-      senderId: data.senderId,  // 发送者ID
-      senderName: data.senderName,  // 发送者名称
-      senderAvatar: data.senderAvatar,  // 发送者头像
-      timestamp: new Date(data.timestamp),  // 时间戳
-      imageUrl: data.imageUrl,  // 图片URL（如果是图片消息）
-      fileName: data.fileName,  // 文件名（如果是文件消息）
-      fileSize: data.fileSize,  // 文件大小（如果是文件消息）
+      type: data.messageType || MessageType.TEXT,
+      content: data.content,
+      senderId: data.senderId,
+      senderName: data.senderName,
+      senderAvatar: data.senderAvatar,
+      timestamp: new Date(data.timestamp),
+      imageUrl: data.imageUrl,
+      fileName: data.fileName,
+      fileSize: data.fileSize,
       fileUrl: data.fileUrl,
       voiceDuration: data.voiceDuration,
       voiceUrl: data.voiceUrl,

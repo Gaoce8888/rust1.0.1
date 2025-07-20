@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户端UI测试导航</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .card h2 {
+            color: #4CAF50;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .card p {
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+        }
+        .enterprise {
+            border: 2px solid #ff9800;
+        }
+        .enterprise h2 {
+            color: #ff9800;
+        }
+        .note {
+            background-color: #333;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+        }
+        .note h3 {
+            margin-top: 0;
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>客户端UI测试导航</h1>
+        
+        <div class="grid">
+            <a href="/enterprise.html" class="card enterprise">
+                <h2>企业级应用</h2>
+                <p>完整的企业级适配版本，包含登录系统、WebSocket连接、消息管理等所有功能</p>
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>推荐使用</span>
+                </div>
+            </a>
+            
+            <a href="/index.html" class="card">
+                <h2>极简版界面</h2>
+                <p>AppMinimal - 简洁的单聊天窗口界面，适合快速测试和简单场景</p>
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>可用</span>
+                </div>
+            </a>
+            
+            <a href="#" onclick="alert('请修改 index.tsx 中的导入来使用 App.tsx'); return false;" class="card">
+                <h2>完整版界面</h2>
+                <p>App - 包含侧边栏、聊天列表、聊天窗口和用户资料的完整界面</p>
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>需要修改入口</span>
+                </div>
+            </a>
+            
+            <a href="#" onclick="alert('请修改 index.tsx 中的导入来使用 AppSimple.tsx'); return false;" class="card">
+                <h2>简化版界面</h2>
+                <p>AppSimple - 左侧聊天列表，右侧聊天窗口的简化布局</p>
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>需要修改入口</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="note">
+            <h3>测试说明</h3>
+            <p>1. <strong>企业级应用</strong>：包含完整的前后端集成，需要先登录才能使用</p>
+            <p>2. <strong>其他界面</strong>：目前是独立的UI展示，需要进一步集成才能与后端通信</p>
+            <p>3. <strong>后端服务</strong>：确保Rust后端运行在 http://localhost:6006</p>
+            <p>4. <strong>测试账号</strong>：使用后端配置的用户名密码登录</p>
+        </div>
+    </div>
+</body>
+</html> 
