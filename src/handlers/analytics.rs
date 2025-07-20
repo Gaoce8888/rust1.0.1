@@ -226,6 +226,7 @@ pub async fn handle_analytics_performance(
 }
 
 // 生成分析报告
+#[allow(dead_code)]
 pub async fn handle_generate_report(
     _request: GenerateReportRequest,
     _ws_manager: Arc<WebSocketManager>,
@@ -257,6 +258,7 @@ pub struct GenerateReportRequest {
 }
 
 // 业务洞察
+#[allow(dead_code)]
 pub async fn handle_business_insights(
     _ws_manager: Arc<WebSocketManager>,
     _storage: Arc<LocalStorage>,

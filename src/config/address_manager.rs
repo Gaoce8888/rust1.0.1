@@ -241,6 +241,7 @@ pub struct LoggingConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnvironmentConfig {
+    #[allow(dead_code)]
     pub current_environment: String,
     pub env_vars: Vec<String>,
     pub config_priority: Vec<String>,
@@ -248,10 +249,14 @@ pub struct EnvironmentConfig {
 
 /// 地址配置管理器
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct AddressManager {
-    config: Arc<RwLock<AddressConfig>>,
-    environment: String,
-    cache: Arc<RwLock<HashMap<String, String>>>,
+    #[allow(dead_code)]
+        config: Arc<RwLock<AddressConfig>>,
+    #[allow(dead_code)]
+        environment: String,
+    #[allow(dead_code)]
+        cache: Arc<RwLock<HashMap<String, String>>>,
 }
 
 impl AddressManager {
@@ -571,6 +576,7 @@ impl AddressManager {
     }
 
     /// 获取API URL
+    #[allow(dead_code)]
     pub async fn get_api_url(&self) -> String {
         let cache_key = format!("api_url_{}", self.environment);
         
@@ -591,6 +597,7 @@ impl AddressManager {
     }
 
     /// 获取WebSocket URL
+    #[allow(dead_code)]
     pub async fn get_ws_url(&self) -> String {
         let cache_key = format!("ws_url_{}", self.environment);
         
@@ -611,6 +618,7 @@ impl AddressManager {
     }
 
     /// 获取前端URL
+    #[allow(dead_code)]
     pub async fn get_web_url(&self) -> String {
         let config = self.config.read().await;
         match self.environment.as_str() {
@@ -622,6 +630,7 @@ impl AddressManager {
     }
 
     /// 获取管理后台URL
+    #[allow(dead_code)]
     pub async fn get_admin_url(&self) -> String {
         let config = self.config.read().await;
         match self.environment.as_str() {
@@ -633,6 +642,7 @@ impl AddressManager {
     }
 
     /// 获取CORS允许的源
+    #[allow(dead_code)]
     pub async fn get_cors_origins(&self) -> Vec<String> {
         let config = self.config.read().await;
         match self.environment.as_str() {
@@ -644,6 +654,7 @@ impl AddressManager {
     }
 
     /// 获取服务器端口
+    #[allow(dead_code)]
     pub async fn get_server_port(&self) -> u16 {
         let config = self.config.read().await;
         match self.environment.as_str() {
@@ -655,55 +666,65 @@ impl AddressManager {
     }
 
     /// 获取WebSocket配置
+    #[allow(dead_code)]
     pub async fn get_websocket_config(&self) -> WebSocketConfig {
         let config = self.config.read().await;
         config.websocket.clone()
     }
 
     /// 获取外部API配置
+    #[allow(dead_code)]
     pub async fn get_external_api_config(&self) -> ExternalApiConfig {
         let config = self.config.read().await;
         config.external_apis.clone()
     }
 
     /// 获取安全配置
+    #[allow(dead_code)]
     pub async fn get_security_config(&self) -> SecurityConfig {
         let config = self.config.read().await;
         config.security.clone()
     }
 
     /// 获取监控配置
+    #[allow(dead_code)]
     pub async fn get_monitoring_config(&self) -> MonitoringConfig {
         let config = self.config.read().await;
         config.monitoring.clone()
     }
 
     /// 获取当前环境
+    #[allow(dead_code)]
     pub fn get_environment(&self) -> &str {
         &self.environment
     }
 
     /// 检查是否为开发环境
+    #[allow(dead_code)]
     pub fn is_development(&self) -> bool {
         self.environment == "development"
     }
 
     /// 检查是否为生产环境
+    #[allow(dead_code)]
     pub fn is_production(&self) -> bool {
         self.environment == "production"
     }
 
     /// 检查是否为测试环境
+    #[allow(dead_code)]
     pub fn is_test(&self) -> bool {
         self.environment == "test"
     }
 
     /// 获取完整的配置
+    #[allow(dead_code)]
     pub async fn get_full_config(&self) -> AddressConfig {
         self.config.read().await.clone()
     }
 
     /// 更新配置
+    #[allow(dead_code)]
     pub async fn update_config(&self, new_config: AddressConfig) -> Result<()> {
         *self.config.write().await = new_config;
         self.cache.write().await.clear();
@@ -711,12 +732,14 @@ impl AddressManager {
     }
 
     /// 重新加载配置
+    #[allow(dead_code)]
     pub async fn reload_config(&self) -> Result<()> {
         let new_config = Self::load_config().await?;
         self.update_config(new_config).await
     }
 
     /// 获取配置摘要
+    #[allow(dead_code)]
     pub async fn get_config_summary(&self) -> HashMap<String, String> {
         let mut summary = HashMap::new();
         summary.insert("environment".to_string(), self.environment.clone());

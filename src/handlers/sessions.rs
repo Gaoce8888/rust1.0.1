@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::websocket::WebSocketManager;
 use crate::storage::LocalStorage;
 use crate::types::api::ApiResponse;
-use crate::message::{CustomerInfo, UserType};
+use crate::message::{UserType};
 use chrono::{DateTime, Utc};
 use anyhow::Result;
 

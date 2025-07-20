@@ -7,10 +7,13 @@ use crate::message::ContentType;
 /// FileManager的扩展trait，添加API所需的额外功能
 #[async_trait::async_trait]
 pub trait FileManagerExt {
+    #[allow(dead_code)]
     async fn list_files(&self, category: Option<&str>, user_id: Option<&str>) -> Result<Vec<FileInfo>>;
     async fn save_file(&self, name: &str, data: &[u8], category: &str, user_id: &str) -> Result<serde_json::Value>;
     async fn get_file(&self, file_id: &str) -> Result<(Vec<u8>, FileMetadata)>;
+    #[allow(dead_code)]
     async fn delete_file(&self, file_id: &str, user_id: &str) -> Result<()>;
+    #[allow(dead_code)]
     async fn get_file_info(&self, file_id: &str) -> Result<serde_json::Value>;
     async fn search_files(&self, keyword: &str, category: Option<&str>) -> Result<Vec<FileInfo>>;
 }
@@ -38,6 +41,7 @@ pub struct FileMetadata {
 /// FileManager的扩展实现
 #[async_trait::async_trait]
 impl FileManagerExt for FileManager {
+    #[allow(dead_code)]
     async fn list_files(&self, category: Option<&str>, user_id: Option<&str>) -> Result<Vec<FileInfo>> {
         // 构建 FileListRequest
         let request = FileListRequest {
@@ -122,12 +126,14 @@ impl FileManagerExt for FileManager {
         Ok((data, metadata))
     }
 
+    #[allow(dead_code)]
     async fn delete_file(&self, file_id: &str, user_id: &str) -> Result<()> {
         // 调用原始的 delete_file 方法，传递两个参数
         FileManager::delete_file(self, file_id, user_id).await?;
         Ok(())
     }
 
+    #[allow(dead_code)]
     async fn get_file_info(&self, file_id: &str) -> Result<serde_json::Value> {
         let info = FileManager::get_file_info(self, file_id)
             .await?
@@ -189,6 +195,7 @@ impl FileManagerExt for FileManager {
 }
 
 /// 创建增强的FileManager
+#[allow(dead_code)]
 pub fn create_enhanced_file_manager(config: crate::config::StorageConfig) -> Result<Arc<FileManager>> {
     let manager = FileManager::new(config)?;
     Ok(Arc::new(manager))

@@ -1230,6 +1230,7 @@ impl WebSocketManager {
     }
 
     // 寻找可用客服 - 简化为公共方法
+    #[allow(dead_code)]
     pub async fn find_available_kefu(&self) -> Result<String> {
         let connections = self.connections.read().await;
         let redis = self.redis.read().await;

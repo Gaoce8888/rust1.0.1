@@ -3,7 +3,7 @@ use warp::{Reply, Rejection};
 use serde::{Deserialize, Serialize};
 use crate::websocket::WebSocketManager;
 use crate::types::api::ApiResponse;
-use crate::message::{CustomerInfo, UserType};
+use crate::message::{UserType};
 use chrono::{DateTime, Utc};
 
 // 请求和响应结构体

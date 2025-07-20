@@ -190,6 +190,7 @@ impl AppConfig {
         Ok(config)
     }
 
+    #[allow(dead_code)]
     pub fn override_from_env(&mut self) {
         if let Ok(env) = std::env::var("APP_ENV") {
             self.app.environment = env;

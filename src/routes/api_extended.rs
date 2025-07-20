@@ -6,7 +6,6 @@ use crate::storage::LocalStorage;
 use crate::file_manager::FileManager;
 
 // 导入系统扩展处理器
-use crate::handlers::system_extended::*;
 
 /// 构建扩展的API路由 - 补充缺失的功能
 pub fn build_extended_api_routes(
