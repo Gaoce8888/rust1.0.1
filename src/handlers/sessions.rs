@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use anyhow::Result;
 
 // 请求和响应结构体
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionListQuery {
     pub page: Option<u32>,
     pub limit: Option<u32>,
@@ -19,21 +19,21 @@ pub struct SessionListQuery {
     pub end_date: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionMessagesQuery {
     pub page: Option<u32>,
     pub limit: Option<u32>,
     pub include_system: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransferSessionRequest {
     pub to_kefu_id: String,
     pub reason: Option<String>,
     pub note: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionInfo {
     pub session_id: String,
     pub kefu_id: String,
@@ -240,13 +240,13 @@ pub async fn handle_get_session(
                     "id": kefu_id,
                     "name": kefu_conn.user_name,
                     "status": format!("{:?}", kefu_conn.status),
-                    "avatar": None
+                    "avatar": None::<String>
                 },
                 "kehu": {
                     "id": kehu_id,
                     "name": kehu_conn.user_name,
                     "status": format!("{:?}", kehu_conn.status),
-                    "avatar": None
+                    "avatar": None::<String>
                 }
             },
             "statistics": {
@@ -264,7 +264,7 @@ pub async fn handle_get_session(
 pub async fn handle_get_session_messages(
     session_id: String,
     query: SessionMessagesQuery,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
     storage: Arc<LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let page = query.page.unwrap_or(1);

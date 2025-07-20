@@ -193,6 +193,8 @@ pub struct ClientRegisterResponse {
     pub location: Option<IpLocationResponse>,
 }
 
+impl warp::reject::Reject for ApiError {}
+
 impl ApiError {
     /// 创建新的API错误
     #[allow(dead_code)] // 工具方法，将在错误处理中使用

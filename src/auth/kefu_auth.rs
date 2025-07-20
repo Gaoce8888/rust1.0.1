@@ -239,7 +239,7 @@ impl KefuAuthManager {
             // 记录客户-客服关系
             let mut conn = self.redis_pool.get_connection().await?;
             let customer_key = format!("customer:kefu:{}", customer_id);
-            conn.set_ex::<_, _, ()>(conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;customer_key, conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;kefu.kefu_id, 3600).await?;
+            conn.set_ex(&customer_key, &kefu.kefu_id, 3600).await?;
             
             return Ok(Some(kefu.kefu_id.clone()));
         }
@@ -262,7 +262,7 @@ impl KefuAuthManager {
                 }
                 
                 let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex::<_, _, ()>(conn.set_ex(&key, updated_json, 3600).await?;key, updated_json, 3600).await?;
+                conn.set_ex(&key, updated_json, 3600).await?;
             }
         }
         
@@ -276,7 +276,7 @@ impl KefuAuthManager {
         
         if let Ok(Some(kefu_id)) = conn.get::<_, Option<String>>(&customer_key).await {
             self.increment_kefu_customers(&kefu_id, -1).await?;
-            conn.del::<_, ()>(conn.del(&customer_key).await?;customer_key).await?;
+            conn.del(&customer_key).await?;
             info!("✅ 为客户 {} 释放客服: {}", customer_id, kefu_id);
         }
         

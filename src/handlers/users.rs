@@ -45,6 +45,7 @@ pub struct UserListQuery {
 // 获取用户列表
 pub async fn handle_list_users(
     _user_manager: Arc<UserManager>,
+    _query: UserListQuery,
 ) -> Result<impl Reply, Rejection> {
     // 在实际实现中，应该从UserManager获取用户列表
     // 这里先返回模拟数据

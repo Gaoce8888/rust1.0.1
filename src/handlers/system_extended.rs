@@ -256,7 +256,7 @@ pub async fn handle_redis_keys(
 
 // 系统健康检查（增强版）
 pub async fn handle_system_health(
-    _ws_manager: Arc<WebSocketManager>,
+    ws_manager: Arc<WebSocketManager>,
     _storage: Arc<crate::storage::LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let connection_stats = ws_manager.get_connection_stats().await;

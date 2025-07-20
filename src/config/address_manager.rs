@@ -258,7 +258,7 @@ impl AddressManager {
     /// 创建新的地址管理器
     pub async fn new() -> Result<Self> {
         let config = Self::load_config().await?;
-        let environment = Self::get_environment();
+        let environment = Self::detect_environment();
         
         Ok(Self {
             config: Arc::new(RwLock::new(config)),
@@ -302,7 +302,7 @@ impl AddressManager {
     }
 
     /// 获取当前环境
-    fn get_environment() -> String {
+    fn detect_environment() -> String {
         env::var("APP_ENV")
             .unwrap_or_else(|_| env::var("NODE_ENV").unwrap_or_else(|_| "development".to_string()))
     }

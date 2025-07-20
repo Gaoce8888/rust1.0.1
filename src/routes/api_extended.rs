@@ -19,9 +19,11 @@ pub fn build_extended_api_routes(
     // === 用户管理 API ===
     let users_list = warp::path!("api" / "users")
         .and(warp::get())
-        .and(warp::query())
+        .and(warp::query::<crate::handlers::users::UserListQuery>())
         .and(with_user_manager(user_manager.clone()))
-        .and_then(crate::handlers::users::handle_list_users);
+        .and_then(|query, user_manager| {
+            crate::handlers::users::handle_list_users(user_manager, query)
+        });
 
     let users_create = warp::path!("api" / "users" / "create")
         .and(warp::post())
@@ -278,7 +280,7 @@ fn with_storage(storage: Arc<LocalStorage>) -> impl Filter<Extract = (Arc<LocalS
 }
 
 // 系统管理处理器
-async fn handle_system_logs(query: std::collections::HashMap<String, String>) -> Result<impl warp::Reply, warp::Rejection> {
+async fn handle_system_logs(_query: std::collections::HashMap<String, String>) -> Result<impl warp::Reply, warp::Rejection> {
     // TODO: 实现系统日志查询
     let response = crate::types::api::ApiResponse {
         success: true,
@@ -291,7 +293,7 @@ async fn handle_system_logs(query: std::collections::HashMap<String, String>) ->
     Ok(warp::reply::json(&response))
 }
 
-async fn handle_system_backup(request: serde_json::Value, _storage: Arc<LocalStorage>) -> Result<impl warp::Reply, warp::Rejection> {
+async fn handle_system_backup(_request: serde_json::Value, _storage: Arc<LocalStorage>) -> Result<impl warp::Reply, warp::Rejection> {
     // TODO: 实现系统备份
     let response = crate::types::api::ApiResponse {
         success: true,
@@ -305,7 +307,7 @@ async fn handle_system_backup(request: serde_json::Value, _storage: Arc<LocalSto
     Ok(warp::reply::json(&response))
 }
 
-async fn handle_system_maintenance(request: serde_json::Value) -> Result<impl warp::Reply, warp::Rejection> {
+async fn handle_system_maintenance(_request: serde_json::Value) -> Result<impl warp::Reply, warp::Rejection> {
     // TODO: 实现系统维护
     let response = crate::types::api::ApiResponse {
         success: true,
@@ -350,7 +352,7 @@ async fn handle_redis_status(_ws_manager: Arc<WebSocketManager>) -> Result<impl 
     Ok(warp::reply::json(&response))
 }
 
-async fn handle_redis_flush(request: serde_json::Value, _ws_manager: Arc<WebSocketManager>) -> Result<impl warp::Reply, warp::Rejection> {
+async fn handle_redis_flush(_request: serde_json::Value, _ws_manager: Arc<WebSocketManager>) -> Result<impl warp::Reply, warp::Rejection> {
     // TODO: 实现Redis数据清理
     let response = crate::types::api::ApiResponse {
         success: true,

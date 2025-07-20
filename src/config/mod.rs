@@ -289,3 +289,5 @@ mod tests {
         std::env::remove_var("SERVER_PORT");
     }
 }
+pub mod compatibility;
+pub use compatibility::{AppConfig, StorageConfig, init_config};
