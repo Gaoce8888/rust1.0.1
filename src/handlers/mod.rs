@@ -15,6 +15,7 @@
 /// - `users`: 用户管理处理器
 /// - `messages`: 消息管理处理器
 /// - `sessions`: 会话管理处理器
+/// - `kefu_assignment`: 客服分配管理处理器
 /// - `analytics`: 统计分析处理器
 /// 
 /// # 设计原则
@@ -35,6 +36,7 @@ pub mod ai;
 pub mod users;
 pub mod messages;
 pub mod sessions;
+pub mod kefu_assignment;
 pub mod analytics;
 
 #[cfg(test)]

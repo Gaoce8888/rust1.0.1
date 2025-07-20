@@ -9,9 +9,9 @@ path = "src/main.rs"
 
 # 企业级编译优化配置
 [profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
+opt-level = 2  # 从3降低到2，减少内存使用
+lto = "thin"   # 从true改为thin，减少内存使用
+codegen-units = 4  # 从1增加到4，减少内存使用
 panic = "abort"
 strip = true
 
@@ -81,6 +81,9 @@ regex = "1.0"
 
 # 文件类型检测
 mime_guess = "2.0"
+
+# TOML 配置文件解析
+toml = "0.8"
 
 # Swagger/OpenAPI 文档生成
 utoipa = { version = "4.2", features = ["axum_extras", "chrono", "uuid"] }

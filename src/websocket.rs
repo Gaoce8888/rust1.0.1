@@ -1139,7 +1139,7 @@ impl WebSocketManager {
     }
 
     // 🎯 企业级客服负载均衡算法 - 集成工作负载分析
-    async fn find_optimal_kefu_for_customer(&self, _customer_id: &str) -> Result<String> {
+    pub async fn find_optimal_kefu_for_customer(&self, _customer_id: &str) -> Result<String> {
         let connections = self.connections.read().await;
         let redis = self.redis.read().await;
 
@@ -1149,21 +1149,21 @@ impl WebSocketManager {
         for (kefu_id, connection) in connections.iter() {
             if connection.user_type == UserType::Kefu {
                 // 🚀 使用企业级工作负载分析
-                let workload_data = match redis.get_kefu_workload(kefu_id).await { Ok(workload) => {
-                    workload
-                } _ => {
-                    // 如果获取失败，使用基础数据
-                    serde_json::json!({
-                        "active_sessions": 0,
-                        "avg_response_time": 0,
-                        "satisfaction_score": 5.0
-                    })
-                }};
+                let workload_data = match redis.get_kefu_workload(kefu_id).await { 
+                    Ok(workload) => workload,
+                    Err(_) => {
+                        // 如果获取失败，使用基础数据
+                        serde_json::json!({
+                            "active_sessions": 0,
+                            "avg_response_time": 0,
+                            "satisfaction_score": 5.0
+                        })
+                    }
+                };
 
                 let session_count = workload_data["active_sessions"].as_u64().unwrap_or(0) as usize;
                 let avg_response_time = workload_data["avg_response_time"].as_f64().unwrap_or(0.0);
-                let satisfaction_score =
-                    workload_data["satisfaction_score"].as_f64().unwrap_or(5.0);
+                let satisfaction_score = workload_data["satisfaction_score"].as_f64().unwrap_or(5.0);
 
                 // 只考虑未满负载的客服（最大5个会话）
                 if session_count < 5 {
@@ -1229,16 +1229,16 @@ impl WebSocketManager {
         Ok(None)
     }
 
-    // 寻找可用客服
-    #[allow(dead_code)] // 企业级API方法，预留给未来使用
-    async fn find_available_kefu(&self) -> Result<String> {
+    // 寻找可用客服 - 简化为公共方法
+    #[allow(dead_code)]
+    pub async fn find_available_kefu(&self) -> Result<String> {
         let connections = self.connections.read().await;
+        let redis = self.redis.read().await;
 
         // 查找在线的客服
         for (user_id, connection) in connections.iter() {
             if connection.user_type == UserType::Kefu {
                 // 检查这个客服是否已经有客户
-                let redis = self.redis.read().await;
                 if let Ok(None) = redis.get_partner(user_id).await {
                     // 没有伙伴关系，说明客服可用
                     return Ok(user_id.clone());
@@ -1249,15 +1249,15 @@ impl WebSocketManager {
         Err(anyhow::anyhow!("No available kefu found"))
     }
 
-    // 寻找等待的客户
-    async fn find_waiting_customer(&self) -> Result<String> {
+    // 寻找等待的客户 - 简化为公共方法
+    pub async fn find_waiting_customer(&self) -> Result<String> {
         let connections = self.connections.read().await;
+        let redis = self.redis.read().await;
 
         // 查找在线但没有分配客服的客户
         for (user_id, connection) in connections.iter() {
             if connection.user_type == UserType::Kehu {
                 // 检查这个客户是否已经有客服
-                let redis = self.redis.read().await;
                 if let Ok(None) = redis.get_partner(user_id).await {
                     // 没有伙伴关系，说明客户在等待
                     return Ok(user_id.clone());
@@ -1268,8 +1268,8 @@ impl WebSocketManager {
         Err(anyhow::anyhow!("No waiting customer found"))
     }
 
-    // 🚀 企业级会话建立系统
-    async fn establish_session(
+    // 🚀 企业级会话建立系统 - 简化为公共方法
+    pub async fn establish_session(
         &self,
         kehu_id: &str,
         kefu_id: &str,

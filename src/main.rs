@@ -34,15 +34,6 @@ mod ai;
 // Swagger文档模块
 mod swagger;
 
-// 性能监控模块
-mod monitoring;
-
-// 中间件模块
-mod middleware;
-
-// 缓存模块
-mod cache;
-
 use anyhow::Result;
 use tracing::info;
 

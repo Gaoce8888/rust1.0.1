@@ -11,7 +11,6 @@ use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
 use crate::auth::kefu_auth::KefuAuthManager;
-use crate::monitoring::{MetricsRegistry, PerformanceCollector, PrometheusExporter};
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
 // use crate::websocket_pool::{WebSocketConnectionPool, WebSocketPoolConfig};

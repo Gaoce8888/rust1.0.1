@@ -41,6 +41,7 @@ pub struct RedisFlushRequest {
 }
 
 // 获取系统日志
+#[allow(dead_code)]
 pub async fn handle_system_logs(
     query: SystemLogsQuery,
 ) -> Result<impl Reply, Rejection> {
@@ -90,9 +91,10 @@ pub async fn handle_system_logs(
 }
 
 // 系统备份
+#[allow(dead_code)]
 pub async fn handle_system_backup(
     request: SystemBackupRequest,
-    storage: Arc<crate::storage::LocalStorage>,
+    _storage: Arc<crate::storage::LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let backup_id = Uuid::new_v4().to_string();
     let backup_name = format!("backup_{}_{}.tar.gz", 
@@ -120,6 +122,7 @@ pub async fn handle_system_backup(
 }
 
 // 维护模式控制
+#[allow(dead_code)]
 pub async fn handle_system_maintenance(
     request: MaintenanceModeRequest,
 ) -> Result<impl Reply, Rejection> {
@@ -144,8 +147,9 @@ pub async fn handle_system_maintenance(
 }
 
 // Redis状态
+#[allow(dead_code)]
 pub async fn handle_redis_status(
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 从Redis获取实际状态
     let redis_info = serde_json::json!({
@@ -179,9 +183,10 @@ pub async fn handle_redis_status(
 }
 
 // Redis刷新
+#[allow(dead_code)]
 pub async fn handle_redis_flush(
     request: RedisFlushRequest,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     if !request.confirm {
         let response: ApiResponse<()> = ApiResponse {
@@ -213,9 +218,10 @@ pub async fn handle_redis_flush(
 }
 
 // 获取Redis键列表
+#[allow(dead_code)]
 pub async fn handle_redis_keys(
     pattern: Option<String>,
-    ws_manager: Arc<WebSocketManager>,
+    _ws_manager: Arc<WebSocketManager>,
 ) -> Result<impl Reply, Rejection> {
     let search_pattern = pattern.unwrap_or_else(|| "*".to_string());
     
@@ -255,9 +261,10 @@ pub async fn handle_redis_keys(
 }
 
 // 系统健康检查（增强版）
+#[allow(dead_code)]
 pub async fn handle_system_health(
     ws_manager: Arc<WebSocketManager>,
-    storage: Arc<crate::storage::LocalStorage>,
+    _storage: Arc<crate::storage::LocalStorage>,
 ) -> Result<impl Reply, Rejection> {
     let connection_stats = ws_manager.get_connection_stats().await;
     

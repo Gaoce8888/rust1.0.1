@@ -201,6 +201,7 @@ pub async fn handle_delete_message(
 }
 
 // 批量删除消息
+#[allow(dead_code)]
 pub async fn handle_bulk_delete_messages(
     message_ids: Vec<String>,
     _storage: Arc<LocalStorage>,
@@ -221,6 +222,7 @@ pub async fn handle_bulk_delete_messages(
 }
 
 // 标记消息已读
+#[allow(dead_code)]
 pub async fn handle_mark_messages_read(
     message_ids: Vec<String>,
     _storage: Arc<LocalStorage>,

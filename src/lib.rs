@@ -7,3 +7,6 @@
 // pub mod performance_optimizer;
 // pub mod health_monitor;
 // pub mod failover_manager;
+
+// 配置管理模块
+pub mod config;

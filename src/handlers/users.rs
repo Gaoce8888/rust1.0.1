@@ -44,7 +44,8 @@ pub struct UserListQuery {
 
 // 获取用户列表
 pub async fn handle_list_users(
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
+    _query: UserListQuery,
 ) -> Result<impl Reply, Rejection> {
     // 在实际实现中，应该从UserManager获取用户列表
     // 这里先返回模拟数据
@@ -88,7 +89,7 @@ pub async fn handle_list_users(
 // 创建用户
 pub async fn handle_create_user(
     request: CreateUserRequest,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     let user_id = Uuid::new_v4().to_string();
     
@@ -128,7 +129,7 @@ pub async fn handle_create_user(
 // 获取单个用户
 pub async fn handle_get_user(
     user_id: String,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 从UserManager获取用户
     let user = serde_json::json!({
@@ -157,7 +158,7 @@ pub async fn handle_get_user(
 pub async fn handle_update_user(
     user_id: String,
     request: UpdateUserRequest,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实际更新用户信息
     
@@ -181,7 +182,7 @@ pub async fn handle_update_user(
 // 删除用户
 pub async fn handle_delete_user(
     user_id: String,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实际删除用户（通常是软删除）
     
@@ -201,7 +202,7 @@ pub async fn handle_delete_user(
 pub async fn handle_update_permissions(
     user_id: String,
     request: UpdatePermissionsRequest,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实际更新权限
     
@@ -221,7 +222,7 @@ pub async fn handle_update_permissions(
 pub async fn handle_update_user_status(
     user_id: String,
     request: UpdateStatusRequest,
-    user_manager: Arc<UserManager>,
+    _user_manager: Arc<UserManager>,
 ) -> Result<impl Reply, Rejection> {
     // TODO: 实际更新状态
     
