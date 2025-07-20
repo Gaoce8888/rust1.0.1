@@ -11,6 +11,7 @@ use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
 use crate::auth::kefu_auth::KefuAuthManager;
+use crate::platform;
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
 // use crate::websocket_pool::{WebSocketConnectionPool, WebSocketPoolConfig};
@@ -49,6 +50,13 @@ pub struct SystemComponents {
 
 /// 初始化系统组件
 pub async fn initialize_system_components() -> Result<SystemComponents> {
+    // 创建平台特定的目录结构
+    if let Err(e) = platform::create_platform_directories() {
+        error!("创建平台目录失败: {:?}", e);
+        return Err(anyhow::anyhow!("创建平台目录失败: {}", e));
+    }
+    info!("✅ 平台目录结构创建成功");
+    
     // 加载配置
     init_config().map_err(|e| anyhow::anyhow!("配置加载失败: {}", e))?;
     let config = AppConfig::get();
@@ -122,7 +130,7 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     };
 
     // 初始化语音消息管理器
-    let voice_manager = match VoiceMessageManager::new(std::path::PathBuf::from("data/voice")) {
+    let voice_manager = match VoiceMessageManager::new(platform::get_data_dir().join("voice")) {
         Ok(manager) => {
             info!("🎤 语音消息管理器初始化成功");
             Arc::new(manager)

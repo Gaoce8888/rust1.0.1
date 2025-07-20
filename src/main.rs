@@ -21,6 +21,7 @@ mod storage;
 mod websocket;
 mod user_manager;
 mod voice_message;
+mod platform;  // 新增：跨平台兼容性模块
 
 // 新的模块结构
 mod types;
