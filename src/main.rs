@@ -28,10 +28,10 @@ mod platform;  // 新增：跨平台兼容性模块
 mod types;
 mod errors;
 mod auth;
-// mod handlers;  // 暂时禁用，有编译错误
+mod handlers;  // 处理器模块
 mod routes;
 mod server;
-// mod ai;  // 暂时禁用AI模块
+mod ai;  // AI模块
 
 // Swagger文档模块
 mod swagger;

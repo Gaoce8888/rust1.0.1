@@ -11,7 +11,7 @@ use crate::storage::LocalStorage;
 use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
-use crate::ai::AIManager;
+use crate::ai::{AIManager, EnhancedServiceConfig};
 use crate::auth::{KefuAuthManager, CustomerManager, HeartbeatService, start_heartbeat_service_background};
 use crate::platform;
 // Temporarily disabled enterprise modules for compilation
@@ -177,7 +177,7 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     info!("WebSocket管理器初始化成功");
 
     // 初始化AI管理器
-    let ai_manager = Arc::new(AIManager::new());
+    let ai_manager = Arc::new(AIManager::new(EnhancedServiceConfig::default()));
     info!("AI管理器初始化成功");
 
     // 初始化客服认证管理器

@@ -1,0 +1,371 @@
+=== 未使用代码检测报告 ===
+生成时间: Mon Jul 21 03:58:46 PM UTC 2025
+
+## 未使用的导入
+文件: /workspace/src/types/auth.rs
+文件: /workspace/src/types/frontend_compatibility.rs
+文件: /workspace/src/types/websocket.rs
+文件: /workspace/src/types/mod.rs
+文件: /workspace/src/types/config.rs
+文件: /workspace/src/types/api.rs
+文件: /workspace/src/monitoring/metrics.rs
+文件: /workspace/src/monitoring/exporter.rs
+文件: /workspace/src/monitoring/mod.rs
+文件: /workspace/src/monitoring/collector.rs
+文件: /workspace/src/errors/mod.rs
+文件: /workspace/src/file_manager_ext.rs
+文件: /workspace/src/auth/customer_manager.rs
+文件: /workspace/src/auth/websocket.rs
+文件: /workspace/src/auth/mod.rs
+文件: /workspace/src/auth/heartbeat_service.rs
+文件: /workspace/src/auth/kefu_auth.rs
+文件: /workspace/src/auth/middleware.rs
+文件: /workspace/src/auth/customer_api_routes.rs
+文件: /workspace/src/auth/api_routes.rs
+文件: /workspace/src/swagger.rs
+文件: /workspace/src/html_template_manager.rs
+文件: /workspace/src/cache/memory.rs
+文件: /workspace/src/cache/manager.rs
+文件: /workspace/src/cache/mod.rs
+文件: /workspace/src/message.rs
+文件: /workspace/src/health_monitor.rs
+文件: /workspace/src/redis_pool.rs
+文件: /workspace/src/handlers/auth.rs
+文件: /workspace/src/handlers/messages.rs
+文件: /workspace/src/handlers/system_extended.rs
+文件: /workspace/src/handlers/users.rs
+文件: /workspace/src/handlers/client.rs
+文件: /workspace/src/handlers/websocket.rs
+文件: /workspace/src/handlers/template.rs
+文件: /workspace/src/handlers/system.rs
+文件: /workspace/src/handlers/mod.rs
+文件: /workspace/src/handlers/voice.rs
+文件: /workspace/src/handlers/sessions.rs
+文件: /workspace/src/handlers/file.rs
+文件: /workspace/src/websocket_pool.rs
+文件: /workspace/src/react_template_manager.rs
+文件: /workspace/src/redis_client.rs
+文件: /workspace/src/websocket_backup.rs
+文件: /workspace/src/file_manager.rs
+文件: /workspace/src/routes/auth.rs
+文件: /workspace/src/routes/swagger.rs
+文件: /workspace/src/routes/api_simple.rs
+文件: /workspace/src/routes/ai_react_routes.rs
+文件: /workspace/src/routes/api_real.rs
+文件: /workspace/src/routes/react_template.rs
+文件: /workspace/src/routes/frontend.rs
+文件: /workspace/src/routes/websocket.rs
+文件: /workspace/src/routes/api_extended.rs
+文件: /workspace/src/routes/mod.rs
+文件: /workspace/src/routes/kefu_auth.rs
+文件: /workspace/src/routes/auth_simple.rs
+文件: /workspace/src/routes/api.rs
+文件: /workspace/src/main.rs
+文件: /workspace/src/http_fallback.rs
+文件: /workspace/src/user_manager.rs
+文件: /workspace/src/websocket.rs
+文件: /workspace/src/proxy/analytics_proxy.rs
+文件: /workspace/src/proxy/react_card_proxy.rs
+文件: /workspace/src/proxy/mod.rs
+文件: /workspace/src/proxy/enterprise_proxy.rs
+文件: /workspace/src/proxy/ai_proxy.rs
+文件: /workspace/src/load_balancer.rs
+文件: /workspace/src/api_gateway.rs
+文件: /workspace/src/failover_manager.rs
+文件: /workspace/src/message_enhanced.rs
+文件: /workspace/src/type_generator.rs
+文件: /workspace/src/platform/mod.rs
+文件: /workspace/src/voice_message.rs
+文件: /workspace/src/auto_upgrade.rs
+文件: /workspace/src/compression.rs
+文件: /workspace/src/performance_optimizer.rs
+文件: /workspace/src/config/address_manager.rs
+文件: /workspace/src/config/compatibility.rs
+文件: /workspace/src/config/mod.rs
+文件: /workspace/src/middleware/metrics.rs
+文件: /workspace/src/middleware/mod.rs
+文件: /workspace/src/message_queue.rs
+文件: /workspace/src/storage.rs
+文件: /workspace/src/lib.rs
+文件: /workspace/src/message_processor.rs
+文件: /workspace/src/server/startup.rs
+文件: /workspace/src/server/components.rs
+文件: /workspace/src/server/mod.rs
+文件: /workspace/src/api_docs.rs
+文件: /workspace/src/api_routes.rs
+
+## 被注释的模块
+/workspace/src/handlers/mod.rs:// pub mod react_template;  // 暂时禁用React模板模块
+/workspace/src/handlers/mod.rs:// pub mod ai;  // 暂时禁用AI模块
+/workspace/src/handlers/mod.rs:// pub mod kefu_assignment;  // 暂时禁用客服分配模块
+/workspace/src/handlers/mod.rs:// pub mod analytics;  // 暂时禁用分析模块
+/workspace/src/routes/mod.rs:// pub mod api;
+/workspace/src/routes/mod.rs:// pub mod react_template;  // 暂时禁用，有编译错误
+/workspace/src/routes/mod.rs:// pub mod auth;
+/workspace/src/routes/mod.rs:// pub mod api_extended;  // 暂时禁用，有编译错误
+/workspace/src/routes/mod.rs:// pub mod api_real;  // 暂时禁用，有编译错误
+/workspace/src/routes/mod.rs:// pub mod kefu_auth;
+/workspace/src/lib.rs:// pub mod load_balancer;
+/workspace/src/lib.rs:// pub mod websocket_pool;
+/workspace/src/lib.rs:// pub mod api_routes;
+/workspace/src/lib.rs:// pub mod http_fallback;
+/workspace/src/lib.rs:// pub mod auto_upgrade;
+/workspace/src/lib.rs:// pub mod performance_optimizer;
+/workspace/src/lib.rs:// pub mod health_monitor;
+/workspace/src/lib.rs:// pub mod failover_manager;
+/workspace/src/lib.rs:// pub mod ai;  // 暂时禁用AI模块
+
+## dead_code标记
+/workspace/src/types/websocket.rs:#[allow(dead_code)] // 将在WebSocket认证中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在文件列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在文件列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在文件列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在文件列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在文件列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在模板列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在模板列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在模板列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 将在模板列表API中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在错误处理中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在错误处理中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在API响应中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在API响应中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在API响应中使用
+/workspace/src/types/api.rs:    #[allow(dead_code)] // 工具方法，将在API响应中使用
+/workspace/src/errors/mod.rs:#[allow(dead_code)] // 用于错误统计和监控
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:    #[allow(dead_code)]
+/workspace/src/file_manager_ext.rs:#[allow(dead_code)]
+/workspace/src/auth/customer_manager.rs:    #[allow(dead_code)]
+/workspace/src/auth/customer_manager.rs:    #[allow(dead_code)]
+/workspace/src/auth/heartbeat_service.rs:    #[allow(dead_code)]
+/workspace/src/auth/heartbeat_service.rs:    #[allow(dead_code)]
+/workspace/src/auth/heartbeat_service.rs:    #[allow(dead_code)]
+/workspace/src/auth/kefu_auth.rs:    #[allow(dead_code)]
+/workspace/src/auth/kefu_auth.rs:    #[allow(dead_code)]
+/workspace/src/auth/kefu_auth.rs:    #[allow(dead_code)]
+/workspace/src/auth/middleware.rs:#[allow(dead_code)]
+/workspace/src/auth/middleware.rs:#[allow(dead_code)]
+/workspace/src/auth/api_routes.rs:    #[allow(dead_code)]
+/workspace/src/swagger.rs:#[allow(dead_code)]
+/workspace/src/swagger.rs:#[allow(dead_code)]
+/workspace/src/html_template_manager.rs:    #[allow(dead_code)] // 企业级字段：config用于未来配置扩展和企业级功能
+/workspace/src/html_template_manager.rs:    #[allow(dead_code)]
+/workspace/src/html_template_manager.rs:#[allow(dead_code)]
+/workspace/src/message.rs:#[allow(dead_code)] // 企业级字段保留：user_id, zhanghao用于未来扩展功能
+/workspace/src/redis_pool.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_pool.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_pool.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_pool.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_pool.rs:    #[allow(dead_code)]
+/workspace/src/handlers/messages.rs:#[allow(dead_code)]
+/workspace/src/handlers/messages.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/system_extended.rs:#[allow(dead_code)]
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在WebSocket管理API路由中使用
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在用户管理API路由中使用
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在管理员API路由中使用
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在管理员API路由中使用
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在用户状态API路由中使用
+/workspace/src/handlers/websocket.rs:#[allow(dead_code)] // 将在健康检查API路由中使用
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 将在模板管理API路由中使用
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板查询API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板更新API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板删除API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板渲染API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板列表API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板创建API，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板更新API路由版本，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板删除API路由版本，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板获取API路由版本，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 企业级功能：模板渲染API路由版本，已在Swagger文档中定义
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 将在模板预览API路由中使用
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 将在模板列表API路由中使用
+/workspace/src/handlers/template.rs:#[allow(dead_code)] // 将在模板分类API路由中使用
+/workspace/src/handlers/system.rs:#[allow(dead_code)]
+/workspace/src/handlers/system.rs:#[allow(dead_code)]
+/workspace/src/handlers/system.rs:#[allow(dead_code)]
+/workspace/src/handlers/system.rs:#[allow(dead_code)]
+/workspace/src/handlers/system.rs:#[allow(dead_code)]
+/workspace/src/handlers/system.rs:#[allow(dead_code)] // 企业级功能：系统健康检查，运维监控时使用
+/workspace/src/handlers/system.rs:#[allow(dead_code)] // 企业级功能：系统调试接口，故障排查时使用
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 将在语音消息API路由中使用
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音删除API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音统计API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音格式查询API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音下载API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音上传API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音列表API，已在Swagger文档中定义
+/workspace/src/handlers/voice.rs:#[allow(dead_code)] // 企业级功能：语音删除API，已在Swagger文档中定义
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 企业级功能：文件上传API，已在Swagger文档中定义
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 企业级功能：文件列表API，已在Swagger文档中定义
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 企业级功能：文件下载API，已在Swagger文档中定义
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 企业级功能：文件删除API，已在Swagger文档中定义
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 将在文件管理API路由中使用
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 将在文件管理API路由中使用
+/workspace/src/handlers/file.rs:#[allow(dead_code)] // 将在文件管理API路由中使用
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级向后兼容保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级向后兼容保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级保留：作为establish_session_enhanced的备用实现
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级功能保留
+/workspace/src/redis_client.rs:    #[allow(dead_code)] // 企业级API方法，预留给未来使用
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/redis_client.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)] // 企业级字段：config用于未来配置扩展和企业级功能
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/file_manager.rs:    #[allow(dead_code)]
+/workspace/src/routes/mod.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)] // 企业级功能：会话刷新机制，在某些场景下会被调用
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/user_manager.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:#[allow(dead_code)] // 企业级WebSocket管理器：message_queue和status_syncer用于Redis增强功能
+/workspace/src/websocket.rs:#[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)] // 企业级功能：用于大规模用户状态管理和日志记录
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/websocket.rs:    #[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/platform/mod.rs:#[allow(dead_code)]
+/workspace/src/voice_message.rs:    #[allow(dead_code)]
+/workspace/src/voice_message.rs:    #[allow(dead_code)]
+/workspace/src/voice_message.rs:    #[allow(dead_code)]
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 将在语音格式查询API中使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 将在语音上传API中使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 将在语音上传API中使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 企业级API方法，预留给未来使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 将在语音下载API中使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 企业级API方法，预留给未来使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 将在语音统计API中使用
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 内部工具方法
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 内部工具方法
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 内部工具方法
+/workspace/src/voice_message.rs:    #[allow(dead_code)] // 内部工具方法
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：compression_ratio用于性能监控和分析
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：compressed用于性能监控和分析
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：processing_time_ms用于性能监控和分析
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于数据解压缩和历史消息处理
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于大规模消息批处理和历史数据压缩
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于智能压缩和消息类型优化
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于运行时配置查询和监控
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于运行时配置更新和动态调整
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于性能监控和统计分析
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于定期统计重置和性能分析周期管理
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：compressor用于动态压缩处理
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：adjustment_interval用于自适应调整
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级字段：last_adjustment用于自适应调整
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于自适应压缩和性能优化
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于自适应配置调整和性能优化
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于性能监控和运营分析
+/workspace/src/compression.rs:    #[allow(dead_code)] // 企业级功能：用于自适应解压缩处理
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:#[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/address_manager.rs:    #[allow(dead_code)]
+/workspace/src/config/compatibility.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:#[allow(dead_code)]
+/workspace/src/config/mod.rs:#[allow(dead_code)]
+/workspace/src/config/mod.rs:#[allow(dead_code)]
+/workspace/src/config/mod.rs:#[allow(dead_code)]
+/workspace/src/config/mod.rs:#[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/config/mod.rs:    #[allow(dead_code)]
+/workspace/src/message_queue.rs:#[allow(dead_code)] // 企业级消息结构：所有字段用于完整的企业级消息队列功能
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级功能：用于创建具有完整元数据的企业级消息
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级功能：用于消息去重和防止重复处理
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级功能：用于消息生命周期管理
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级字段：pending_messages用于离线消息重发和可靠性保障
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级字段：sequence_counters用于消息顺序保证和去重
+/workspace/src/message_queue.rs:    #[allow(dead_code)] // 企业级字段：retry_queue用于消息重试机制和故障恢复
+/workspace/src/message_queue.rs:#[allow(dead_code)] // 企业级消息队列方法：所有方法用于完整的Redis增强功能
+/workspace/src/message_queue.rs:#[allow(dead_code)] // 企业级状态同步器：queue_manager字段用于完整的消息状态管理
+/workspace/src/message_queue.rs:#[allow(dead_code)] // 企业级状态同步方法：所有方法用于完整的状态同步功能
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/storage.rs:    #[allow(dead_code)] // 企业级功能：用于复杂的会话管理和客户关系追踪
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/storage.rs:    #[allow(dead_code)] // 企业级功能：用于客户账号关联和历史查询
+/workspace/src/storage.rs:    #[allow(dead_code)] // 企业级功能：用于数据库维护和存储优化
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/storage.rs:    #[allow(dead_code)]
+/workspace/src/server/components.rs:    #[allow(dead_code)] // 系统核心组件，间接使用
+/workspace/src/server/components.rs:    #[allow(dead_code)] // 系统核心组件，间接使用
+/workspace/src/server/components.rs:    #[allow(dead_code)]
+

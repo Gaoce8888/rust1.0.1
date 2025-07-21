@@ -1,0 +1,59 @@
+=== 未实现功能检测报告 ===
+生成时间: Mon Jul 21 03:58:46 PM UTC 2025
+
+## TODO标记
+文件: /workspace/src/handlers/messages.rs (5个TODO)
+  48:    // TODO: 从storage实际获取消息
+  92:    // TODO: 从storage获取消息
+  126:    // TODO: 实现搜索逻辑
+  161:    // TODO: 实现导出逻辑
+  189:    // TODO: 实际删除消息（软删除）
+文件: /workspace/src/handlers/system_extended.rs (6个TODO)
+  50:    // TODO: 实际从日志系统读取
+  105:    // TODO: 实际执行备份操作
+  129:    // TODO: 实际设置维护模式
+  154:    // TODO: 从Redis获取实际状态
+  200:    // TODO: 实际执行Redis刷新
+  228:    // TODO: 从Redis获取实际键列表
+文件: /workspace/src/handlers/users.rs (6个TODO)
+  108:    // TODO: 实际保存到UserManager
+  134:    // TODO: 从UserManager获取用户
+  163:    // TODO: 实际更新用户信息
+  187:    // TODO: 实际删除用户（通常是软删除）
+  207:    // TODO: 实际更新权限
+  227:    // TODO: 实际更新状态
+文件: /workspace/src/handlers/sessions.rs (7个TODO)
+  84:                        message_count: 0, // TODO: 从存储获取实际消息数
+  117:                                message_count: 0, // TODO: 从存储获取实际消息数
+  118:                                last_message: None, // TODO: 从存储获取最后消息
+  231:    let avg_response_time = 30; // TODO: 计算实际平均响应时间
+  434:                    "duration_seconds": 0, // TODO: 计算实际持续时间
+  435:                    "message_count": 0 // TODO: 获取实际消息数
+  517:                "satisfaction_score": null // TODO: 实现满意度评分
+文件: /workspace/src/routes/api_extended.rs (7个TODO)
+  283:    // TODO: 实现系统日志查询
+  296:    // TODO: 实现系统备份
+  310:    // TODO: 实现系统维护
+  323:    // TODO: 实现系统健康检查
+  341:    // TODO: 实现Redis状态检查
+  355:    // TODO: 实现Redis数据清理
+  368:    // TODO: 实现Redis键查询
+文件: /workspace/src/websocket.rs (1个TODO)
+  1675:                            unread_count: 0, // TODO: 实现未读消息计数
+总计: 32个TODO标记
+
+## FIXME标记
+总计: 0个FIXME标记
+
+## 空实现函数
+
+## 占位符返回
+文件: /workspace/src/voice_message.rs
+  187:            return Err(anyhow!("语音文件过大，最大允许 {}MB", self.max_file_size / 1024 / 1024));
+文件: /workspace/src/config/mod.rs
+  135:            return Err(anyhow::anyhow!("Server port cannot be 0"));
+  159:            return Err(anyhow::anyhow!("WebSocket heartbeat interval cannot be 0"));
+  163:            return Err(anyhow::anyhow!("WebSocket max message size cannot be 0"));
+  177:            return Err(anyhow::anyhow!("Rate limit window cannot be 0"));
+  181:            return Err(anyhow::anyhow!("Rate limit max requests cannot be 0"));
+
