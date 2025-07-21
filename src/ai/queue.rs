@@ -55,6 +55,7 @@ pub struct AIQueue {
     retry_queue: VecDeque<AITask>,
     metrics: QueueMetrics,
     max_concurrent_tasks: usize,
+    #[allow(dead_code)]
     max_completed_history: usize,
 }
 
@@ -97,6 +98,7 @@ impl AIQueue {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub async fn dequeue(&mut self) -> Result<Option<AITask>> {
         // 检查并发限制
         if self.processing_tasks.len() >= self.max_concurrent_tasks {
@@ -128,6 +130,7 @@ impl AIQueue {
         Ok(None)
     }
 
+    #[allow(dead_code)]
     pub async fn complete_task(&mut self, task_id: &str, output: serde_json::Value) -> Result<()> {
         if let Some(mut task) = self.processing_tasks.remove(task_id) {
             task.complete(output.clone());
@@ -172,6 +175,7 @@ impl AIQueue {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub async fn fail_task(&mut self, task_id: &str, error: String) -> Result<()> {
         if let Some(mut task) = self.processing_tasks.remove(task_id) {
             if task.can_retry() {
@@ -331,6 +335,7 @@ impl AIQueue {
         tasks
     }
 
+    #[allow(dead_code)]
     fn update_average_processing_time(&mut self, new_time: u64) {
         let current_avg = self.metrics.average_processing_time_ms;
         let completed_count = self.metrics.completed_tasks;

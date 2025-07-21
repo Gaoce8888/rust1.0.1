@@ -60,6 +60,7 @@ pub struct KefuAuthApiRoutes {
 
 impl KefuAuthApiRoutes {
     /// 创建新的客服认证API路由管理器
+    #[allow(dead_code)]
     pub fn new(redis_pool: Arc<RedisPoolManager>) -> Self {
         let auth_manager = Arc::new(KefuAuthManager::new(redis_pool));
         Self { auth_manager }

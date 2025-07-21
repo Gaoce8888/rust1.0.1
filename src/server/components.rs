@@ -41,6 +41,7 @@ pub struct SystemComponents {
     pub ai_manager: Arc<AIManager>,
     pub kefu_auth_manager: Arc<KefuAuthManager>,
     pub customer_manager: Arc<CustomerManager>,
+    #[allow(dead_code)]
     pub heartbeat_service: Arc<HeartbeatService>,
     // 企业级组件 - 暂时禁用以修复编译
     // pub load_balancer: Arc<LoadBalancer>,
@@ -136,7 +137,8 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     };
 
     // 初始化用户管理器
-    let user_manager = match UserManager::new("config/users.json") {
+    let user_config_path = std::path::PathBuf::from(&config.storage.data_dir).join("users.json");
+    let user_manager = match UserManager::new(user_config_path.to_str().unwrap()) {
         Ok(manager) => {
             info!("用户管理器初始化成功");
             Arc::new(manager)

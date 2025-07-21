@@ -274,10 +274,12 @@ impl AddressManager {
 
     /// 加载配置文件
     async fn load_config() -> Result<AddressConfig> {
-        // 尝试从多个位置加载配置
+        // 尝试从多个位置加载配置，使用跨平台路径
+        let config_toml = std::path::PathBuf::from("config").join("address_config.toml");
+        let config_json = std::path::PathBuf::from("config").join("address_config.json");
         let config_paths = [
-            "config/address_config.toml",
-            "config/address_config.json",
+            config_toml.to_str().unwrap(),
+            config_json.to_str().unwrap(),
             "address_config.toml",
         ];
 
@@ -295,10 +297,14 @@ impl AddressManager {
     async fn load_from_file(path: &str) -> Result<AddressConfig> {
         let content = tokio::fs::read_to_string(path).await?;
         
-        if path.ends_with(".toml") {
+        if std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("toml")) {
             let config: AddressConfig = toml::from_str(&content)?;
             Ok(config)
-        } else if path.ends_with(".json") {
+        } else if std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("json")) {
             let config: AddressConfig = serde_json::from_str(&content)?;
             Ok(config)
         } else {
@@ -451,8 +457,8 @@ impl AddressManager {
                 enabled: false,
                 proxy_host: "127.0.0.1".to_string(),
                 proxy_port: 8080,
-                proxy_username: "".to_string(),
-                proxy_password: "".to_string(),
+                proxy_username: String::new(),
+                proxy_password: String::new(),
                 reverse_proxy_enabled: true,
                 nginx_config_path: "/etc/nginx/sites-available/ylqkf.com".to_string(),
                 nginx_ssl_config_path: "/etc/nginx/sites-available/ylqkf.com-ssl".to_string(),
@@ -489,7 +495,7 @@ impl AddressManager {
                 reconnect_interval: 5000,
                 max_reconnect_attempts: 5,
                 message_timeout: 10000,
-                max_message_size: 1048576,
+                max_message_size: 1_048_576,
                 ws_path: "/ws".to_string(),
                 ws_upgrade_path: "/ws/upgrade".to_string(),
                 ws_fallback_path: "/ws/fallback".to_string(),
@@ -548,7 +554,7 @@ impl AddressManager {
                 log_file_path: "./logs/app.log".to_string(),
                 access_log_path: "./logs/access.log".to_string(),
                 error_log_path: "./logs/error.log".to_string(),
-                max_log_size: 10485760,
+                max_log_size: 10_485_760,
                 max_log_files: 5,
                 log_retention_days: 30,
             },

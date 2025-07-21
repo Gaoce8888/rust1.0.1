@@ -39,6 +39,7 @@ pub struct RouteBuilderConfig {
     pub storage: Arc<LocalStorage>,
     pub ai_manager: Arc<AIManager>,
     pub kefu_auth_manager: Arc<KefuAuthManager>,
+    #[allow(dead_code)]
     pub customer_manager: Arc<CustomerManager>,
     pub redis_pool: Arc<RedisPoolManager>,
 }

@@ -477,6 +477,7 @@ impl CustomerManager {
     }
 
     /// 检查客户会话是否有效
+    #[allow(dead_code)]
     pub async fn is_customer_session_valid(&self, session_id: &str) -> Result<bool> {
         let mut conn = self.redis_pool.get_connection().await?;
         let session_key = format!("customer:session:{}", session_id);
@@ -485,6 +486,7 @@ impl CustomerManager {
     }
 
     /// 根据会话ID获取客户ID
+    #[allow(dead_code)]
     pub async fn get_customer_id_by_session(&self, session_id: &str) -> Result<Option<String>> {
         let mut conn = self.redis_pool.get_connection().await?;
         let session_key = format!("customer:session:{}", session_id);

@@ -98,18 +98,21 @@ impl HeartbeatService {
     }
 
     /// 设置清理间隔
+    #[allow(dead_code)]
     pub fn set_cleanup_interval(&mut self, interval: Duration) {
         self.cleanup_interval = interval;
         info!("⏰ 心跳检测间隔已设置为: {:?}", interval);
     }
 
     /// 手动执行一次清理
+    #[allow(dead_code)]
     pub async fn manual_cleanup(&self) -> Result<()> {
         info!("🔧 手动执行连接清理");
         self.perform_cleanup().await
     }
 
     /// 获取服务状态
+    #[allow(dead_code)]
     pub async fn get_service_status(&self) -> Result<ServiceStatus> {
         let kefu_count = self.kefu_auth_manager.get_online_kefu_count().await?;
         let customer_count = self.customer_manager.get_connected_customer_count().await?;

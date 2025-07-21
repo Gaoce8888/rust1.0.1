@@ -442,6 +442,7 @@ impl KefuAuthManager {
     }
 
     /// 获取客服信息
+    #[allow(dead_code)]
     pub async fn get_kefu_info(&self, kefu_id: &str) -> Result<Option<KefuAuth>> {
         let accounts = self.kefu_accounts.read().await;
         Ok(accounts.get(kefu_id).cloned())
@@ -469,6 +470,7 @@ impl KefuAuthManager {
     }
 
     /// 检查会话是否有效
+    #[allow(dead_code)]
     pub async fn is_session_valid(&self, session_id: &str) -> Result<bool> {
         let mut conn = self.redis_pool.get_connection().await?;
         let session_key = format!("kefu:session:{}", session_id);
@@ -477,6 +479,7 @@ impl KefuAuthManager {
     }
 
     /// 根据会话ID获取客服ID
+    #[allow(dead_code)]
     pub async fn get_kefu_id_by_session(&self, session_id: &str) -> Result<Option<String>> {
         let mut conn = self.redis_pool.get_connection().await?;
         let session_key = format!("kefu:session:{}", session_id);

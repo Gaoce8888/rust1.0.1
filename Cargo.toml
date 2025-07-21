@@ -9,11 +9,14 @@ path = "src/main.rs"
 
 # 企业级编译优化配置
 [profile.release]
-opt-level = 2  # 从3降低到2，减少内存使用
-lto = "thin"   # 从true改为thin，减少内存使用
-codegen-units = 4  # 从1增加到4，减少内存使用
-panic = "abort"
-strip = true
+opt-level = 3          # 最大优化
+lto = true            # 链接时优化
+codegen-units = 1     # 单一代码生成单元
+strip = true          # 移除符号信息
+panic = "abort"       # panic时直接终止
+
+[profile.release.package."*"]
+opt-level = 3         # 依赖项也最大优化
 
 [profile.dev]
 opt-level = 0

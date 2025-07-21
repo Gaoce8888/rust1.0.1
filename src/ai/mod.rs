@@ -78,27 +78,32 @@ impl AITask {
         }
     }
 
+    #[allow(dead_code)]
     pub fn start_processing(&mut self) {
         self.status = AITaskStatus::Processing;
         self.started_at = Some(Utc::now());
     }
 
+    #[allow(dead_code)]
     pub fn complete(&mut self, output: serde_json::Value) {
         self.status = AITaskStatus::Completed;
         self.output_data = Some(output);
         self.completed_at = Some(Utc::now());
     }
 
+    #[allow(dead_code)]
     pub fn fail(&mut self, error: String) {
         self.status = AITaskStatus::Failed;
         self.error_message = Some(error);
         self.completed_at = Some(Utc::now());
     }
 
+    #[allow(dead_code)]
     pub fn can_retry(&self) -> bool {
         self.retry_count < self.max_retries
     }
 
+    #[allow(dead_code)]
     pub fn retry(&mut self) {
         self.retry_count += 1;
         self.status = AITaskStatus::Pending;
@@ -124,6 +129,7 @@ pub struct AIResult {
 // AI处理器接口
 #[async_trait::async_trait]
 pub trait AIProcessor: Send + Sync {
+    #[allow(dead_code)]
     async fn process(&self, task: &AITask) -> Result<serde_json::Value>;
     #[allow(dead_code)]
     fn get_task_type(&self) -> AITaskType;
@@ -134,8 +140,11 @@ pub trait AIProcessor: Send + Sync {
 // AI管理器
 pub struct AIManager {
     pub queue: Arc<RwLock<queue::AIQueue>>,
+    #[allow(dead_code)]
     pub intent_processor: Arc<intent_recognition::IntentProcessor>,
+    #[allow(dead_code)]
     pub translation_processor: Arc<translation::TranslationProcessor>,
+    #[allow(dead_code)]
     pub speech_processor: Arc<speech_recognition::SpeechProcessor>,
     pub config: Arc<RwLock<config::AIConfig>>,
 }
@@ -170,6 +179,7 @@ impl AIManager {
         queue.get_task_result(task_id).await
     }
 
+    #[allow(dead_code)]
     pub async fn start_processing(&self) -> Result<()> {
         let queue = self.queue.clone();
         let intent_processor = self.intent_processor.clone();
