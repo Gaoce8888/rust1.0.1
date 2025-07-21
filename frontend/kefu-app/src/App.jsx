@@ -26,6 +26,8 @@ import MessagingChatMessage, { MessageType } from "./messaging-chat-message";
 import EnhancedPromptInput from "./enhanced-prompt-input";
 import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
+import { initializeMonitoring, monitorWebSocket } from "./utils/monitoring";
+import { validateMessageContent, validateCustomerData, escapeHtml } from "./utils/validation";
 
 // 主应用组件 - 客服聊天界面
 export default function Component() {
@@ -54,6 +56,11 @@ export default function Component() {
       '如果您还有其他问题，随时可以咨询我。'
     ]
   });
+
+  // 初始化监控系统
+  React.useEffect(() => {
+    initializeMonitoring();
+  }, []);
 
   // 检查登录状态
   React.useEffect(() => {
@@ -98,96 +105,139 @@ export default function Component() {
   React.useEffect(() => {
     if (!isLoggedIn || !currentUser) return;
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:6006/ws';
-    const client = getWebSocketClient(wsUrl, {
-      userId: currentUser?.id,
-      userType: currentUser?.type,
-      sessionToken: currentUser?.sessionToken,
-    });
+    let mounted = true; // 避免竞态条件
+    let client = null;
 
-    // 设置事件监听
-    client.on('connected', () => {
-      setConnectionStatus('connected');
-      console.log('WebSocket连接成功');
-      
-      // 连接成功后，请求在线用户列表
-      setTimeout(() => {
-        console.log('请求在线用户列表...');
-        client.send({
-          type: 'GetOnlineUsers',
-          user_id: currentUser?.id,
-          timestamp: new Date().toISOString()
+    const initWebSocket = async () => {
+      try {
+        const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:6006/ws';
+        client = getWebSocketClient(wsUrl, {
+          userId: currentUser?.id,
+          userType: currentUser?.type,
+          sessionToken: currentUser?.sessionToken,
         });
-      }, 500);
-    });
 
-    client.on('disconnected', () => {
-      setConnectionStatus('disconnected');
-      console.log('WebSocket连接断开');
-    });
-
-    client.on('error', (error) => {
-      console.error('WebSocket错误:', error);
-      setConnectionStatus('disconnected');
-    });
-
-    client.on('Chat', (data) => {
-      handleReceiveMessage(data);
-    });
-
-    client.on('message', (data) => {
-      handleReceiveMessage(data);
-    });
-    
-    // 监听在线用户列表更新
-    client.on('OnlineUsers', (data) => {
-      console.log('收到在线用户列表:', data);
-      if (data.users) {
-        // 过滤出客户列表（客服只需要看到客户）
-        const onlineCustomers = data.users.filter(user => user.user_type === 'Kehu');
-        updateOnlineCustomers(onlineCustomers);
-      }
-    });
-    
-    // 监听用户加入
-    client.on('UserJoined', (data) => {
-      console.log('用户加入:', data);
-      if (data.user_type === 'Kehu') {
-        // 如果是客户加入，添加到客户列表
-        addNewCustomer({
-          id: data.user_id,
-          name: data.user_name,
-          status: 'online',
-          lastMessage: '新客户上线',
-          timestamp: new Date(data.timestamp),
-          unreadCount: 0,
-          messages: []
+        // 设置事件监听
+        client.on('connected', () => {
+          if (!mounted) return;
+          setConnectionStatus('connected');
+          console.log('WebSocket连接成功');
+          
+          // 连接成功后，请求在线用户列表
+          setTimeout(() => {
+            if (!mounted) return;
+            console.log('请求在线用户列表...');
+            client?.send({
+              type: 'GetOnlineUsers',
+              user_id: currentUser?.id,
+              timestamp: new Date().toISOString()
+            });
+          }, 500);
         });
-      }
-    });
-    
-    // 监听用户离开
-    client.on('UserLeft', (data) => {
-      console.log('用户离开:', data);
-      if (data.user_type === 'Kehu') {
-        // 如果是客户离开，更新客户状态
-        updateCustomerStatus(data.user_id, 'offline');
-      }
-    });
-    
-    // 监听状态更新
-    client.on('Status', (data) => {
-      console.log('用户状态更新:', data);
-      updateCustomerStatus(data.user_id, data.status);
-    });
 
-    // 添加调试监听器
-    client.on('message', (data) => {
-      console.log('收到WebSocket消息:', {
-        type: data.type,
-        data: data
-      });
-    });
+        client.on('disconnected', () => {
+          if (!mounted) return;
+          setConnectionStatus('disconnected');
+          console.log('WebSocket连接断开');
+        });
+
+        client.on('error', (error) => {
+          if (!mounted) return;
+          console.error('WebSocket错误:', error);
+          setConnectionStatus('disconnected');
+        });
+
+        client.on('Chat', (data) => {
+          if (!mounted) return;
+          handleReceiveMessage(data);
+        });
+
+        client.on('message', (data) => {
+          if (!mounted) return;
+          handleReceiveMessage(data);
+        });
+        
+        // 监听在线用户列表更新
+        client.on('OnlineUsers', (data) => {
+          if (!mounted) return;
+          console.log('收到在线用户列表:', data);
+          if (data?.users) {
+            // 过滤出客户列表（客服只需要看到客户）
+            const onlineCustomers = data.users.filter(user => user?.user_type === 'Kehu');
+            updateOnlineCustomers(onlineCustomers);
+          }
+        });
+        
+        // 监听用户加入
+        client.on('UserJoined', (data) => {
+          if (!mounted) return;
+          console.log('用户加入:', data);
+          if (data?.user_type === 'Kehu') {
+            // 如果是客户加入，添加到客户列表
+            addNewCustomer({
+              id: data.user_id,
+              name: data.user_name,
+              status: 'online',
+              lastMessage: '新客户上线',
+              timestamp: new Date(data.timestamp),
+              unreadCount: 0,
+              messages: []
+            });
+          }
+        });
+        
+        // 监听用户离开
+        client.on('UserLeft', (data) => {
+          if (!mounted) return;
+          console.log('用户离开:', data);
+          if (data?.user_type === 'Kehu') {
+            // 如果是客户离开，更新客户状态
+            updateCustomerStatus(data.user_id, 'offline');
+          }
+        });
+        
+        // 监听状态更新
+        client.on('Status', (data) => {
+          if (!mounted) return;
+          console.log('用户状态更新:', data);
+          updateCustomerStatus(data.user_id, data.status);
+        });
+
+        // 添加调试监听器
+        client.on('message', (data) => {
+          if (!mounted) return;
+          console.log('收到WebSocket消息:', {
+            type: data.type,
+            data: data
+          });
+        });
+
+        setWsClient(client);
+        
+        // 监控WebSocket连接
+        monitorWebSocket(client);
+      } catch (error) {
+        if (mounted) {
+          console.error('WebSocket初始化失败:', error);
+          setConnectionStatus('error');
+        }
+      }
+    };
+
+    initWebSocket();
+
+    // 清理函数
+    return () => {
+      mounted = false;
+      if (client) {
+        try {
+          client.disconnect();
+        } catch (error) {
+          console.error('WebSocket断开连接失败:', error);
+        }
+      }
+    };
+  }, [isLoggedIn, currentUser]);
 
     // 连接
     client.connect();
@@ -201,89 +251,141 @@ export default function Component() {
 
   // 处理接收到的消息
   const handleReceiveMessage = (data) => {
-    const newMessage = {
-      id: data.id,
-      type: data.messageType || MessageType.TEXT,
-      content: data.content,
-      senderId: data.senderId,
-      senderName: data.senderName,
-      senderAvatar: data.senderAvatar,
-      timestamp: new Date(data.timestamp),
-      imageUrl: data.imageUrl,
-      fileName: data.fileName,
-      fileSize: data.fileSize,
-      fileUrl: data.fileUrl,
-      voiceDuration: data.voiceDuration,
-      voiceUrl: data.voiceUrl,
-      status: 'delivered',
-    };
+    try {
+      // 输入验证
+      if (!data) {
+        console.warn('收到空消息数据');
+        return;
+      }
 
-    setMessages(prev => [...prev, newMessage]);
+      // 验证消息内容
+      const validatedContent = data?.content ? 
+        validateMessageContent(data.content, data.messageType || 'text') : '';
+
+      // 使用可选链操作符防止空指针访问
+      const newMessage = {
+        id: data?.id || Date.now().toString(),
+        type: data?.messageType || MessageType.TEXT,
+        content: escapeHtml(validatedContent), // 防XSS
+        senderId: data?.senderId || '',
+        senderName: escapeHtml(data?.senderName || '未知用户'), // 防XSS
+        senderAvatar: data?.senderAvatar || '',
+        timestamp: new Date(data?.timestamp || Date.now()),
+        imageUrl: data?.imageUrl || null,
+        fileName: data?.fileName || null,
+        fileSize: data?.fileSize || null,
+        fileUrl: data?.fileUrl || null,
+        voiceDuration: data?.voiceDuration || null,
+        voiceUrl: data?.voiceUrl || null,
+        status: 'delivered',
+      };
+
+      setMessages(prev => [...prev, newMessage]);
+    } catch (error) {
+      console.error('消息处理失败:', error);
+    }
   };
   
   // 更新在线客户列表
   const updateOnlineCustomers = (onlineCustomers) => {
+    // 数组访问安全检查
+    if (!Array.isArray(onlineCustomers)) {
+      console.warn('onlineCustomers 不是数组:', onlineCustomers);
+      return;
+    }
+
     setCustomers(prevCustomers => {
       // 创建一个新的客户列表
       const updatedCustomers = [...prevCustomers];
       
       // 标记所有客户为离线
       updatedCustomers.forEach(customer => {
-        customer.status = 'offline';
+        if (customer) {
+          customer.status = 'offline';
+        }
       });
       
       // 更新在线客户的状态
       onlineCustomers.forEach(onlineCustomer => {
-        const existingCustomer = updatedCustomers.find(c => c.id === onlineCustomer.user_id);
+        // 使用可选链操作符防止空指针访问
+        const customerId = onlineCustomer?.user_id;
+        const customerName = onlineCustomer?.user_name;
+        
+        if (!customerId || !customerName) {
+          console.warn('客户数据不完整:', onlineCustomer);
+          return;
+        }
+
+        const existingCustomer = updatedCustomers.find(c => c?.id === customerId);
         if (existingCustomer) {
           existingCustomer.status = 'online';
-          existingCustomer.name = onlineCustomer.user_name;
+          existingCustomer.name = customerName;
         } else {
           // 如果是新客户，添加到列表
-          updatedCustomers.push({
-            id: onlineCustomer.user_id,
-            name: onlineCustomer.user_name,
+          const newCustomer = {
+            id: customerId,
+            name: customerName,
             status: 'online',
-            avatar: onlineCustomer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(onlineCustomer.user_name)}&background=random`,
+            avatar: onlineCustomer?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=random`,
             lastMessage: '新客户',
-            timestamp: new Date(onlineCustomer.last_seen),
+            timestamp: new Date(onlineCustomer?.last_seen || Date.now()),
             unreadCount: 0,
             messages: []
-          });
+          };
+          updatedCustomers.push(newCustomer);
         }
       });
       
       // 按状态和时间排序：在线的在前，然后按最后活动时间降序
       return updatedCustomers.sort((a, b) => {
+        if (!a || !b) return 0;
         if (a.status === 'online' && b.status !== 'online') return -1;
         if (a.status !== 'online' && b.status === 'online') return 1;
-        return b.timestamp - a.timestamp;
+        return (b.timestamp || 0) - (a.timestamp || 0);
       });
     });
   };
   
+  // 生成默认头像URL
+  const generateAvatarUrl = (name) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+  };
+
   // 添加新客户
   const addNewCustomer = (newCustomer) => {
-    setCustomers(prevCustomers => {
-      // 检查客户是否已存在
-      const exists = prevCustomers.some(c => c.id === newCustomer.id);
-      if (exists) {
-        // 如果已存在，只更新状态
-        return prevCustomers.map(c => 
-          c.id === newCustomer.id 
-            ? { ...c, status: 'online', timestamp: newCustomer.timestamp }
-            : c
-        );
+    try {
+      // 输入验证
+      if (!newCustomer?.id || !newCustomer?.name) {
+        console.warn('客户数据不完整:', newCustomer);
+        return;
       }
-      
-      // 添加新客户
-      const customer = {
-        ...newCustomer,
-        avatar: newCustomer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCustomer.name)}&background=random`,
-      };
-      
-      return [customer, ...prevCustomers];
-    });
+
+      // 验证客户数据
+      const validatedCustomer = validateCustomerData(newCustomer);
+
+      setCustomers(prevCustomers => {
+        // 检查客户是否已存在
+        const exists = prevCustomers.some(c => c?.id === validatedCustomer.id);
+        if (exists) {
+          // 如果已存在，只更新状态
+          return prevCustomers.map(c => 
+            c?.id === validatedCustomer.id 
+              ? { ...c, status: 'online', timestamp: validatedCustomer.timestamp }
+              : c
+          );
+        }
+        
+        // 添加新客户
+        const customer = {
+          ...validatedCustomer,
+          avatar: validatedCustomer.avatar || generateAvatarUrl(validatedCustomer.name),
+        };
+        
+        return [customer, ...prevCustomers];
+      });
+    } catch (error) {
+      console.error('添加客户失败:', error);
+    }
   };
   
   // 更新客户状态
@@ -299,7 +401,16 @@ export default function Component() {
 
   // 发送消息
   const handleSendMessage = async (messageData) => {
-    if (!currentCustomer) return;
+    // 输入验证
+    if (!currentCustomer) {
+      console.warn('没有选择客户');
+      return;
+    }
+
+    if (!messageData?.content && !messageData?.imageUrl && !messageData?.fileUrl && !messageData?.voiceUrl) {
+      console.warn('消息内容不能为空');
+      return;
+    }
 
     const message = {
       id: Date.now().toString(),
@@ -307,19 +418,19 @@ export default function Component() {
             messageData.type === 'image' ? MessageType.IMAGE :
             messageData.type === 'file' ? MessageType.FILE :
             messageData.type === 'voice' ? MessageType.VOICE : MessageType.TEXT,
-      content: messageData.content,
-      senderId: currentUser?.id,
-      senderName: currentUser?.name,
-      senderAvatar: currentUser?.avatar,
+      content: messageData.content || '',
+      senderId: currentUser?.id || '',
+      senderName: currentUser?.name || '客服',
+      senderAvatar: currentUser?.avatar || '',
       timestamp: new Date(),
       customerId: currentCustomer.id,
       status: 'sending',
-      imageUrl: messageData.imageUrl,
-      fileName: messageData.fileName,
-      fileSize: messageData.fileSize,
-      fileUrl: messageData.fileUrl,
-      voiceDuration: messageData.voiceDuration,
-      voiceUrl: messageData.voiceUrl,
+      imageUrl: messageData.imageUrl || null,
+      fileName: messageData.fileName || null,
+      fileSize: messageData.fileSize || null,
+      fileUrl: messageData.fileUrl || null,
+      voiceDuration: messageData.voiceDuration || null,
+      voiceUrl: messageData.voiceUrl || null,
     };
 
     // 添加消息到当前客户的消息历史
@@ -340,7 +451,7 @@ export default function Component() {
         // 更新消息状态
         setCustomerMessages(prev => ({
           ...prev,
-          [currentCustomer.id]: prev[currentCustomer.id].map(msg => 
+          [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
             msg.id === message.id ? {...msg, status: 'sent'} : msg
           )
         }));
@@ -349,7 +460,7 @@ export default function Component() {
         setTimeout(() => {
           setCustomerMessages(prev => ({
             ...prev,
-            [currentCustomer.id]: prev[currentCustomer.id].map(msg => 
+            [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
               msg.id === message.id ? {...msg, status: 'sent'} : msg
             )
           }));
@@ -358,6 +469,13 @@ export default function Component() {
 
     } catch (error) {
       console.error('发送消息失败:', error);
+      // 更新消息状态为失败
+      setCustomerMessages(prev => ({
+        ...prev,
+        [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
+          msg.id === message.id ? {...msg, status: 'failed'} : msg
+        )
+      }));
     }
   };
 
