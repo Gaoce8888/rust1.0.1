@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术文档 - 客服系统</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/prism.css">
+    <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <meta name="description" content="客服系统技术文档，包含架构设计、开发指南、部署说明等">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../assets/images/logo.png" alt="客服系统" class="logo-img">
+                <span class="logo-text">客服系统 v1.3.0</span>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">首页</a>
+                <a href="../api/index.html" class="nav-link">API文档</a>
+                <a href="../user-guide/index.html" class="nav-link">用户指南</a>
+                <a href="index.html" class="nav-link active">技术文档</a>
+                <a href="../deployment/index.html" class="nav-link">部署指南</a>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="搜索技术文档..." class="search-input">
+                <button class="search-btn" onclick="searchDocs()">🔍</button>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="../index.html">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">技术文档</span>
+                </div>
+                <h1 class="page-title">技术文档</h1>
+                <p class="page-subtitle">深入的技术架构、开发指南和系统设计文档</p>
+            </div>
+        </section>
+
+        <!-- 技术概览 -->
+        <section class="tech-overview">
+            <div class="container">
+                <h2 class="section-title">技术概览</h2>
+                
+                <div class="tech-stats">
+                    <div class="tech-stat-card">
+                        <div class="tech-stat-icon">🦀</div>
+                        <div class="tech-stat-number">Rust</div>
+                        <div class="tech-stat-label">核心语言</div>
+                    </div>
+                    <div class="tech-stat-card">
+                        <div class="tech-stat-icon">⚡</div>
+                        <div class="tech-stat-number">Tokio</div>
+                        <div class="tech-stat-label">异步运行时</div>
+                    </div>
+                    <div class="tech-stat-card">
+                        <div class="tech-stat-icon">🌐</div>
+                        <div class="tech-stat-number">Warp</div>
+                        <div class="tech-stat-label">Web框架</div>
+                    </div>
+                    <div class="tech-stat-card">
+                        <div class="tech-stat-icon">🔴</div>
+                        <div class="tech-stat-number">Redis</div>
+                        <div class="tech-stat-label">缓存存储</div>
+                    </div>
+                </div>
+
+                <div class="tech-highlights">
+                    <div class="highlight-card">
+                        <h3>🚀 高性能</h3>
+                        <p>基于Rust的零成本抽象和内存安全特性，提供企业级性能表现</p>
+                        <ul>
+                            <li>零拷贝数据传输</li>
+                            <li>无GC内存管理</li>
+                            <li>并发安全保证</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="highlight-card">
+                        <h3>🔒 安全可靠</h3>
+                        <p>编译时内存安全和线程安全，避免运行时错误</p>
+                        <ul>
+                            <li>内存安全保证</li>
+                            <li>线程安全设计</li>
+                            <li>类型安全系统</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="highlight-card">
+                        <h3>📱 跨平台</h3>
+                        <p>支持Windows、Linux、macOS等多个平台</p>
+                        <ul>
+                            <li>统一API接口</li>
+                            <li>原生性能表现</li>
+                            <li>最小化依赖</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 架构设计 -->
+        <section class="architecture-design">
+            <div class="container">
+                <h2 class="section-title">架构设计</h2>
+                
+                <div class="architecture-overview">
+                    <div class="arch-diagram">
+                        <h3>系统架构图</h3>
+                        <div class="arch-layers">
+                            <div class="arch-layer">
+                                <h4>前端层</h4>
+                                <div class="arch-components">
+                                    <span class="arch-component">Web客户端</span>
+                                    <span class="arch-component">移动端</span>
+                                    <span class="arch-component">管理后台</span>
+                                </div>
+                            </div>
+                            <div class="arch-layer">
+                                <h4>网关层</h4>
+                                <div class="arch-components">
+                                    <span class="arch-component">HTTP API</span>
+                                    <span class="arch-component">WebSocket</span>
+                                    <span class="arch-component">负载均衡</span>
+                                </div>
+                            </div>
+                            <div class="arch-layer">
+                                <h4>业务层</h4>
+                                <div class="arch-components">
+                                    <span class="arch-component">认证服务</span>
+                                    <span class="arch-component">消息服务</span>
+                                    <span class="arch-component">用户服务</span>
+                                    <span class="arch-component">AI服务</span>
+                                </div>
+                            </div>
+                            <div class="arch-layer">
+                                <h4>数据层</h4>
+                                <div class="arch-components">
+                                    <span class="arch-component">Redis缓存</span>
+                                    <span class="arch-component">本地存储</span>
+                                    <span class="arch-component">文件存储</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="arch-details">
+                        <div class="detail-card">
+                            <h3>🔌 接口设计</h3>
+                            <p>RESTful API + WebSocket实时通信</p>
+                            <ul>
+                                <li>HTTP API用于CRUD操作</li>
+                                <li>WebSocket用于实时消息</li>
+                                <li>统一错误处理机制</li>
+                                <li>版本化API设计</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h3>💾 数据存储</h3>
+                            <p>多层级存储策略</p>
+                            <ul>
+                                <li>Redis用于会话和缓存</li>
+                                <li>Sled用于持久化数据</li>
+                                <li>文件系统用于文件存储</li>
+                                <li>数据备份和恢复机制</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h3>🔄 消息队列</h3>
+                            <p>异步消息处理</p>
+                            <ul>
+                                <li>内存队列处理实时消息</li>
+                                <li>持久化队列处理离线消息</li>
+                                <li>消息重试和死信处理</li>
+                                <li>消息优先级支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 开发指南 -->
+        <section class="development-guide">
+            <div class="container">
+                <h2 class="section-title">开发指南</h2>
+                
+                <div class="dev-sections">
+                    <div class="dev-section">
+                        <h3>🛠️ 环境搭建</h3>
+                        <div class="dev-content">
+                            <h4>系统要求</h4>
+                            <ul>
+                                <li>Rust 1.70+</li>
+                                <li>Redis 6.0+</li>
+                                <li>Linux/Windows/macOS</li>
+                                <li>4GB+ RAM</li>
+                            </ul>
+                            
+                            <h4>安装步骤</h4>
+                            <pre><code class="language-bash"># 安装Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 克隆项目
+git clone https://github.com/Gaoce8888/rust1.0.1.git
+cd rust1.0.1
+
+# 编译项目
+cargo build --release
+
+# 启动Redis
+redis-server
+
+# 运行系统
+./target/release/kefu-system</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="dev-section">
+                        <h3>📁 项目结构</h3>
+                        <div class="dev-content">
+                            <pre><code class="language-plaintext">src/
+├── main.rs              # 程序入口
+├── auth/                # 认证模块
+│   ├── mod.rs
+│   ├── kefu_auth.rs     # 客服认证
+│   ├── customer_manager.rs # 客户管理
+│   ├── api_routes.rs    # API路由
+│   └── heartbeat_service.rs # 心跳服务
+├── handlers/            # HTTP处理器
+├── routes/              # 路由配置
+├── websocket/           # WebSocket处理
+├── ai/                  # AI服务
+├── config/              # 配置管理
+└── server/              # 服务器组件</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="dev-section">
+                        <h3>🔧 配置管理</h3>
+                        <div class="dev-content">
+                            <h4>配置文件</h4>
+                            <pre><code class="language-toml"># config.toml
+[server]
+host = "0.0.0.0"
+port = 6006
+workers = 4
+
+[redis]
+url = "redis://localhost:6379"
+pool_size = 10
+
+[database]
+path = "./data/kefu.db"
+
+[logging]
+level = "info"
+file = "./logs/kefu.log"</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心模块 -->
+        <section class="core-modules">
+            <div class="container">
+                <h2 class="section-title">核心模块</h2>
+                
+                <div class="modules-grid">
+                    <div class="module-detail-card">
+                        <h3>🔐 认证模块 (auth)</h3>
+                        <p>处理用户认证、会话管理和权限控制</p>
+                        <div class="module-features">
+                            <h4>主要功能</h4>
+                            <ul>
+                                <li>客服登录/登出</li>
+                                <li>会话token管理</li>
+                                <li>权限验证</li>
+                                <li>心跳检测</li>
+                            </ul>
+                        </div>
+                        <a href="auth-module.html" class="module-link">查看详情</a>
+                    </div>
+                    
+                    <div class="module-detail-card">
+                        <h3>💬 消息模块 (handlers)</h3>
+                        <p>处理消息发送、接收和存储</p>
+                        <div class="module-features">
+                            <h4>主要功能</h4>
+                            <ul>
+                                <li>消息发送/接收</li>
+                                <li>消息历史查询</li>
+                                <li>文件传输</li>
+                                <li>消息状态管理</li>
+                            </ul>
+                        </div>
+                        <a href="message-module.html" class="module-link">查看详情</a>
+                    </div>
+                    
+                    <div class="module-detail-card">
+                        <h3>🔌 WebSocket模块</h3>
+                        <p>实时通信和连接管理</p>
+                        <div class="module-features">
+                            <h4>主要功能</h4>
+                            <ul>
+                                <li>WebSocket连接管理</li>
+                                <li>实时消息推送</li>
+                                <li>连接状态监控</li>
+                                <li>断线重连处理</li>
+                            </ul>
+                        </div>
+                        <a href="websocket-module.html" class="module-link">查看详情</a>
+                    </div>
+                    
+                    <div class="module-detail-card">
+                        <h3>🤖 AI模块</h3>
+                        <p>智能客服和自动化处理</p>
+                        <div class="module-features">
+                            <h4>主要功能</h4>
+                            <ul>
+                                <li>智能回复</li>
+                                <li>意图识别</li>
+                                <li>自动分类</li>
+                                <li>知识库管理</li>
+                            </ul>
+                        </div>
+                        <a href="ai-module.html" class="module-link">查看详情</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 性能优化 -->
+        <section class="performance-optimization">
+            <div class="container">
+                <h2 class="section-title">性能优化</h2>
+                
+                <div class="optimization-strategies">
+                    <div class="strategy-card">
+                        <h3>⚡ 异步处理</h3>
+                        <p>使用Tokio异步运行时提升并发性能</p>
+                        <pre><code class="language-rust">use tokio::spawn;
+
+async fn handle_message(msg: Message) {
+    spawn(async move {
+        // 异步处理消息
+        process_message(msg).await;
+    });
+}</code></pre>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3>💾 缓存策略</h3>
+                        <p>多级缓存减少数据库访问</p>
+                        <ul>
+                            <li>Redis缓存热点数据</li>
+                            <li>内存缓存会话信息</li>
+                            <li>CDN缓存静态资源</li>
+                            <li>数据库连接池</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3>🔧 编译优化</h3>
+                        <p>生产环境编译优化</p>
+                        <pre><code class="language-toml">[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true</code></pre>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3>📊 监控指标</h3>
+                        <p>关键性能指标监控</p>
+                        <ul>
+                            <li>响应时间 < 100ms</li>
+                            <li>并发连接 > 10K</li>
+                            <li>内存使用 < 1GB</li>
+                            <li>CPU使用率 < 80%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 安全设计 -->
+        <section class="security-design">
+            <div class="container">
+                <h2 class="section-title">安全设计</h2>
+                
+                <div class="security-aspects">
+                    <div class="security-card">
+                        <h3>🔐 认证安全</h3>
+                        <ul>
+                            <li>Session Token认证</li>
+                            <li>Token过期机制</li>
+                            <li>密码加密存储</li>
+                            <li>登录失败限制</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="security-card">
+                        <h3>🛡️ 数据安全</h3>
+                        <ul>
+                            <li>HTTPS传输加密</li>
+                            <li>敏感数据脱敏</li>
+                            <li>SQL注入防护</li>
+                            <li>XSS攻击防护</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="security-card">
+                        <h3>🔒 访问控制</h3>
+                        <ul>
+                            <li>基于角色的权限控制</li>
+                            <li>API访问频率限制</li>
+                            <li>IP白名单机制</li>
+                            <li>操作审计日志</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="security-card">
+                        <h3>🔄 安全更新</h3>
+                        <ul>
+                            <li>依赖包安全更新</li>
+                            <li>安全漏洞修复</li>
+                            <li>定期安全扫描</li>
+                            <li>应急响应机制</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 测试策略 -->
+        <section class="testing-strategy">
+            <div class="container">
+                <h2 class="section-title">测试策略</h2>
+                
+                <div class="test-types">
+                    <div class="test-card">
+                        <h3>🧪 单元测试</h3>
+                        <p>测试单个函数和模块</p>
+                        <pre><code class="language-rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_login_success() {
+        let result = authenticate_user("kefu001", "123456");
+        assert!(result.is_ok());
+    }
+}</code></pre>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3>🔗 集成测试</h3>
+                        <p>测试模块间交互</p>
+                        <ul>
+                            <li>API接口测试</li>
+                            <li>数据库集成测试</li>
+                            <li>Redis集成测试</li>
+                            <li>WebSocket连接测试</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3>🚀 性能测试</h3>
+                        <p>测试系统性能指标</p>
+                        <ul>
+                            <li>并发连接测试</li>
+                            <li>消息吞吐量测试</li>
+                            <li>内存使用测试</li>
+                            <li>响应时间测试</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3>🔒 安全测试</h3>
+                        <p>测试安全防护机制</p>
+                        <ul>
+                            <li>认证绕过测试</li>
+                            <li>权限提升测试</li>
+                            <li>注入攻击测试</li>
+                            <li>会话劫持测试</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 部署架构 -->
+        <section class="deployment-architecture">
+            <div class="container">
+                <h2 class="section-title">部署架构</h2>
+                
+                <div class="deployment-options">
+                    <div class="deployment-card">
+                        <h3>🏠 单机部署</h3>
+                        <p>适用于小规模使用场景</p>
+                        <div class="deployment-diagram">
+                            <div class="deploy-component">Nginx</div>
+                            <div class="deploy-component">客服系统</div>
+                            <div class="deploy-component">Redis</div>
+                        </div>
+                        <a href="../deployment/single-server.html" class="deployment-link">部署指南</a>
+                    </div>
+                    
+                    <div class="deployment-card">
+                        <h3>🏢 集群部署</h3>
+                        <p>适用于大规模生产环境</p>
+                        <div class="deployment-diagram">
+                            <div class="deploy-component">负载均衡器</div>
+                            <div class="deploy-row">
+                                <div class="deploy-component">客服系统1</div>
+                                <div class="deploy-component">客服系统2</div>
+                                <div class="deploy-component">客服系统N</div>
+                            </div>
+                            <div class="deploy-component">Redis集群</div>
+                        </div>
+                        <a href="../deployment/cluster.html" class="deployment-link">部署指南</a>
+                    </div>
+                    
+                    <div class="deployment-card">
+                        <h3>☁️ 容器化部署</h3>
+                        <p>使用Docker和Kubernetes</p>
+                        <div class="deployment-diagram">
+                            <div class="deploy-component">Kubernetes</div>
+                            <div class="deploy-component">Docker容器</div>
+                            <div class="deploy-component">持久化存储</div>
+                        </div>
+                        <a href="../deployment/container.html" class="deployment-link">部署指南</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>客服系统</h4>
+                    <p>企业级实时客服解决方案</p>
+                </div>
+                <div class="footer-section">
+                    <h4>文档</h4>
+                    <ul>
+                        <li><a href="../api/index.html">API文档</a></li>
+                        <li><a href="../user-guide/index.html">用户指南</a></li>
+                        <li><a href="index.html">技术文档</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支持</h4>
+                    <ul>
+                        <li><a href="troubleshooting.html">故障排除</a></li>
+                        <li><a href="faq.html">常见问题</a></li>
+                        <li><a href="https://github.com/Gaoce8888/rust1.0.1">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>版本</h4>
+                    <p>当前版本: v1.3.0</p>
+                    <p>最后更新: 2025-07-21</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 客服系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- JavaScript -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/prism.js"></script>
+</body>
+</html>

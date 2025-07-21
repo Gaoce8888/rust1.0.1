@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API文档 - 客服系统</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/prism.css">
+    <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <meta name="description" content="客服系统完整API文档，包含认证、消息、用户管理等接口">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../assets/images/logo.png" alt="客服系统" class="logo-img">
+                <span class="logo-text">客服系统 v1.3.0</span>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">首页</a>
+                <a href="index.html" class="nav-link active">API文档</a>
+                <a href="../user-guide/index.html" class="nav-link">用户指南</a>
+                <a href="../technical/index.html" class="nav-link">技术文档</a>
+                <a href="../deployment/index.html" class="nav-link">部署指南</a>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="搜索API..." class="search-input">
+                <button class="search-btn" onclick="searchDocs()">🔍</button>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="../index.html">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">API文档</span>
+                </div>
+                <h1 class="page-title">API文档</h1>
+                <p class="page-subtitle">完整的API接口参考文档，包含认证、消息、用户管理等所有接口</p>
+            </div>
+        </section>
+
+        <!-- API概览 -->
+        <section class="api-overview">
+            <div class="container">
+                <h2 class="section-title">API概览</h2>
+                
+                <div class="api-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">🔐</div>
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">认证接口</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💬</div>
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">消息接口</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-number">6</div>
+                        <div class="stat-label">用户接口</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚙️</div>
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">系统接口</div>
+                    </div>
+                </div>
+
+                <div class="api-info">
+                    <div class="info-card">
+                        <h3>基础信息</h3>
+                        <ul>
+                            <li><strong>基础URL:</strong> <code>http://localhost:6006</code></li>
+                            <li><strong>协议:</strong> HTTP/HTTPS</li>
+                            <li><strong>数据格式:</strong> JSON</li>
+                            <li><strong>字符编码:</strong> UTF-8</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>认证方式</h3>
+                        <ul>
+                            <li><strong>客服端:</strong> Session Token</li>
+                            <li><strong>客户端:</strong> 无需认证</li>
+                            <li><strong>WebSocket:</strong> URL参数认证</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>响应格式</h3>
+                        <ul>
+                            <li><strong>成功:</strong> HTTP 200 + JSON</li>
+                            <li><strong>错误:</strong> HTTP 4xx/5xx + JSON</li>
+                            <li><strong>分页:</strong> 支持 limit/offset</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API分类导航 -->
+        <section class="api-categories">
+            <div class="container">
+                <h2 class="section-title">API分类</h2>
+                
+                <div class="category-grid">
+                    <a href="authentication.html" class="category-card">
+                        <div class="category-icon">🔐</div>
+                        <h3>认证授权</h3>
+                        <p>客服登录、登出、会话管理</p>
+                        <div class="category-stats">
+                            <span class="api-count">5个接口</span>
+                        </div>
+                    </a>
+                    
+                    <a href="messages.html" class="category-card">
+                        <div class="category-icon">💬</div>
+                        <h3>消息管理</h3>
+                        <p>发送消息、获取历史、消息状态</p>
+                        <div class="category-stats">
+                            <span class="api-count">8个接口</span>
+                        </div>
+                    </a>
+                    
+                    <a href="users.html" class="category-card">
+                        <div class="category-icon">👥</div>
+                        <h3>用户管理</h3>
+                        <p>客服信息、在线状态、客户管理</p>
+                        <div class="category-stats">
+                            <span class="api-count">6个接口</span>
+                        </div>
+                    </a>
+                    
+                    <a href="system.html" class="category-card">
+                        <div class="category-icon">⚙️</div>
+                        <h3>系统管理</h3>
+                        <p>系统状态、配置管理、监控</p>
+                        <div class="category-stats">
+                            <span class="api-count">4个接口</span>
+                        </div>
+                    </a>
+                    
+                    <a href="websocket.html" class="category-card">
+                        <div class="category-icon">🔌</div>
+                        <h3>WebSocket</h3>
+                        <p>实时通信、连接管理、事件</p>
+                        <div class="category-stats">
+                            <span class="api-count">实时接口</span>
+                        </div>
+                    </a>
+                    
+                    <a href="errors.html" class="category-card">
+                        <div class="category-icon">⚠️</div>
+                        <h3>错误码</h3>
+                        <p>错误码定义、处理方式、示例</p>
+                        <div class="category-stats">
+                            <span class="api-count">完整参考</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速开始 -->
+        <section class="quick-start">
+            <div class="container">
+                <h2 class="section-title">快速开始</h2>
+                
+                <div class="quick-start-content">
+                    <div class="code-example">
+                        <h3>1. 客服登录</h3>
+                        <pre><code class="language-bash">curl -X POST http://localhost:6006/api/kefu/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "kefu001",
+    "password": "123456"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="code-example">
+                        <h3>2. 获取在线客服</h3>
+                        <pre><code class="language-bash">curl -X GET http://localhost:6006/api/kefu/online \
+  -H "Authorization: Bearer YOUR_SESSION_TOKEN"</code></pre>
+                    </div>
+                    
+                    <div class="code-example">
+                        <h3>3. WebSocket连接</h3>
+                        <pre><code class="language-javascript">const ws = new WebSocket(
+  'ws://localhost:6006/ws?user_id=123&user_type=kefu&session_token=YOUR_TOKEN'
+);
+
+ws.onmessage = function(event) {
+  const message = JSON.parse(event.data);
+  console.log('收到消息:', message);
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 认证说明 -->
+        <section class="authentication-guide">
+            <div class="container">
+                <h2 class="section-title">认证说明</h2>
+                
+                <div class="auth-methods">
+                    <div class="auth-method">
+                        <h3>客服端认证</h3>
+                        <p>客服端需要先登录获取session_token，然后在请求头中携带：</p>
+                        <pre><code class="language-http">Authorization: Bearer YOUR_SESSION_TOKEN</code></pre>
+                        <p>或者作为URL参数：</p>
+                        <pre><code class="language-http">?session_token=YOUR_SESSION_TOKEN</code></pre>
+                    </div>
+                    
+                    <div class="auth-method">
+                        <h3>客户端认证</h3>
+                        <p>客户端无需认证，系统会自动分配客服。但需要提供用户标识：</p>
+                        <pre><code class="language-http">?user_id=CLIENT_ID&user_name=CLIENT_NAME</code></pre>
+                    </div>
+                    
+                    <div class="auth-method">
+                        <h3>WebSocket认证</h3>
+                        <p>WebSocket连接时通过URL参数进行认证：</p>
+                        <pre><code class="language-http">ws://localhost:6006/ws?user_id=123&user_type=kefu&session_token=TOKEN</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 响应格式 -->
+        <section class="response-format">
+            <div class="container">
+                <h2 class="section-title">响应格式</h2>
+                
+                <div class="format-examples">
+                    <div class="format-example">
+                        <h3>成功响应</h3>
+                        <pre><code class="language-json">{
+  "success": true,
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "user_id": "123",
+    "username": "kefu001",
+    "status": "online"
+  },
+  "timestamp": "2025-07-21T10:30:00Z"
+}</code></pre>
+                    </div>
+                    
+                    <div class="format-example">
+                        <h3>错误响应</h3>
+                        <pre><code class="language-json">{
+  "success": false,
+  "code": 401,
+  "message": "认证失败",
+  "error": "INVALID_TOKEN",
+  "details": "Session token已过期",
+  "timestamp": "2025-07-21T10:30:00Z"
+}</code></pre>
+                    </div>
+                    
+                    <div class="format-example">
+                        <h3>分页响应</h3>
+                        <pre><code class="language-json">{
+  "success": true,
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "items": [...],
+    "pagination": {
+      "total": 100,
+      "page": 1,
+      "limit": 20,
+      "pages": 5
+    }
+  },
+  "timestamp": "2025-07-21T10:30:00Z"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最佳实践 -->
+        <section class="best-practices">
+            <div class="container">
+                <h2 class="section-title">最佳实践</h2>
+                
+                <div class="practices-grid">
+                    <div class="practice-card">
+                        <h3>🔒 安全认证</h3>
+                        <ul>
+                            <li>始终使用HTTPS进行生产环境通信</li>
+                            <li>定期更新session_token</li>
+                            <li>不要在客户端代码中硬编码token</li>
+                            <li>实现token刷新机制</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>⚡ 性能优化</h3>
+                        <ul>
+                            <li>使用WebSocket进行实时通信</li>
+                            <li>合理设置请求频率限制</li>
+                            <li>缓存不经常变化的数据</li>
+                            <li>使用分页获取大量数据</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>🛡️ 错误处理</h3>
+                        <ul>
+                            <li>始终检查响应状态码</li>
+                            <li>实现重试机制处理网络错误</li>
+                            <li>记录详细的错误日志</li>
+                            <li>提供用户友好的错误提示</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>📱 移动端适配</h3>
+                        <ul>
+                            <li>考虑网络不稳定的情况</li>
+                            <li>实现离线消息缓存</li>
+                            <li>优化图片和文件传输</li>
+                            <li>适配不同屏幕尺寸</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>客服系统</h4>
+                    <p>企业级实时客服解决方案</p>
+                </div>
+                <div class="footer-section">
+                    <h4>文档</h4>
+                    <ul>
+                        <li><a href="index.html">API文档</a></li>
+                        <li><a href="../user-guide/index.html">用户指南</a></li>
+                        <li><a href="../technical/index.html">技术文档</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支持</h4>
+                    <ul>
+                        <li><a href="../technical/troubleshooting.html">故障排除</a></li>
+                        <li><a href="../technical/faq.html">常见问题</a></li>
+                        <li><a href="https://github.com/Gaoce8888/rust1.0.1">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>版本</h4>
+                    <p>当前版本: v1.3.0</p>
+                    <p>最后更新: 2025-07-21</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 客服系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- JavaScript -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/prism.js"></script>
+</body>
+</html>

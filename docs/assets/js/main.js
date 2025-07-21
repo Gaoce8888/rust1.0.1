@@ -1,323 +1,274 @@
-// 企业级客服系统技术文档 JavaScript
+// 客服系统文档 JavaScript 主文件
 
+// 全局变量
+let searchIndex = [];
+let currentSearchResults = [];
+
+// DOM 加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化所有功能
-    initMobileMenu();
-    initSearch();
-    initSmoothScrolling();
-    initCodeHighlighting();
-    initPrintButton();
-    initActiveNavigation();
-    initScrollToTop();
+    initializeApp();
 });
 
-// 移动端菜单切换
-function initMobileMenu() {
-    const menuToggle = document.querySelector('.menu-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    let overlay = document.querySelector('.sidebar-overlay');
-    
-    // 如果遮罩层不存在，创建它
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'sidebar-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-        `;
-        document.body.appendChild(overlay);
+// 初始化应用
+function initializeApp() {
+    initializeSearch();
+    initializeNavigation();
+    initializeScrollEffects();
+    initializeAnimations();
+    initializeCodeHighlighting();
+    initializeOfflineSupport();
+}
+
+// 搜索功能初始化
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(handleSearch, 300));
+        searchInput.addEventListener('keydown', handleSearchKeydown);
     }
+    
+    // 构建搜索索引
+    buildSearchIndex();
+}
 
-    if (menuToggle) {
-        menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            // 更新display属性以兼容旧代码
-            overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
-            
-            // 防止背景滚动
-            if (sidebar.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        });
+// 构建搜索索引
+function buildSearchIndex() {
+    // 这里可以从服务器获取搜索索引，或者动态构建
+    searchIndex = [
+        { title: '快速开始', url: 'user-guide/quick-start.html', keywords: '快速开始,安装,配置,启动' },
+        { title: 'API文档', url: 'api/index.html', keywords: 'API,接口,文档,认证,消息' },
+        { title: '用户指南', url: 'user-guide/index.html', keywords: '用户指南,使用说明,操作手册' },
+        { title: '技术文档', url: 'technical/index.html', keywords: '技术文档,架构,设计,开发' },
+        { title: '部署指南', url: 'deployment/index.html', keywords: '部署,安装,配置,生产环境' },
+        { title: '认证授权', url: 'api/authentication.html', keywords: '认证,授权,登录,会话' },
+        { title: '消息API', url: 'api/messages.html', keywords: '消息,聊天,发送,接收' },
+        { title: '系统配置', url: 'user-guide/configuration.html', keywords: '配置,设置,环境变量' },
+        { title: '生产部署', url: 'deployment/production.html', keywords: '生产,部署,服务器,优化' },
+        { title: '故障排除', url: 'technical/troubleshooting.html', keywords: '故障,问题,解决,调试' }
+    ];
+}
 
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            overlay.style.display = 'none';
-            document.body.style.overflow = '';
-        });
+// 处理搜索
+function handleSearch(event) {
+    const query = event.target.value.trim().toLowerCase();
+    
+    if (query.length < 2) {
+        hideSearchResults();
+        return;
     }
-
-    // 窗口大小改变时自动隐藏侧边栏
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 1024) {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            overlay.style.display = 'none';
-            document.body.style.overflow = '';
-        }
-    });
-}
-
-// 搜索功能
-function initSearch() {
-    const searchInput = document.querySelector('.search-input');
-    const searchResults = document.querySelector('.search-results');
     
-    if (!searchInput || !searchResults) return;
-
-    // 文档内容索引
-    const searchIndex = createSearchIndex();
-
-    searchInput.addEventListener('input', function() {
-        const query = this.value.trim().toLowerCase();
-        
-        if (query.length < 2) {
-            searchResults.classList.remove('active');
-            return;
-        }
-
-        const results = searchIndex.filter(item => 
-            item.title.toLowerCase().includes(query) ||
-            item.content.toLowerCase().includes(query) ||
-            item.tags.some(tag => tag.toLowerCase().includes(query))
-        );
-
-        displaySearchResults(results, query);
-    });
-
-    // 点击外部关闭搜索结果
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.classList.remove('active');
-        }
-    });
-}
-
-// 创建搜索索引
-function createSearchIndex() {
-    const index = [];
+    const results = searchIndex.filter(item => 
+        item.title.toLowerCase().includes(query) ||
+        item.keywords.toLowerCase().includes(query)
+    );
     
-    // 从页面内容中提取搜索数据
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        const title = section.querySelector('h2, h3, h4')?.textContent || '';
-        const content = section.textContent || '';
-        const tags = extractTags(section);
-        
-        index.push({
-            title: title,
-            content: content,
-            tags: tags,
-            url: window.location.pathname + '#' + section.id
-        });
-    });
-
-    return index;
-}
-
-// 提取标签
-function extractTags(section) {
-    const tags = [];
-    const codeBlocks = section.querySelectorAll('code');
-    codeBlocks.forEach(code => {
-        const text = code.textContent;
-        if (text.includes('API') || text.includes('GET') || text.includes('POST')) {
-            tags.push('API');
-        }
-        if (text.includes('Rust') || text.includes('cargo')) {
-            tags.push('Rust');
-        }
-        if (text.includes('WebSocket')) {
-            tags.push('WebSocket');
-        }
-    });
-    return tags;
+    displaySearchResults(results, query);
 }
 
 // 显示搜索结果
 function displaySearchResults(results, query) {
-    const searchResults = document.querySelector('.search-results');
+    let searchResults = document.getElementById('searchResults');
+    
+    if (!searchResults) {
+        searchResults = document.createElement('div');
+        searchResults.id = 'searchResults';
+        searchResults.className = 'search-results';
+        document.querySelector('.nav-search').appendChild(searchResults);
+    }
     
     if (results.length === 0) {
         searchResults.innerHTML = '<div class="search-result-item">未找到相关结果</div>';
     } else {
-        searchResults.innerHTML = results.slice(0, 10).map(result => `
-            <div class="search-result-item" onclick="navigateToResult('${result.url}')">
-                <div style="font-weight: 600; margin-bottom: 0.25rem;">${highlightText(result.title, query)}</div>
-                <div style="font-size: 0.8rem; color: #666;">${highlightText(result.content.substring(0, 100), query)}...</div>
-                <div style="font-size: 0.7rem; color: #999; margin-top: 0.25rem;">
-                    ${result.tags.map(tag => `<span style="background: #e9ecef; padding: 0.1rem 0.3rem; border-radius: 3px; margin-right: 0.25rem;">${tag}</span>`).join('')}
-                </div>
+        searchResults.innerHTML = results.map(item => `
+            <div class="search-result-item" onclick="navigateTo('${item.url}')">
+                <div class="result-title">${highlightQuery(item.title, query)}</div>
+                <div class="result-keywords">${item.keywords}</div>
             </div>
         `).join('');
     }
     
-    searchResults.classList.add('active');
+    searchResults.style.display = 'block';
+    currentSearchResults = results;
 }
 
-// 高亮搜索文本
-function highlightText(text, query) {
-    if (!query) return text;
+// 隐藏搜索结果
+function hideSearchResults() {
+    const searchResults = document.getElementById('searchResults');
+    if (searchResults) {
+        searchResults.style.display = 'none';
+    }
+}
+
+// 高亮搜索关键词
+function highlightQuery(text, query) {
     const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark style="background: #ffeb3b; padding: 0.1rem 0.2rem; border-radius: 2px;">$1</mark>');
+    return text.replace(regex, '<mark>$1</mark>');
 }
 
-// 导航到搜索结果
-function navigateToResult(url) {
-    if (url.startsWith('#')) {
-        // 同一页面的锚点
-        const element = document.querySelector(url);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
-    } else {
-        // 其他页面
-        window.location.href = url;
+// 处理搜索键盘事件
+function handleSearchKeydown(event) {
+    if (event.key === 'Escape') {
+        hideSearchResults();
+        event.target.blur();
+    }
+}
+
+// 导航到指定页面
+function navigateTo(url) {
+    window.location.href = url;
+    hideSearchResults();
+}
+
+// 导航功能初始化
+function initializeNavigation() {
+    // 移动端菜单切换
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
     }
     
-    // 关闭搜索结果
-    document.querySelector('.search-results').classList.remove('active');
-    document.querySelector('.search-input').value = '';
-}
-
-// 平滑滚动
-function initSmoothScrolling() {
-    const links = document.querySelectorAll('a[href^="#"]');
+    // 点击外部关闭菜单
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.nav-container')) {
+            navMenu?.classList.remove('active');
+            navToggle?.classList.remove('active');
+        }
+    });
     
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // 平滑滚动到锚点
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
-                const targetPosition = targetElement.offsetTop - headerHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
                 });
-                
-                // 更新URL
-                history.pushState(null, null, '#' + targetId);
             }
         });
     });
 }
 
-// 代码高亮
-function initCodeHighlighting() {
-    // 等待 highlight.js 加载完成
-    if (typeof hljs !== 'undefined') {
-        hljs.highlightAll();
-    } else {
-        // 如果 highlight.js 还没加载，等待一下
-        setTimeout(() => {
-            if (typeof hljs !== 'undefined') {
-                hljs.highlightAll();
-            }
-        }, 1000);
-    }
-}
-
-// 打印按钮
-function initPrintButton() {
-    const printBtn = document.querySelector('.print-btn');
-    if (printBtn) {
-        printBtn.addEventListener('click', function() {
-            window.print();
-        });
-    }
-}
-
-// 活跃导航状态
-function initActiveNavigation() {
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+// 滚动效果初始化
+function initializeScrollEffects() {
+    // 返回顶部按钮
+    const backToTop = document.getElementById('backToTop');
     
-    function updateActiveNav() {
-        const scrollPosition = window.scrollY + 100;
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
-            
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                // 移除所有活跃状态
-                navLinks.forEach(link => link.classList.remove('active'));
-                
-                // 添加活跃状态到当前部分
-                const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                }
-            }
-        });
-    }
-    
-    window.addEventListener('scroll', updateActiveNav);
-    updateActiveNav(); // 初始化
-}
-
-// 回到顶部按钮
-function initScrollToTop() {
-    const scrollToTopBtn = document.createElement('button');
-    scrollToTopBtn.innerHTML = '↑';
-    scrollToTopBtn.style.cssText = `
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        width: 3rem;
-        height: 3rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        opacity: 0;
-        visibility: hidden;
-        z-index: 1000;
-    `;
-    
-    document.body.appendChild(scrollToTopBtn);
-    
-    scrollToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-    
-    // 显示/隐藏按钮
     window.addEventListener('scroll', function() {
-        if (window.scrollY > 300) {
-            scrollToTopBtn.style.opacity = '1';
-            scrollToTopBtn.style.visibility = 'visible';
+        if (window.pageYOffset > 300) {
+            backToTop?.classList.add('visible');
         } else {
-            scrollToTopBtn.style.opacity = '0';
-            scrollToTopBtn.style.visibility = 'hidden';
+            backToTop?.classList.remove('visible');
         }
     });
+    
+    // 导航栏滚动效果
+    let lastScrollTop = 0;
+    const navbar = document.querySelector('.navbar');
+    
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // 向下滚动
+            navbar?.classList.add('navbar-hidden');
+        } else {
+            // 向上滚动
+            navbar?.classList.remove('navbar-hidden');
+        }
+        
+        lastScrollTop = scrollTop;
+    });
 }
 
-// 工具函数：防抖
+// 滚动到顶部
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// 动画初始化
+function initializeAnimations() {
+    // 观察器选项
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    // 创建观察器
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    // 观察需要动画的元素
+    document.querySelectorAll('.overview-card, .quick-nav-card, .version-item').forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// 代码高亮初始化
+function initializeCodeHighlighting() {
+    // 如果页面有代码块，应用语法高亮
+    const codeBlocks = document.querySelectorAll('pre code');
+    codeBlocks.forEach(block => {
+        // 这里可以集成 Prism.js 或其他代码高亮库
+        block.classList.add('language-rust');
+    });
+}
+
+// 离线支持初始化
+function initializeOfflineSupport() {
+    // 检查是否支持 Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(function(err) {
+                    console.log('ServiceWorker registration failed');
+                });
+        });
+    }
+    
+    // 离线状态检测
+    window.addEventListener('online', function() {
+        showNotification('网络已连接', 'success');
+    });
+    
+    window.addEventListener('offline', function() {
+        showNotification('网络已断开，部分功能可能不可用', 'warning');
+    });
+}
+
+// 显示通知
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // 自动移除通知
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// 防抖函数
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -330,7 +281,7 @@ function debounce(func, wait) {
     };
 }
 
-// 工具函数：节流
+// 节流函数
 function throttle(func, limit) {
     let inThrottle;
     return function() {
@@ -344,25 +295,91 @@ function throttle(func, limit) {
     };
 }
 
-// 性能优化：使用节流处理滚动事件
-const throttledScrollHandler = throttle(function() {
-    initActiveNavigation();
-}, 100);
-
-window.addEventListener('scroll', throttledScrollHandler);
-
-// 错误处理
-window.addEventListener('error', function(e) {
-    console.error('文档脚本错误:', e.error);
-});
-
-// 页面可见性API - 优化性能
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // 页面不可见时暂停一些操作
-        console.log('页面不可见，暂停非关键操作');
-    } else {
-        // 页面可见时恢复操作
-        console.log('页面可见，恢复操作');
+// 搜索文档（全局函数）
+function searchDocs() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim()) {
+        handleSearch({ target: searchInput });
     }
+}
+
+// 切换菜单（全局函数）
+function toggleMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    const navToggle = document.querySelector('.nav-toggle');
+    
+    navMenu?.classList.toggle('active');
+    navToggle?.classList.toggle('active');
+}
+
+// 主题切换
+function toggleTheme() {
+    const body = document.body;
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // 更新主题图标
+    const themeIcon = document.querySelector('.theme-toggle');
+    if (themeIcon) {
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+}
+
+// 初始化主题
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+}
+
+// 复制代码到剪贴板
+function copyToClipboard(text) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showNotification('代码已复制到剪贴板', 'success');
+        }).catch(() => {
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
+    }
+}
+
+// 备用复制方法
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        showNotification('代码已复制到剪贴板', 'success');
+    } catch (err) {
+        showNotification('复制失败', 'error');
+    }
+    document.body.removeChild(textArea);
+}
+
+// 页面加载完成后的额外初始化
+window.addEventListener('load', function() {
+    initializeTheme();
+    
+    // 添加代码复制按钮
+    document.querySelectorAll('pre').forEach(pre => {
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-button';
+        copyButton.textContent = '复制';
+        copyButton.onclick = () => copyToClipboard(pre.textContent);
+        pre.appendChild(copyButton);
+    });
 });
+
+// 导出全局函数
+window.navigateTo = navigateTo;
+window.scrollToTop = scrollToTop;
+window.searchDocs = searchDocs;
+window.toggleMenu = toggleMenu;
+window.toggleTheme = toggleTheme;
+window.copyToClipboard = copyToClipboard;

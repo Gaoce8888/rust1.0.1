@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部署指南 - 客服系统</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/prism.css">
+    <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <meta name="description" content="客服系统部署指南，包含单机部署、集群部署、容器化部署等方案">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../assets/images/logo.png" alt="客服系统" class="logo-img">
+                <span class="logo-text">客服系统 v1.3.0</span>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">首页</a>
+                <a href="../api/index.html" class="nav-link">API文档</a>
+                <a href="../user-guide/index.html" class="nav-link">用户指南</a>
+                <a href="../technical/index.html" class="nav-link">技术文档</a>
+                <a href="index.html" class="nav-link active">部署指南</a>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="搜索部署指南..." class="search-input">
+                <button class="search-btn" onclick="searchDocs()">🔍</button>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="../index.html">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">部署指南</span>
+                </div>
+                <h1 class="page-title">部署指南</h1>
+                <p class="page-subtitle">完整的系统部署方案，从开发环境到生产环境的全面指南</p>
+            </div>
+        </section>
+
+        <!-- 部署概览 -->
+        <section class="deployment-overview">
+            <div class="container">
+                <h2 class="section-title">部署概览</h2>
+                
+                <div class="deployment-stats">
+                    <div class="deploy-stat-card">
+                        <div class="deploy-stat-icon">🏠</div>
+                        <div class="deploy-stat-number">单机部署</div>
+                        <div class="deploy-stat-label">适合小规模使用</div>
+                    </div>
+                    <div class="deploy-stat-card">
+                        <div class="deploy-stat-icon">🏢</div>
+                        <div class="deploy-stat-number">集群部署</div>
+                        <div class="deploy-stat-label">适合大规模生产</div>
+                    </div>
+                    <div class="deploy-stat-card">
+                        <div class="deploy-stat-icon">☁️</div>
+                        <div class="deploy-stat-number">容器化部署</div>
+                        <div class="deploy-stat-label">适合云原生环境</div>
+                    </div>
+                    <div class="deploy-stat-card">
+                        <div class="deploy-stat-icon">🚀</div>
+                        <div class="deploy-stat-number">自动化部署</div>
+                        <div class="deploy-stat-label">CI/CD流水线</div>
+                    </div>
+                </div>
+
+                <div class="deployment-requirements">
+                    <div class="requirement-card">
+                        <h3>📋 系统要求</h3>
+                        <ul>
+                            <li><strong>操作系统:</strong> Linux (Ubuntu 20.04+), Windows 10+, macOS 10.15+</li>
+                            <li><strong>内存:</strong> 最小 2GB, 推荐 4GB+</li>
+                            <li><strong>存储:</strong> 最小 10GB 可用空间</li>
+                            <li><strong>网络:</strong> 稳定的网络连接</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requirement-card">
+                        <h3>🔧 依赖软件</h3>
+                        <ul>
+                            <li><strong>Rust:</strong> 1.70+ (编译环境)</li>
+                            <li><strong>Redis:</strong> 6.0+ (缓存服务)</li>
+                            <li><strong>Nginx:</strong> 1.18+ (反向代理, 可选)</li>
+                            <li><strong>Docker:</strong> 20.10+ (容器化部署)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requirement-card">
+                        <h3>🌐 网络要求</h3>
+                        <ul>
+                            <li><strong>端口:</strong> 6006 (HTTP), 6379 (Redis)</li>
+                            <li><strong>防火墙:</strong> 开放必要端口</li>
+                            <li><strong>域名:</strong> 生产环境建议配置SSL证书</li>
+                            <li><strong>CDN:</strong> 静态资源加速(可选)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 部署方案 -->
+        <section class="deployment-options">
+            <div class="container">
+                <h2 class="section-title">部署方案</h2>
+                
+                <div class="deployment-grid">
+                    <div class="deployment-option-card">
+                        <div class="option-header">
+                            <h3>🏠 单机部署</h3>
+                            <span class="option-tag">推荐新手</span>
+                        </div>
+                        <p>最简单的部署方式，适合开发测试和小规模使用</p>
+                        <div class="option-features">
+                            <h4>适用场景</h4>
+                            <ul>
+                                <li>开发测试环境</li>
+                                <li>小团队使用</li>
+                                <li>快速验证功能</li>
+                                <li>学习研究用途</li>
+                            </ul>
+                        </div>
+                        <div class="option-pros-cons">
+                            <div class="pros">
+                                <h4>✅ 优点</h4>
+                                <ul>
+                                    <li>部署简单快速</li>
+                                    <li>资源需求低</li>
+                                    <li>维护成本低</li>
+                                    <li>适合快速启动</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ 缺点</h4>
+                                <ul>
+                                    <li>单点故障风险</li>
+                                    <li>扩展性有限</li>
+                                    <li>性能瓶颈</li>
+                                    <li>不适合大规模使用</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="single-server.html" class="option-link">查看详细指南</a>
+                    </div>
+                    
+                    <div class="deployment-option-card">
+                        <div class="option-header">
+                            <h3>🏢 集群部署</h3>
+                            <span class="option-tag">生产推荐</span>
+                        </div>
+                        <p>高可用、高性能的部署方案，适合企业级生产环境</p>
+                        <div class="option-features">
+                            <h4>适用场景</h4>
+                            <ul>
+                                <li>企业生产环境</li>
+                                <li>高并发访问</li>
+                                <li>高可用要求</li>
+                                <li>大规模用户</li>
+                            </ul>
+                        </div>
+                        <div class="option-pros-cons">
+                            <div class="pros">
+                                <h4>✅ 优点</h4>
+                                <ul>
+                                    <li>高可用性</li>
+                                    <li>高性能扩展</li>
+                                    <li>负载均衡</li>
+                                    <li>故障自动恢复</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ 缺点</h4>
+                                <ul>
+                                    <li>部署复杂度高</li>
+                                    <li>资源需求大</li>
+                                    <li>维护成本高</li>
+                                    <li>需要专业运维</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="cluster.html" class="option-link">查看详细指南</a>
+                    </div>
+                    
+                    <div class="deployment-option-card">
+                        <div class="option-header">
+                            <h3>☁️ 容器化部署</h3>
+                            <span class="option-tag">云原生</span>
+                        </div>
+                        <p>基于Docker和Kubernetes的现代化部署方案</p>
+                        <div class="option-features">
+                            <h4>适用场景</h4>
+                            <ul>
+                                <li>云原生环境</li>
+                                <li>微服务架构</li>
+                                <li>DevOps团队</li>
+                                <li>弹性伸缩需求</li>
+                            </ul>
+                        </div>
+                        <div class="option-pros-cons">
+                            <div class="pros">
+                                <h4>✅ 优点</h4>
+                                <ul>
+                                    <li>环境一致性</li>
+                                    <li>快速部署</li>
+                                    <li>弹性伸缩</li>
+                                    <li>易于管理</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ 缺点</h4>
+                                <ul>
+                                    <li>学习成本高</li>
+                                    <li>资源开销</li>
+                                    <li>网络复杂性</li>
+                                    <li>调试困难</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="container.html" class="option-link">查看详细指南</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速开始 -->
+        <section class="quick-start">
+            <div class="container">
+                <h2 class="section-title">快速开始</h2>
+                
+                <div class="quick-start-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>环境准备</h3>
+                        <p>安装必要的软件和依赖</p>
+                        <pre><code class="language-bash"># 安装Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 安装Redis
+sudo apt update
+sudo apt install redis-server
+
+# 启动Redis
+sudo systemctl start redis-server
+sudo systemctl enable redis-server</code></pre>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>下载编译</h3>
+                        <p>获取源码并编译系统</p>
+                        <pre><code class="language-bash"># 克隆项目
+git clone https://github.com/Gaoce8888/rust1.0.1.git
+cd rust1.0.1
+
+# 编译项目
+cargo build --release
+
+# 检查编译结果
+ls -la target/release/kefu-system</code></pre>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>配置系统</h3>
+                        <p>创建配置文件</p>
+                        <pre><code class="language-bash"># 创建配置目录
+mkdir -p config data logs
+
+# 创建配置文件
+cat > config/config.toml << EOF
+[server]
+host = "0.0.0.0"
+port = 6006
+workers = 4
+
+[redis]
+url = "redis://localhost:6379"
+pool_size = 10
+
+[database]
+path = "./data/kefu.db"
+
+[logging]
+level = "info"
+file = "./logs/kefu.log"
+EOF</code></pre>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3>启动服务</h3>
+                        <p>运行客服系统</p>
+                        <pre><code class="language-bash"># 启动系统
+./target/release/kefu-system
+
+# 后台运行
+nohup ./target/release/kefu-system > logs/kefu.log 2>&1 &
+
+# 检查服务状态
+curl http://localhost:6006/api/health</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 环境配置 -->
+        <section class="environment-config">
+            <div class="container">
+                <h2 class="section-title">环境配置</h2>
+                
+                <div class="config-sections">
+                    <div class="config-section">
+                        <h3>🔧 系统配置</h3>
+                        <div class="config-content">
+                            <h4>配置文件结构</h4>
+                            <pre><code class="language-toml"># config.toml
+[server]
+host = "0.0.0.0"           # 监听地址
+port = 6006               # 监听端口
+workers = 4               # 工作线程数
+max_connections = 10000   # 最大连接数
+
+[redis]
+url = "redis://localhost:6379"  # Redis连接URL
+pool_size = 10                  # 连接池大小
+timeout = 5                     # 连接超时时间
+
+[database]
+path = "./data/kefu.db"    # 数据库文件路径
+backup_interval = 3600     # 备份间隔(秒)
+
+[logging]
+level = "info"             # 日志级别
+file = "./logs/kefu.log"   # 日志文件路径
+max_size = "100MB"         # 日志文件最大大小
+backup_count = 5           # 备份文件数量
+
+[security]
+session_timeout = 3600     # 会话超时时间
+max_login_attempts = 5     # 最大登录尝试次数
+rate_limit = 100           # 请求频率限制</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <h3>🌐 网络配置</h3>
+                        <div class="config-content">
+                            <h4>Nginx反向代理配置</h4>
+                            <pre><code class="language-nginx">server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        proxy_pass http://localhost:6006;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /ws {
+        proxy_pass http://localhost:6006;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <h3>🔒 SSL配置</h3>
+                        <div class="config-content">
+                            <h4>Let's Encrypt SSL证书</h4>
+                            <pre><code class="language-bash"># 安装certbot
+sudo apt install certbot python3-certbot-nginx
+
+# 获取SSL证书
+sudo certbot --nginx -d your-domain.com
+
+# 自动续期
+sudo crontab -e
+# 添加以下行
+0 12 * * * /usr/bin/certbot renew --quiet</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 监控运维 -->
+        <section class="monitoring-ops">
+            <div class="container">
+                <h2 class="section-title">监控运维</h2>
+                
+                <div class="monitoring-tools">
+                    <div class="tool-card">
+                        <h3>📊 系统监控</h3>
+                        <p>监控系统运行状态和性能指标</p>
+                        <ul>
+                            <li>CPU使用率监控</li>
+                            <li>内存使用情况</li>
+                            <li>磁盘空间监控</li>
+                            <li>网络流量统计</li>
+                        </ul>
+                        <pre><code class="language-bash"># 使用htop监控系统
+sudo apt install htop
+htop
+
+# 监控磁盘使用
+df -h
+du -sh /path/to/data
+
+# 监控网络连接
+netstat -tulpn | grep :6006</code></pre>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>📝 日志管理</h3>
+                        <p>日志收集、分析和轮转</p>
+                        <ul>
+                            <li>日志轮转配置</li>
+                            <li>错误日志分析</li>
+                            <li>性能日志统计</li>
+                            <li>日志备份策略</li>
+                        </ul>
+                        <pre><code class="language-bash"># 查看实时日志
+tail -f logs/kefu.log
+
+# 日志轮转配置
+sudo nano /etc/logrotate.d/kefu-system
+
+# 配置内容
+/path/to/logs/kefu.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 root root
+}</code></pre>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🔄 备份恢复</h3>
+                        <p>数据备份和灾难恢复</p>
+                        <ul>
+                            <li>数据库备份</li>
+                            <li>配置文件备份</li>
+                            <li>文件存储备份</li>
+                            <li>恢复测试</li>
+                        </ul>
+                        <pre><code class="language-bash"># 创建备份脚本
+#!/bin/bash
+BACKUP_DIR="/backup/$(date +%Y%m%d)"
+mkdir -p $BACKUP_DIR
+
+# 备份数据库
+cp data/kefu.db $BACKUP_DIR/
+
+# 备份配置
+cp -r config $BACKUP_DIR/
+
+# 备份日志
+cp -r logs $BACKUP_DIR/
+
+echo "Backup completed: $BACKUP_DIR"</code></pre>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🚨 告警通知</h3>
+                        <p>异常情况告警和通知</p>
+                        <ul>
+                            <li>服务状态监控</li>
+                            <li>性能阈值告警</li>
+                            <li>邮件/短信通知</li>
+                            <li>告警级别管理</li>
+                        </ul>
+                        <pre><code class="language-bash"># 服务状态检查脚本
+#!/bin/bash
+if ! curl -f http://localhost:6006/api/health; then
+    echo "Service is down!" | mail -s "Alert" admin@example.com
+    systemctl restart kefu-system
+fi</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 性能调优 -->
+        <section class="performance-tuning">
+            <div class="container">
+                <h2 class="section-title">性能调优</h2>
+                
+                <div class="tuning-strategies">
+                    <div class="tuning-card">
+                        <h3>⚡ 系统调优</h3>
+                        <p>操作系统级别的性能优化</p>
+                        <pre><code class="language-bash"># 调整文件描述符限制
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# 调整内核参数
+echo "net.core.somaxconn = 65535" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_max_syn_backlog = 65535" >> /etc/sysctl.conf
+sysctl -p</code></pre>
+                    </div>
+                    
+                    <div class="tuning-card">
+                        <h3>🔴 Redis调优</h3>
+                        <p>Redis缓存性能优化</p>
+                        <pre><code class="language-conf"># redis.conf
+maxmemory 2gb
+maxmemory-policy allkeys-lru
+save 900 1
+save 300 10
+save 60 10000
+tcp-keepalive 300</code></pre>
+                    </div>
+                    
+                    <div class="tuning-card">
+                        <h3>🌐 网络调优</h3>
+                        <p>网络连接和传输优化</p>
+                        <pre><code class="language-nginx"># nginx.conf
+worker_processes auto;
+worker_connections 1024;
+keepalive_timeout 65;
+client_max_body_size 100M;
+gzip on;
+gzip_types text/plain application/json;</code></pre>
+                    </div>
+                    
+                    <div class="tuning-card">
+                        <h3>💾 存储优化</h3>
+                        <p>数据存储和I/O优化</p>
+                        <ul>
+                            <li>使用SSD存储</li>
+                            <li>定期清理日志</li>
+                            <li>数据库索引优化</li>
+                            <li>文件压缩存储</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 故障排除 -->
+        <section class="troubleshooting">
+            <div class="container">
+                <h2 class="section-title">故障排除</h2>
+                
+                <div class="trouble-categories">
+                    <div class="trouble-card">
+                        <h3>🔌 连接问题</h3>
+                        <div class="trouble-item">
+                            <h4>问题：无法连接到服务</h4>
+                            <p><strong>解决方案：</strong></p>
+                            <ol>
+                                <li>检查服务是否启动：<code>ps aux | grep kefu-system</code></li>
+                                <li>检查端口是否监听：<code>netstat -tulpn | grep 6006</code></li>
+                                <li>检查防火墙设置：<code>sudo ufw status</code></li>
+                                <li>检查配置文件：<code>cat config/config.toml</code></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="trouble-card">
+                        <h3>🔴 Redis问题</h3>
+                        <div class="trouble-item">
+                            <h4>问题：Redis连接失败</h4>
+                            <p><strong>解决方案：</strong></p>
+                            <ol>
+                                <li>检查Redis服务：<code>sudo systemctl status redis</code></li>
+                                <li>测试Redis连接：<code>redis-cli ping</code></li>
+                                <li>检查Redis配置：<code>cat /etc/redis/redis.conf</code></li>
+                                <li>重启Redis服务：<code>sudo systemctl restart redis</code></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="trouble-card">
+                        <h3>💾 数据问题</h3>
+                        <div class="trouble-item">
+                            <h4>问题：数据丢失或损坏</h4>
+                            <p><strong>解决方案：</strong></p>
+                            <ol>
+                                <li>检查数据库文件：<code>ls -la data/kefu.db</code></li>
+                                <li>验证数据完整性：<code>sqlite3 data/kefu.db "PRAGMA integrity_check;"</code></li>
+                                <li>恢复备份数据：<code>cp backup/kefu.db data/</code></li>
+                                <li>检查磁盘空间：<code>df -h</code></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="trouble-card">
+                        <h3>📊 性能问题</h3>
+                        <div class="trouble-item">
+                            <h4>问题：系统响应缓慢</h4>
+                            <p><strong>解决方案：</strong></p>
+                            <ol>
+                                <li>检查CPU使用率：<code>top</code></li>
+                                <li>检查内存使用：<code>free -h</code></li>
+                                <li>检查网络连接：<code>ss -tulpn</code></li>
+                                <li>优化配置参数</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="trouble-more">
+                    <a href="../technical/troubleshooting.html" class="btn btn-primary">查看更多故障排除指南</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>客服系统</h4>
+                    <p>企业级实时客服解决方案</p>
+                </div>
+                <div class="footer-section">
+                    <h4>文档</h4>
+                    <ul>
+                        <li><a href="../api/index.html">API文档</a></li>
+                        <li><a href="../user-guide/index.html">用户指南</a></li>
+                        <li><a href="../technical/index.html">技术文档</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支持</h4>
+                    <ul>
+                        <li><a href="../technical/troubleshooting.html">故障排除</a></li>
+                        <li><a href="../technical/faq.html">常见问题</a></li>
+                        <li><a href="https://github.com/Gaoce8888/rust1.0.1">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>版本</h4>
+                    <p>当前版本: v1.3.0</p>
+                    <p>最后更新: 2025-07-21</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 客服系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- JavaScript -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/prism.js"></script>
+</body>
+</html>

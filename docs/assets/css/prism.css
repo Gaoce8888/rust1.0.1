@@ -1,0 +1,344 @@
+/* Prism.js 代码高亮主题 - 客服系统文档 */
+
+/* 基础样式 */
+pre[class*="language-"],
+code[class*="language-"] {
+    color: #e2e8f0;
+    background: none;
+    font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.9em;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    tab-size: 4;
+    hyphens: none;
+}
+
+/* 代码块样式 */
+pre[class*="language-"] {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow: auto;
+    background: #1a202c;
+    border-radius: 8px;
+    border: 1px solid #2d3748;
+}
+
+/* 行内代码样式 */
+:not(pre) > code[class*="language-"] {
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    background: #2d3748;
+    color: #e2e8f0;
+    font-size: 0.85em;
+}
+
+/* 代码块中的代码 */
+pre[class*="language-"] code[class*="language-"] {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+}
+
+/* 语法高亮颜色 */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #718096;
+    font-style: italic;
+}
+
+.token.punctuation {
+    color: #a0aec0;
+}
+
+.token.namespace {
+    opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+    color: #90cdf4;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: #9ae6b4;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    color: #f6ad55;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+    color: #f687b3;
+}
+
+.token.function,
+.token.class-name {
+    color: #68d391;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+    color: #fc8181;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+/* 行号样式 */
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 1px solid #4a5568;
+    user-select: none;
+}
+
+.line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: #718096;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+}
+
+/* 命令行提示符 */
+.language-bash .token.function {
+    color: #68d391;
+}
+
+.language-bash .token.string {
+    color: #f6ad55;
+}
+
+/* JSON 语法高亮 */
+.language-json .token.property {
+    color: #90cdf4;
+}
+
+.language-json .token.string {
+    color: #9ae6b4;
+}
+
+.language-json .token.number {
+    color: #f687b3;
+}
+
+.language-json .token.boolean {
+    color: #68d391;
+}
+
+.language-json .token.null {
+    color: #fc8181;
+}
+
+/* TOML 语法高亮 */
+.language-toml .token.key {
+    color: #90cdf4;
+}
+
+.language-toml .token.string {
+    color: #9ae6b4;
+}
+
+.language-toml .token.number {
+    color: #f687b3;
+}
+
+.language-toml .token.boolean {
+    color: #68d391;
+}
+
+.language-toml .token.comment {
+    color: #718096;
+}
+
+/* Rust 语法高亮 */
+.language-rust .token.keyword {
+    color: #f687b3;
+}
+
+.language-rust .token.function {
+    color: #68d391;
+}
+
+.language-rust .token.string {
+    color: #9ae6b4;
+}
+
+.language-rust .token.number {
+    color: #f6ad55;
+}
+
+.language-rust .token.comment {
+    color: #718096;
+}
+
+.language-rust .token.lifetime {
+    color: #fc8181;
+}
+
+.language-rust .token.macro {
+    color: #68d391;
+}
+
+/* HTTP 语法高亮 */
+.language-http .token.method {
+    color: #f687b3;
+}
+
+.language-http .token.url {
+    color: #90cdf4;
+}
+
+.language-http .token.header {
+    color: #68d391;
+}
+
+.language-http .token.string {
+    color: #9ae6b4;
+}
+
+/* Nginx 语法高亮 */
+.language-nginx .token.directive {
+    color: #f687b3;
+}
+
+.language-nginx .token.string {
+    color: #9ae6b4;
+}
+
+.language-nginx .token.number {
+    color: #f6ad55;
+}
+
+.language-nginx .token.comment {
+    color: #718096;
+}
+
+/* 代码块标题 */
+.code-block-header {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #4a5568;
+    border-radius: 8px 8px 0 0;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.code-block-header + pre[class*="language-"] {
+    border-radius: 0 0 8px 8px;
+    margin-top: 0;
+}
+
+/* 复制按钮 */
+.copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #4a5568;
+    color: #e2e8f0;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75em;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+pre[class*="language-"]:hover .copy-button {
+    opacity: 1;
+}
+
+.copy-button:hover {
+    background: #718096;
+}
+
+/* 代码块容器 */
+.code-block-container {
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+/* 响应式代码块 */
+@media (max-width: 768px) {
+    pre[class*="language-"] {
+        padding: 1rem;
+        font-size: 0.8em;
+    }
+    
+    .copy-button {
+        opacity: 1;
+        font-size: 0.7em;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+    pre[class*="language-"] {
+        background: #1a202c;
+        border-color: #2d3748;
+    }
+    
+    :not(pre) > code[class*="language-"] {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    pre[class*="language-"] {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .copy-button {
+        display: none !important;
+    }
+}

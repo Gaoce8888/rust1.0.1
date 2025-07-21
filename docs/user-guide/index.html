@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户指南 - 客服系统</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/prism.css">
+    <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <meta name="description" content="客服系统用户指南，包含快速开始、配置说明、使用教程等">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../assets/images/logo.png" alt="客服系统" class="logo-img">
+                <span class="logo-text">客服系统 v1.3.0</span>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">首页</a>
+                <a href="../api/index.html" class="nav-link">API文档</a>
+                <a href="index.html" class="nav-link active">用户指南</a>
+                <a href="../technical/index.html" class="nav-link">技术文档</a>
+                <a href="../deployment/index.html" class="nav-link">部署指南</a>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="搜索指南..." class="search-input">
+                <button class="search-btn" onclick="searchDocs()">🔍</button>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="../index.html">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">用户指南</span>
+                </div>
+                <h1 class="page-title">用户指南</h1>
+                <p class="page-subtitle">完整的系统使用指南，帮助您快速上手并充分利用客服系统功能</p>
+            </div>
+        </section>
+
+        <!-- 快速开始 -->
+        <section class="quick-start-section">
+            <div class="container">
+                <h2 class="section-title">快速开始</h2>
+                
+                <div class="start-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>系统安装</h3>
+                        <p>下载并安装客服系统，配置基础环境</p>
+                        <a href="quick-start.html" class="step-link">查看详情 →</a>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>基础配置</h3>
+                        <p>配置数据库、Redis、端口等基础设置</p>
+                        <a href="configuration.html" class="step-link">查看详情 →</a>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>启动服务</h3>
+                        <p>启动系统服务，验证功能正常</p>
+                        <a href="deployment.html" class="step-link">查看详情 →</a>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3>开始使用</h3>
+                        <p>登录系统，开始客服工作</p>
+                        <a href="usage.html" class="step-link">查看详情 →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户角色 -->
+        <section class="user-roles">
+            <div class="container">
+                <h2 class="section-title">用户角色</h2>
+                
+                <div class="roles-grid">
+                    <div class="role-card">
+                        <div class="role-icon">👨‍💼</div>
+                        <h3>系统管理员</h3>
+                        <p>负责系统配置、用户管理、监控维护</p>
+                        <ul class="role-features">
+                            <li>系统配置管理</li>
+                            <li>用户权限设置</li>
+                            <li>系统监控维护</li>
+                            <li>数据备份恢复</li>
+                        </ul>
+                        <a href="admin-guide.html" class="role-link">管理员指南</a>
+                    </div>
+                    
+                    <div class="role-card">
+                        <div class="role-icon">👩‍💻</div>
+                        <h3>客服人员</h3>
+                        <p>处理客户咨询，提供在线服务支持</p>
+                        <ul class="role-features">
+                            <li>接收客户消息</li>
+                            <li>回复客户咨询</li>
+                            <li>管理客户会话</li>
+                            <li>查看客户信息</li>
+                        </ul>
+                        <a href="kefu-guide.html" class="role-link">客服指南</a>
+                    </div>
+                    
+                    <div class="role-card">
+                        <div class="role-icon">👤</div>
+                        <h3>客户用户</h3>
+                        <p>发起咨询，与客服进行实时对话</p>
+                        <ul class="role-features">
+                            <li>发起在线咨询</li>
+                            <li>发送消息文件</li>
+                            <li>查看聊天历史</li>
+                            <li>评价服务质量</li>
+                        </ul>
+                        <a href="customer-guide.html" class="role-link">客户指南</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能模块 -->
+        <section class="features-modules">
+            <div class="container">
+                <h2 class="section-title">功能模块</h2>
+                
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-icon">🔐</div>
+                        <h3>认证管理</h3>
+                        <p>用户登录、权限控制、会话管理</p>
+                        <div class="module-features">
+                            <span class="feature-tag">登录认证</span>
+                            <span class="feature-tag">权限控制</span>
+                            <span class="feature-tag">会话管理</span>
+                        </div>
+                        <a href="authentication.html" class="module-link">了解详情</a>
+                    </div>
+                    
+                    <div class="module-card">
+                        <div class="module-icon">💬</div>
+                        <h3>消息系统</h3>
+                        <p>实时消息、文件传输、消息历史</p>
+                        <div class="module-features">
+                            <span class="feature-tag">实时消息</span>
+                            <span class="feature-tag">文件传输</span>
+                            <span class="feature-tag">消息历史</span>
+                        </div>
+                        <a href="messaging.html" class="module-link">了解详情</a>
+                    </div>
+                    
+                    <div class="module-card">
+                        <div class="module-icon">👥</div>
+                        <h3>用户管理</h3>
+                        <p>用户信息、在线状态、分配策略</p>
+                        <div class="module-features">
+                            <span class="feature-tag">用户信息</span>
+                            <span class="feature-tag">在线状态</span>
+                            <span class="feature-tag">智能分配</span>
+                        </div>
+                        <a href="user-management.html" class="module-link">了解详情</a>
+                    </div>
+                    
+                    <div class="module-card">
+                        <div class="module-icon">📊</div>
+                        <h3>统计分析</h3>
+                        <p>数据统计、报表生成、性能监控</p>
+                        <div class="module-features">
+                            <span class="feature-tag">数据统计</span>
+                            <span class="feature-tag">报表生成</span>
+                            <span class="feature-tag">性能监控</span>
+                        </div>
+                        <a href="analytics.html" class="module-link">了解详情</a>
+                    </div>
+                    
+                    <div class="module-card">
+                        <div class="module-icon">⚙️</div>
+                        <h3>系统设置</h3>
+                        <p>系统配置、参数设置、环境管理</p>
+                        <div class="module-features">
+                            <span class="feature-tag">系统配置</span>
+                            <span class="feature-tag">参数设置</span>
+                            <span class="feature-tag">环境管理</span>
+                        </div>
+                        <a href="settings.html" class="module-link">了解详情</a>
+                    </div>
+                    
+                    <div class="module-card">
+                        <div class="module-icon">🔧</div>
+                        <h3>维护工具</h3>
+                        <p>系统维护、故障排除、数据管理</p>
+                        <div class="module-features">
+                            <span class="feature-tag">系统维护</span>
+                            <span class="feature-tag">故障排除</span>
+                            <span class="feature-tag">数据管理</span>
+                        </div>
+                        <a href="maintenance.html" class="module-link">了解详情</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用教程 -->
+        <section class="tutorials">
+            <div class="container">
+                <h2 class="section-title">使用教程</h2>
+                
+                <div class="tutorials-grid">
+                    <div class="tutorial-card">
+                        <div class="tutorial-header">
+                            <h3>🔧 系统安装配置</h3>
+                            <span class="tutorial-level">初级</span>
+                        </div>
+                        <p>从零开始安装配置客服系统</p>
+                        <ul class="tutorial-topics">
+                            <li>环境准备</li>
+                            <li>系统安装</li>
+                            <li>基础配置</li>
+                            <li>服务启动</li>
+                        </ul>
+                        <a href="installation-tutorial.html" class="tutorial-link">开始学习</a>
+                    </div>
+                    
+                    <div class="tutorial-card">
+                        <div class="tutorial-header">
+                            <h3>👩‍💻 客服工作流程</h3>
+                            <span class="tutorial-level">中级</span>
+                        </div>
+                        <p>掌握客服日常工作的完整流程</p>
+                        <ul class="tutorial-topics">
+                            <li>登录系统</li>
+                            <li>接收消息</li>
+                            <li>回复客户</li>
+                            <li>会话管理</li>
+                        </ul>
+                        <a href="workflow-tutorial.html" class="tutorial-link">开始学习</a>
+                    </div>
+                    
+                    <div class="tutorial-card">
+                        <div class="tutorial-header">
+                            <h3>📊 数据统计分析</h3>
+                            <span class="tutorial-level">高级</span>
+                        </div>
+                        <p>学习如何分析客服数据提升服务质量</p>
+                        <ul class="tutorial-topics">
+                            <li>数据查看</li>
+                            <li>报表生成</li>
+                            <li>趋势分析</li>
+                            <li>优化建议</li>
+                        </ul>
+                        <a href="analytics-tutorial.html" class="tutorial-link">开始学习</a>
+                    </div>
+                    
+                    <div class="tutorial-card">
+                        <div class="tutorial-header">
+                            <h3>🔒 安全配置</h3>
+                            <span class="tutorial-level">中级</span>
+                        </div>
+                        <p>配置系统安全策略保护数据安全</p>
+                        <ul class="tutorial-topics">
+                            <li>访问控制</li>
+                            <li>数据加密</li>
+                            <li>审计日志</li>
+                            <li>安全监控</li>
+                        </ul>
+                        <a href="security-tutorial.html" class="tutorial-link">开始学习</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 常见问题 -->
+        <section class="faq-section">
+            <div class="container">
+                <h2 class="section-title">常见问题</h2>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>如何重置客服密码？</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>可以通过以下方式重置密码：</p>
+                            <ol>
+                                <li>联系系统管理员重置</li>
+                                <li>使用忘记密码功能（如果已配置）</li>
+                                <li>直接修改数据库中的密码字段</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>系统支持哪些文件格式？</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>系统支持以下文件格式：</p>
+                            <ul>
+                                <li>图片：JPG、PNG、GIF、WebP</li>
+                                <li>文档：PDF、DOC、DOCX、TXT</li>
+                                <li>压缩包：ZIP、RAR</li>
+                                <li>其他：MP3、MP4（小文件）</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>如何备份系统数据？</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>建议定期备份以下数据：</p>
+                            <ul>
+                                <li>数据库文件（SQLite/Sled）</li>
+                                <li>配置文件</li>
+                                <li>上传的文件</li>
+                                <li>日志文件</li>
+                            </ul>
+                            <p>可以使用系统提供的备份工具或手动备份。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>系统性能如何优化？</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>可以通过以下方式优化系统性能：</p>
+                            <ul>
+                                <li>配置Redis缓存</li>
+                                <li>优化数据库查询</li>
+                                <li>调整并发连接数</li>
+                                <li>使用CDN加速静态资源</li>
+                                <li>定期清理日志和临时文件</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-more">
+                    <a href="faq.html" class="btn btn-primary">查看更多问题</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系支持 -->
+        <section class="support-section">
+            <div class="container">
+                <h2 class="section-title">获取支持</h2>
+                
+                <div class="support-options">
+                    <div class="support-card">
+                        <div class="support-icon">📚</div>
+                        <h3>文档中心</h3>
+                        <p>查阅完整的技术文档和API参考</p>
+                        <a href="../technical/index.html" class="support-link">查看文档</a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">🔧</div>
+                        <h3>故障排除</h3>
+                        <p>常见问题的解决方案和调试指南</p>
+                        <a href="../technical/troubleshooting.html" class="support-link">故障排除</a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">💬</div>
+                        <h3>社区支持</h3>
+                        <p>在GitHub上提问或参与讨论</p>
+                        <a href="https://github.com/Gaoce8888/rust1.0.1" class="support-link">GitHub</a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">📧</div>
+                        <h3>邮件支持</h3>
+                        <p>发送邮件获取技术支持</p>
+                        <a href="mailto:support@kefu-system.com" class="support-link">发送邮件</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>客服系统</h4>
+                    <p>企业级实时客服解决方案</p>
+                </div>
+                <div class="footer-section">
+                    <h4>文档</h4>
+                    <ul>
+                        <li><a href="../api/index.html">API文档</a></li>
+                        <li><a href="index.html">用户指南</a></li>
+                        <li><a href="../technical/index.html">技术文档</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支持</h4>
+                    <ul>
+                        <li><a href="../technical/troubleshooting.html">故障排除</a></li>
+                        <li><a href="faq.html">常见问题</a></li>
+                        <li><a href="https://github.com/Gaoce8888/rust1.0.1">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>版本</h4>
+                    <p>当前版本: v1.3.0</p>
+                    <p>最后更新: 2025-07-21</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 客服系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- JavaScript -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/prism.js"></script>
+    
+    <!-- FAQ交互脚本 -->
+    <script>
+        // FAQ展开/收起功能
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const toggle = this.querySelector('.faq-toggle');
+                
+                if (answer.style.display === 'block') {
+                    answer.style.display = 'none';
+                    toggle.textContent = '+';
+                } else {
+                    answer.style.display = 'block';
+                    toggle.textContent = '-';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
