@@ -53,7 +53,7 @@ mod mock_config {
     impl AddressManager {
         pub async fn new() -> Result<Self> {
             let config = Self::default_config();
-            let environment = Self::get_environment();
+            let environment = Self::get_environment_static();
             
             Ok(Self {
                 config: Arc::new(RwLock::new(config)),
@@ -62,7 +62,7 @@ mod mock_config {
             })
         }
 
-        fn get_environment() -> String {
+        fn get_environment_static() -> String {
             env::var("APP_ENV").unwrap_or_else(|_| "development".to_string())
         }
 
@@ -132,19 +132,19 @@ async fn main() -> anyhow::Result<()> {
     println!("🚀 地址配置示例开始\n");
 
     // 示例1: 基本使用
-    await basic_usage_example().await?;
+    basic_usage_example().await?;
 
     // 示例2: 环境检测
-    await environment_detection_example().await?;
+    environment_detection_example().await?;
 
     // 示例3: URL生成
-    await url_generation_example().await?;
+    url_generation_example().await?;
 
     // 示例4: 配置摘要
-    await config_summary_example().await?;
+    config_summary_example().await?;
 
     // 示例5: 动态配置
-    await dynamic_config_example().await?;
+    dynamic_config_example().await?;
 
     println!("\n✅ 所有示例执行完成");
     Ok(())
@@ -153,7 +153,7 @@ async fn main() -> anyhow::Result<()> {
 /// 示例1: 基本使用
 async fn basic_usage_example() -> anyhow::Result<()> {
     println!("📋 示例1: 基本使用");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     // 创建地址管理器
     let address_manager = AddressManager::new().await?;
@@ -173,7 +173,7 @@ async fn basic_usage_example() -> anyhow::Result<()> {
 /// 示例2: 环境检测
 async fn environment_detection_example() -> anyhow::Result<()> {
     println!("📋 示例2: 环境检测");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     let address_manager = AddressManager::new().await?;
     
@@ -199,7 +199,7 @@ async fn environment_detection_example() -> anyhow::Result<()> {
 /// 示例3: URL生成
 async fn url_generation_example() -> anyhow::Result<()> {
     println!("📋 示例3: URL生成");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     let address_manager = AddressManager::new().await?;
     
@@ -230,7 +230,7 @@ async fn url_generation_example() -> anyhow::Result<()> {
 /// 示例4: 配置摘要
 async fn config_summary_example() -> anyhow::Result<()> {
     println!("📋 示例4: 配置摘要");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     let address_manager = AddressManager::new().await?;
     
@@ -249,7 +249,7 @@ async fn config_summary_example() -> anyhow::Result<()> {
 /// 示例5: 动态配置
 async fn dynamic_config_example() -> anyhow::Result<()> {
     println!("📋 示例5: 动态配置");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     // 模拟不同环境下的配置
     let environments = ["development", "production"];
@@ -325,7 +325,7 @@ impl ApiRouter {
 /// 集成示例
 async fn integration_example() -> anyhow::Result<()> {
     println!("📋 集成示例: 在组件中使用地址配置");
-    println!("=" * 50);
+    println!("{}", "=".repeat(50));
 
     // WebSocket管理器
     let ws_manager = WebSocketManager::new().await?;
