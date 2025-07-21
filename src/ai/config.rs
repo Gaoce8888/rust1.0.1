@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use super::custom_processor::CustomProcessorConfig;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AIConfig {
@@ -11,6 +12,7 @@ pub struct AIConfig {
     pub speech_recognition: SpeechRecognitionConfig,
     pub sentiment_analysis: SentimentAnalysisConfig,
     pub auto_reply: AutoReplyConfig,
+    pub custom_processor: Option<CustomProcessorConfig>,  // 新增自定义处理器配置
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -146,6 +148,7 @@ impl Default for AIConfig {
             speech_recognition: SpeechRecognitionConfig::default(),
             sentiment_analysis: SentimentAnalysisConfig::default(),
             auto_reply: AutoReplyConfig::default(),
+            custom_processor: None,
         }
     }
 }
@@ -340,6 +343,102 @@ impl Default for PreprocessingConfig {
 }
 
 impl AIConfig {
+    /// 从文件加载AI配置
+    pub async fn load_from_file() -> anyhow::Result<Self> {
+        // 尝试多个配置文件路径
+        let config_paths = vec![
+            "config/ai_config.toml",
+            "ai_config.toml",
+            "/etc/ylqkf/ai_config.toml",
+        ];
+
+        for path in config_paths {
+            if std::path::Path::new(path).exists() {
+                let content = tokio::fs::read_to_string(path).await?;
+                let mut config: Self = toml::from_str(&content)?;
+                
+                // 从环境变量加载敏感信息
+                config.load_secrets_from_env();
+                
+                return Ok(config);
+            }
+        }
+
+        // 如果没有找到配置文件，使用默认配置
+        let mut config = Self::default();
+        config.load_secrets_from_env();
+        Ok(config)
+    }
+
+    /// 从环境变量加载API密钥等敏感信息
+    pub fn load_secrets_from_env(&mut self) {
+        // OpenAI API Key
+        if let Ok(key) = std::env::var("OPENAI_API_KEY") {
+            if self.intent_recognition.model_type == "openai" && self.intent_recognition.api_key.is_empty() {
+                self.intent_recognition.api_key = key.clone();
+            }
+            if self.auto_reply.model_type == "openai" && self.auto_reply.api_key.is_empty() {
+                self.auto_reply.api_key = key;
+            }
+        }
+
+        // Google Translate API Key
+        if let Ok(key) = std::env::var("GOOGLE_TRANSLATE_API_KEY") {
+            if self.translation.service_provider == "google" && self.translation.api_key.is_empty() {
+                self.translation.api_key = key;
+            }
+        }
+
+        // Azure Speech Key
+        if let Ok(key) = std::env::var("AZURE_SPEECH_KEY") {
+            if self.speech_recognition.service_provider == "azure" && self.speech_recognition.api_key.is_empty() {
+                self.speech_recognition.api_key = key;
+            }
+        }
+
+        // Azure Text Analytics Key
+        if let Ok(key) = std::env::var("AZURE_TEXT_ANALYTICS_KEY") {
+            if self.sentiment_analysis.model_type == "azure" && self.sentiment_analysis.api_key.is_empty() {
+                self.sentiment_analysis.api_key = key;
+            }
+        }
+    }
+
+    /// 保存配置到文件
+    pub async fn save_to_file(&self, path: &str) -> anyhow::Result<()> {
+        // 创建一个不包含敏感信息的副本
+        let mut config_to_save = self.clone();
+        config_to_save.mask_secrets();
+        
+        let content = toml::to_string_pretty(&config_to_save)?;
+        tokio::fs::write(path, content).await?;
+        Ok(())
+    }
+
+    /// 屏蔽敏感信息
+    fn mask_secrets(&mut self) {
+        if !self.intent_recognition.api_key.is_empty() {
+            self.intent_recognition.api_key = "".to_string();
+        }
+        if !self.translation.api_key.is_empty() {
+            self.translation.api_key = "".to_string();
+        }
+        if !self.speech_recognition.api_key.is_empty() {
+            self.speech_recognition.api_key = "".to_string();
+        }
+        if !self.sentiment_analysis.api_key.is_empty() {
+            self.sentiment_analysis.api_key = "".to_string();
+        }
+        if !self.auto_reply.api_key.is_empty() {
+            self.auto_reply.api_key = "".to_string();
+        }
+    }
+
+    /// 热重载配置
+    pub async fn reload() -> anyhow::Result<Self> {
+        Self::load_from_file().await
+    }
+
     pub fn validate(&self) -> Result<(), String> {
         if self.max_concurrent_tasks == 0 {
             return Err("max_concurrent_tasks must be greater than 0".to_string());

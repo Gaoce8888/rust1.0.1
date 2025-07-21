@@ -3,6 +3,7 @@ pub mod intent_recognition;
 pub mod translation;
 pub mod speech_recognition;
 pub mod queue;
+pub mod custom_processor;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -19,6 +20,7 @@ pub enum AITaskType {
     SpeechRecognition,
     SentimentAnalysis,
     AutoReply,
+    CustomProcessor,  // 新增自定义处理器类型
 }
 
 // AI处理任务状态
@@ -137,20 +139,62 @@ pub struct AIManager {
     pub intent_processor: Arc<intent_recognition::IntentProcessor>,
     pub translation_processor: Arc<translation::TranslationProcessor>,
     pub speech_processor: Arc<speech_recognition::SpeechProcessor>,
+    pub custom_processor: Arc<custom_processor::CustomAIProcessor>,  // 新增自定义处理器
     pub config: Arc<RwLock<config::AIConfig>>,
 }
 
 impl AIManager {
     pub fn new() -> Self {
-        let config = Arc::new(RwLock::new(config::AIConfig::default()));
+        // 同步加载配置，如果需要异步加载，应该使用 new_async
+        let config = match std::fs::read_to_string("config/ai_config.toml") {
+            Ok(content) => {
+                match toml::from_str::<config::AIConfig>(&content) {
+                    Ok(mut cfg) => {
+                        // 从环境变量加载敏感信息
+                        cfg.load_secrets_from_env();
+                        cfg
+                    }
+                    Err(e) => {
+                        tracing::warn!("Failed to parse AI config file: {}, using default", e);
+                        let mut cfg = config::AIConfig::default();
+                        cfg.load_secrets_from_env();
+                        cfg
+                    }
+                }
+            }
+            Err(_) => {
+                tracing::info!("AI config file not found, using default configuration");
+                let mut cfg = config::AIConfig::default();
+                cfg.load_secrets_from_env();
+                cfg
+            }
+        };
+        
+        let config = Arc::new(RwLock::new(config));
         
         Self {
             queue: Arc::new(RwLock::new(queue::AIQueue::new())),
             intent_processor: Arc::new(intent_recognition::IntentProcessor::new(config.clone())),
             translation_processor: Arc::new(translation::TranslationProcessor::new(config.clone())),
             speech_processor: Arc::new(speech_recognition::SpeechProcessor::new(config.clone())),
+            custom_processor: Arc::new(custom_processor::CustomAIProcessor::new(config.clone())),
             config,
         }
+    }
+
+    /// 异步初始化，支持从文件加载配置
+    pub async fn new_async() -> Result<Self> {
+        let config = config::AIConfig::load_from_file().await?;
+        let config = Arc::new(RwLock::new(config));
+        
+        Ok(Self {
+            queue: Arc::new(RwLock::new(queue::AIQueue::new())),
+            intent_processor: Arc::new(intent_recognition::IntentProcessor::new(config.clone())),
+            translation_processor: Arc::new(translation::TranslationProcessor::new(config.clone())),
+            speech_processor: Arc::new(speech_recognition::SpeechProcessor::new(config.clone())),
+            custom_processor: Arc::new(custom_processor::CustomAIProcessor::new(config.clone())),
+            config,
+        })
     }
 
     pub async fn submit_task(&self, task: AITask) -> Result<String> {
@@ -175,6 +219,7 @@ impl AIManager {
         let intent_processor = self.intent_processor.clone();
         let translation_processor = self.translation_processor.clone();
         let speech_processor = self.speech_processor.clone();
+        let custom_processor = self.custom_processor.clone();
 
         tokio::spawn(async move {
             loop {
@@ -198,6 +243,7 @@ impl AIManager {
                     AITaskType::IntentRecognition => intent_processor.clone(),
                     AITaskType::Translation => translation_processor.clone(),
                     AITaskType::SpeechRecognition => speech_processor.clone(),
+                    AITaskType::CustomProcessor => custom_processor.clone(),  // 添加自定义处理器
                     _ => {
                         tracing::warn!("未支持的AI任务类型: {:?}", task.task_type);
                         continue;
@@ -230,7 +276,19 @@ impl AIManager {
     pub async fn update_config(&self, config: config::AIConfig) -> Result<()> {
         let mut config_lock = self.config.write().await;
         *config_lock = config;
+        
+        // 可选：保存到文件
+        if let Err(e) = config_lock.save_to_file("config/ai_config.toml").await {
+            tracing::warn!("Failed to save AI config to file: {}", e);
+        }
+        
         Ok(())
+    }
+
+    /// 从文件重新加载配置
+    pub async fn reload_config(&self) -> Result<()> {
+        let new_config = config::AIConfig::load_from_file().await?;
+        self.update_config(new_config).await
     }
 
     pub async fn get_config(&self) -> config::AIConfig {

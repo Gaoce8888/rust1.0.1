@@ -81,7 +81,14 @@ pub async fn handle_list_sessions(
                         },
                         created_at: customer.last_activity - chrono::Duration::hours(1), // 估算创建时间
                         updated_at: customer.last_activity,
-                        message_count: 0, // TODO: 从存储获取实际消息数
+                        message_count: {
+                            // 从Redis获取实际消息数
+                            let redis = ws_manager.redis.read().await;
+                            let count = redis.get_conversation_message_count(&format!("{}:{}", customer.id, kefu_id))
+                                .await
+                                .unwrap_or(0);
+                            count as u32
+                        },
                         last_message: Some(customer.last_message),
                     });
                 }
@@ -101,8 +108,20 @@ pub async fn handle_list_sessions(
                 if let Ok(active_sessions) = redis.get_kefu_active_sessions(user_id).await {
                     for customer_id in active_sessions {
                         if let Some(customer_conn) = connections.get(&customer_id) {
+                            let session_key = format!("{}:{}", customer_id, user_id);
+                            
+                            // 获取实际消息数
+                            let message_count = redis.get_conversation_message_count(&session_key)
+                                .await
+                                .unwrap_or(0);
+                            
+                            // 获取最后一条消息
+                            let last_message = redis.get_last_message(&session_key)
+                                .await
+                                .ok();
+                            
                             sessions.push(SessionInfo {
-                                session_id: format!("{}:{}", customer_id, user_id),
+                                session_id: session_key,
                                 kefu_id: user_id.clone(),
                                 kefu_name: connection.user_name.clone(),
                                 kehu_id: customer_id.clone(),
@@ -114,8 +133,8 @@ pub async fn handle_list_sessions(
                                 },
                                 created_at: connection.connected_at,
                                 updated_at: customer_conn.last_heartbeat,
-                                message_count: 0, // TODO: 从存储获取实际消息数
-                                last_message: None, // TODO: 从存储获取最后消息
+                                message_count,
+                                last_message,
                             });
                         }
                     }

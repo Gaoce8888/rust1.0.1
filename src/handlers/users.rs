@@ -238,3 +238,64 @@ pub async fn handle_update_user_status(
 
     Ok(warp::reply::json(&response))
 }
+
+pub async fn handle_get_users(
+    user_type: Option<String>,
+    page: Option<u32>,
+    page_size: Option<u32>,
+    user_manager: Arc<UserManager>,
+) -> Result<impl Reply, Rejection> {
+    let page = page.unwrap_or(1);
+    let page_size = page_size.unwrap_or(20);
+    let skip = ((page - 1) * page_size) as usize;
+    
+    // 从UserManager获取用户列表
+    let all_users = user_manager.get_all_users();
+    
+    // 过滤用户类型
+    let filtered_users: Vec<_> = match user_type.as_deref() {
+        Some("kefu") => all_users.into_iter()
+            .filter(|(_, user)| user.role == "kefu")
+            .collect(),
+        Some("kehu") => all_users.into_iter()
+            .filter(|(_, user)| user.role == "kehu")
+            .collect(),
+        _ => all_users.into_iter().collect(),
+    };
+    
+    let total = filtered_users.len();
+    
+    // 分页
+    let users: Vec<_> = filtered_users
+        .into_iter()
+        .skip(skip)
+        .take(page_size as usize)
+        .map(|(id, user)| {
+            serde_json::json!({
+                "id": id,
+                "name": user.display_name,
+                "user_type": user.role,
+                "avatar": format!("/api/avatar/{}", id),
+                "status": user.status,
+                "created_at": user.created_at,
+                "last_login": user.last_login,
+            })
+        })
+        .collect();
+
+    let response = ApiResponse {
+        success: true,
+        message: "获取用户列表成功".to_string(),
+        data: Some(serde_json::json!({
+            "users": users,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total": total,
+                "total_pages": (total as f64 / page_size as f64).ceil() as u32,
+            }
+        })),
+    };
+
+    Ok(warp::reply::json(&response))
+}
