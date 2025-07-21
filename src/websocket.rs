@@ -1673,7 +1673,13 @@ impl WebSocketManager {
                             status: customer_conn.status.clone(),
                             last_message,
                             last_activity: customer_conn.last_heartbeat,
-                            unread_count: 0, // TODO: 实现未读消息计数
+                            unread_count: {
+                                // 获取未读消息计数
+                                self.redis.read().await
+                                    .get_unread_count(kefu_id, &customer_id)
+                                    .await
+                                    .unwrap_or(0)
+                            },
                         });
                     }
                 }

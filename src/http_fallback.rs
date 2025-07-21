@@ -417,12 +417,19 @@ impl UpgradeDetector {
 
     /// 检查WebSocket可用性
     pub async fn check_websocket_availability(&self) -> bool {
-        // 这里可以实现实际的WebSocket可用性检查
-        // 例如：尝试建立WebSocket连接到本地端口
+        // 实际的WebSocket可用性检查
+        // 尝试建立WebSocket连接到本地端口
         tokio::time::timeout(Duration::from_secs(1), async {
-            // 模拟WebSocket连接检查
-            tokio::time::sleep(Duration::from_millis(100)).await;
-            true
+            match tokio::net::TcpStream::connect("127.0.0.1:8080").await {
+                Ok(_) => {
+                    // 成功连接到WebSocket端口
+                    true
+                }
+                Err(_) => {
+                    // 连接失败，WebSocket可能不可用
+                    false
+                }
+            }
         }).await.unwrap_or(false)
     }
 

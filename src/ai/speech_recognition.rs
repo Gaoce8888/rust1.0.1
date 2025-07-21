@@ -318,25 +318,17 @@ impl SpeechProcessor {
         })
     }
 
-    async fn recognize_speech_local(&self, _audio_data: &[u8], language: &str, format: &str) -> Result<SpeechRecognitionResult> {
-        // 简单的本地语音识别逻辑（示例）
-        let mock_text = match language {
-            "zh-CN" => "这是一个本地语音识别的示例结果",
-            "en-US" => "This is a local speech recognition example result",
-            _ => "Local speech recognition result",
-        };
+    async fn process_local(&self, audio_data: &[u8], language: &str) -> Result<String> {
+        // 本地语音识别实现
+        // 这里应该集成实际的本地语音识别库，如：
+        // - DeepSpeech
+        // - Vosk
+        // - SpeechRecognition (Python绑定)
         
-        Ok(SpeechRecognitionResult {
-            text: mock_text.to_string(),
-            confidence: 0.5,
-            language: language.to_string(),
-            duration_ms: 3000,
-            word_timestamps: vec![],
-            speaker_segments: vec![],
-            provider: "local".to_string(),
-            audio_format: format.to_string(),
-            sample_rate: 16000,
-        })
+        // 目前返回错误，提示需要配置实际的语音识别服务
+        Err(anyhow::anyhow!(
+            "本地语音识别未配置。请配置语音识别服务提供商（Azure、Google、AWS或百度）或集成本地语音识别库。"
+        ))
     }
 
     fn parse_google_timestamp(timestamp: &str) -> u64 {
@@ -401,7 +393,7 @@ impl AIProcessor for SpeechProcessor {
             "azure" => self.recognize_speech_azure(&audio_data, &language, &audio_metadata.format).await?,
             "google" => self.recognize_speech_google(&audio_data, &language, &audio_metadata.format).await?,
             "baidu" => self.recognize_speech_baidu(&audio_data, &language, &audio_metadata.format).await?,
-            _ => self.recognize_speech_local(&audio_data, &language, &audio_metadata.format).await?,
+            _ => self.process_local(&audio_data, &language).await?,
         };
         
         // 后处理结果
@@ -436,9 +428,7 @@ mod tests {
         let config = Arc::new(RwLock::new(AIConfig::default()));
         let processor = SpeechProcessor::new(config);
         
-        let result = processor.recognize_speech_local(&[], "zh-CN", "wav").await.unwrap();
-        assert_eq!(result.provider, "local");
-        assert_eq!(result.language, "zh-CN");
-        assert!(result.text.contains("本地语音识别"));
+        let result = processor.process_local(&[], "zh-CN").await.unwrap_err();
+        assert!(result.to_string().contains("本地语音识别未配置"));
     }
 } 

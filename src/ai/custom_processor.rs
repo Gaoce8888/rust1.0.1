@@ -401,56 +401,302 @@ impl CustomAIProcessor {
     }
 
     fn render_template(&self, template: &serde_json::Value, data: &serde_json::Value) -> Result<serde_json::Value> {
-        // 简单的模板渲染实现
-        // TODO: 使用更强大的模板引擎如Handlebars
+        // 使用简单的字符串替换实现模板渲染
         let template_str = serde_json::to_string(template)?;
-        let rendered = template_str.replace("{{input}}", &serde_json::to_string(data)?);
-        Ok(serde_json::from_str(&rendered)?)
+        let data_str = serde_json::to_string(data)?;
+        
+        // 替换所有{{input}}标记
+        let rendered = template_str.replace("{{input}}", &data_str);
+        
+        // 替换其他可能的变量
+        let mut result = rendered;
+        if let serde_json::Value::Object(map) = data {
+            for (key, value) in map {
+                let placeholder = format!("{{{{{}}}}}", key);
+                let value_str = match value {
+                    serde_json::Value::String(s) => s.clone(),
+                    _ => serde_json::to_string(value)?,
+                };
+                result = result.replace(&placeholder, &value_str);
+            }
+        }
+        
+        Ok(serde_json::from_str(&result)?)
     }
 
     fn render_template_str(&self, template: &str, data: &serde_json::Value) -> Result<serde_json::Value> {
-        let rendered = template.replace("{{input}}", &serde_json::to_string(data)?);
+        let data_str = serde_json::to_string(data)?;
+        let mut rendered = template.replace("{{input}}", &data_str);
+        
+        // 替换其他变量
+        if let serde_json::Value::Object(map) = data {
+            for (key, value) in map {
+                let placeholder = format!("{{{{{}}}}}", key);
+                let value_str = match value {
+                    serde_json::Value::String(s) => s.clone(),
+                    _ => serde_json::to_string(value)?,
+                };
+                rendered = rendered.replace(&placeholder, &value_str);
+            }
+        }
+        
         Ok(serde_json::Value::String(rendered))
     }
 
     fn apply_response_mapping(&self, response: &serde_json::Value, mapping: &serde_json::Value) -> Result<serde_json::Value> {
-        // TODO: 实现响应映射逻辑
+        // 实现响应映射逻辑
+        if let Some(extract_path) = mapping.get("extract_path").and_then(|v| v.as_str()) {
+            // 简单的JSON路径提取
+            let parts: Vec<&str> = extract_path.trim_start_matches("$.").split('.').collect();
+            let mut current = response;
+            
+            for part in parts {
+                if let Some(next) = current.get(part) {
+                    current = next;
+                } else {
+                    return Ok(serde_json::Value::Null);
+                }
+            }
+            
+            // 应用字段重命名
+            if let (Some(rename_map), serde_json::Value::Object(mut obj)) = 
+                (mapping.get("rename_fields").and_then(|v| v.as_object()), current.clone()) {
+                for (old_name, new_name) in rename_map {
+                    if let (Some(value), Some(new_name_str)) = (obj.remove(old_name), new_name.as_str()) {
+                        obj.insert(new_name_str.to_string(), value);
+                    }
+                }
+                return Ok(serde_json::Value::Object(obj));
+            }
+            
+            return Ok(current.clone());
+        }
+        
         Ok(response.clone())
     }
 
     fn normalize_text(&self, input: &serde_json::Value, lowercase: bool, remove_punctuation: bool, remove_extra_spaces: bool) -> Result<serde_json::Value> {
-        // TODO: 实现文本规范化
+        // 实现文本规范化
+        if let Some(text) = input.as_str() {
+            let mut result = text.to_string();
+            
+            if lowercase {
+                result = result.to_lowercase();
+            }
+            
+            if remove_punctuation {
+                result = result.chars()
+                    .filter(|c| c.is_alphanumeric() || c.is_whitespace())
+                    .collect();
+            }
+            
+            if remove_extra_spaces {
+                result = result.split_whitespace().collect::<Vec<_>>().join(" ");
+            }
+            
+            return Ok(serde_json::Value::String(result));
+        }
+        
         Ok(input.clone())
     }
 
     fn split_text(&self, input: &serde_json::Value, method: &str, max_length: usize, overlap: usize) -> Result<serde_json::Value> {
-        // TODO: 实现文本分割
+        // 实现文本分割
+        if let Some(text) = input.as_str() {
+            let chunks = match method {
+                "sentence" => {
+                    // 按句子分割
+                    text.split(|c| c == '。' || c == '！' || c == '？' || c == '.' || c == '!' || c == '?')
+                        .filter(|s| !s.is_empty())
+                        .map(|s| s.trim().to_string())
+                        .collect::<Vec<_>>()
+                }
+                "paragraph" => {
+                    // 按段落分割
+                    text.split("\n\n")
+                        .filter(|s| !s.is_empty())
+                        .map(|s| s.trim().to_string())
+                        .collect::<Vec<_>>()
+                }
+                "token" | _ => {
+                    // 按固定长度分割
+                    let chars: Vec<char> = text.chars().collect();
+                    let mut chunks = Vec::new();
+                    let mut i = 0;
+                    
+                    while i < chars.len() {
+                        let end = (i + max_length).min(chars.len());
+                        let chunk: String = chars[i..end].iter().collect();
+                        chunks.push(chunk);
+                        
+                        if i + max_length >= chars.len() {
+                            break;
+                        }
+                        
+                        i += max_length - overlap;
+                    }
+                    
+                    chunks
+                }
+            };
+            
+            return Ok(serde_json::json!(chunks));
+        }
+        
         Ok(input.clone())
     }
 
     fn transform_data(&self, input: &serde_json::Value, jq_expression: &str) -> Result<serde_json::Value> {
-        // TODO: 实现JQ数据转换
-        Ok(input.clone())
+        // 简单的数据转换实现（不使用真正的JQ）
+        // 这里只实现一些基本的转换
+        match jq_expression {
+            ".text" => Ok(input.get("text").cloned().unwrap_or(serde_json::Value::Null)),
+            ".query" => Ok(input.get("query").cloned().unwrap_or(serde_json::Value::Null)),
+            "." => Ok(input.clone()),
+            _ => {
+                // 对于复杂的JQ表达式，暂时返回原始数据
+                tracing::warn!("Unsupported JQ expression: {}", jq_expression);
+                Ok(input.clone())
+            }
+        }
     }
 
     fn extract_json_path(&self, input: &serde_json::Value, path: &str) -> Result<serde_json::Value> {
-        // TODO: 实现JSON路径提取
-        Ok(input.clone())
+        // 实现JSON路径提取
+        let parts: Vec<&str> = path.trim_start_matches("$.").split('.').collect();
+        let mut current = input;
+        
+        for part in parts {
+            if part.contains('[') && part.contains(']') {
+                // 处理数组索引
+                let (field, index_str) = part.split_once('[').unwrap();
+                let index = index_str.trim_end_matches(']').parse::<usize>()?;
+                
+                if !field.is_empty() {
+                    current = current.get(field).ok_or_else(|| anyhow::anyhow!("Field not found: {}", field))?;
+                }
+                
+                current = current.get(index).ok_or_else(|| anyhow::anyhow!("Index out of bounds: {}", index))?;
+            } else {
+                current = current.get(part).ok_or_else(|| anyhow::anyhow!("Field not found: {}", part))?;
+            }
+        }
+        
+        Ok(current.clone())
     }
 
     fn format_text(&self, input: &serde_json::Value, format_template: &str) -> Result<serde_json::Value> {
-        // TODO: 实现文本格式化
-        Ok(input.clone())
+        // 实现文本格式化
+        let mut result = format_template.to_string();
+        
+        // 替换{{result}}
+        let input_str = match input {
+            serde_json::Value::String(s) => s.clone(),
+            _ => serde_json::to_string(input)?,
+        };
+        result = result.replace("{{result}}", &input_str);
+        result = result.replace("{{input}}", &input_str);
+        
+        // 替换其他可能的占位符
+        if let serde_json::Value::Object(map) = input {
+            for (key, value) in map {
+                let placeholder = format!("{{{{{}}}}}", key);
+                let value_str = match value {
+                    serde_json::Value::String(s) => s.clone(),
+                    _ => serde_json::to_string(value)?,
+                };
+                result = result.replace(&placeholder, &value_str);
+            }
+        }
+        
+        Ok(serde_json::Value::String(result))
     }
 
     fn filter_result(&self, input: &serde_json::Value, condition: &str) -> Result<serde_json::Value> {
-        // TODO: 实现结果过滤
-        Ok(input.clone())
+        // 实现结果过滤
+        // 简单的条件评估
+        let parts: Vec<&str> = condition.split_whitespace().collect();
+        if parts.len() != 3 {
+            return Ok(input.clone());
+        }
+        
+        let field = parts[0];
+        let op = parts[1];
+        let value = parts[2];
+        
+        // 获取字段值
+        let field_value = if field == "score" || field == "confidence" {
+            input.get(field).and_then(|v| v.as_f64())
+        } else {
+            None
+        };
+        
+        if let Some(fv) = field_value {
+            let threshold = value.parse::<f64>()?;
+            let passes = match op {
+                ">" => fv > threshold,
+                ">=" => fv >= threshold,
+                "<" => fv < threshold,
+                "<=" => fv <= threshold,
+                "==" => (fv - threshold).abs() < f64::EPSILON,
+                _ => true,
+            };
+            
+            if passes {
+                Ok(input.clone())
+            } else {
+                Ok(serde_json::Value::Null)
+            }
+        } else {
+            Ok(input.clone())
+        }
     }
 
     fn merge_results(&self, input: &serde_json::Value, merge_strategy: &str) -> Result<serde_json::Value> {
-        // TODO: 实现结果合并
-        Ok(input.clone())
+        // 实现结果合并
+        if let serde_json::Value::Array(arr) = input {
+            match merge_strategy {
+                "concat" => {
+                    // 连接所有结果
+                    let mut merged = Vec::new();
+                    for item in arr {
+                        if let serde_json::Value::Array(sub_arr) = item {
+                            merged.extend(sub_arr.clone());
+                        } else {
+                            merged.push(item.clone());
+                        }
+                    }
+                    Ok(serde_json::json!(merged))
+                }
+                "best" => {
+                    // 选择最佳结果（基于score字段）
+                    let best = arr.iter()
+                        .max_by(|a, b| {
+                            let a_score = a.get("score").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                            let b_score = b.get("score").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                            a_score.partial_cmp(&b_score).unwrap_or(std::cmp::Ordering::Equal)
+                        });
+                    Ok(best.cloned().unwrap_or(serde_json::Value::Null))
+                }
+                "vote" => {
+                    // 投票机制（选择出现次数最多的）
+                    let mut counts = std::collections::HashMap::new();
+                    for item in arr {
+                        let key = serde_json::to_string(item)?;
+                        *counts.entry(key).or_insert(0) += 1;
+                    }
+                    
+                    if let Some((most_common, _)) = counts.iter().max_by_key(|(_, count)| *count) {
+                        Ok(serde_json::from_str(most_common)?)
+                    } else {
+                        Ok(serde_json::Value::Null)
+                    }
+                }
+                _ => Ok(input.clone()),
+            }
+        } else {
+            Ok(input.clone())
+        }
     }
 }
 

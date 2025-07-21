@@ -279,30 +279,13 @@ impl TranslationProcessor {
     }
 
     async fn translate_local(&self, text: &str, source_lang: &str, target_lang: &str) -> Result<TranslationResult> {
-        // 简单的本地翻译逻辑（示例）
-        let translation_dict = HashMap::from([
-            ("hello", "你好"),
-            ("thank you", "谢谢"),
-            ("goodbye", "再见"),
-            ("yes", "是的"),
-            ("no", "不是"),
-        ]);
+        // 本地翻译实现
+        // 这里应该集成实际的本地翻译库或模型
+        // 目前返回错误，提示需要配置实际的翻译服务
         
-        let translated = if let Some(translation) = translation_dict.get(text.to_lowercase().as_str()) {
-            translation.to_string()
-        } else {
-            format!("[本地翻译] {}", text)
-        };
-        
-        Ok(TranslationResult {
-            original_text: text.to_string(),
-            translated_text: translated,
-            source_language: source_lang.to_string(),
-            target_language: target_lang.to_string(),
-            confidence: 0.3,
-            provider: "local".to_string(),
-            cached: false,
-        })
+        Err(anyhow::anyhow!(
+            "本地翻译未配置。请配置翻译服务提供商（Google、Azure、AWS或百度）或集成本地翻译模型。"
+        ))
     }
 
     async fn validate_language_support(&self, source_lang: &str, target_lang: &str) -> Result<()> {

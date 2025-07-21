@@ -596,13 +596,19 @@ impl PerformanceOptimizer {
                 
                 for (id, optimization) in optimizations.iter_mut() {
                     if optimization.status == OptimizationStatus::Running {
-                        // 模拟优化进度
-                        optimization.progress += 10.0;
-                        
-                        if optimization.progress >= 100.0 {
-                            optimization.status = OptimizationStatus::Completed;
-                            optimization.progress = 100.0;
-                            completed.push(id.clone());
+                        // 执行优化策略
+                        for strategy in &optimization.strategies {
+                            let result = self.execute_strategy(strategy).await;
+                            results.push(result);
+                            
+                            // 更新优化进度
+                            let mut opt = optimizations.get_mut(&optimization.id).unwrap();
+                            opt.metrics.tasks_completed += 1;
+                            
+                            // 通知进度更新
+                            if let Some(tx) = self.optimization_updates.read().await.get(&optimization.id) {
+                                let _ = tx.send(opt.clone()).await;
+                            }
                         }
                     }
                 }

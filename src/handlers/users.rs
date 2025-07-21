@@ -238,3 +238,47 @@ pub async fn handle_update_user_status(
 
     Ok(warp::reply::json(&response))
 }
+
+pub async fn handle_get_users(
+    user_type: Option<String>,
+    page: Option<u32>,
+    page_size: Option<u32>,
+    user_manager: Arc<UserManager>,
+) -> Result<impl Reply, Rejection> {
+    let page = page.unwrap_or(1);
+    let page_size = page_size.unwrap_or(20);
+    let skip = ((page - 1) * page_size) as usize;
+    
+    // 从UserManager获取用户列表
+    let all_users = user_manager.get_all_users();
+    
+    // 过滤用户类型
+    let filtered_users: Vec<_> = match user_type.as_deref() {
+        Some("kefu") => all_users.into_iter()
+            .filter(|(_, user)| user.user_type == "kefu")
+            .collect(),
+        Some("kehu") => all_users.into_iter()
+            .filter(|(_, user)| user.user_type == "kehu")
+            .collect(),
+        _ => all_users.into_iter().collect(),
+    };
+    
+    let total = filtered_users.len();
+    
+    // 分页
+    let users: Vec<_> = filtered_users
+        .into_iter()
+        .skip(skip)
+        .take(page_size as usize)
+        .map(|(id, user)| {
+            serde_json::json!({
+                "id": id,
+                "name": user.name,
+                "user_type": user.user_type,
+                "avatar": user.avatar,
+                "status": "active",
+                "created_at": chrono::Utc::now() - chrono::Duration::days(30),
+                "last_login": chrono::Utc::now() - chrono::Duration::hours(2),
+            })
+        })
+        .collect();

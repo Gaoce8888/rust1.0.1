@@ -356,15 +356,26 @@ pub fn build_api_routes(
         .and(warp::get())
         .and_then(|voice_id: String| async move {
             tracing::info!("🎤 下载语音请求: {}", voice_id);
-            // 模拟返回音频数据
-            let mock_audio_data = vec![0u8; 1024]; // 模拟音频数据
-            Result::<_, warp::Rejection>::Ok(
-                warp::reply::with_header(
-                    mock_audio_data,
-                    "Content-Type",
-                    "audio/webm"
-                )
-            )
+            
+            // 从存储中获取语音文件路径
+            let voice_path = format!("uploads/voices/{}.webm", voice_id);
+            
+            // 读取音频文件
+            match tokio::fs::read(&voice_path).await {
+                Ok(audio_data) => {
+                    Result::<_, warp::Rejection>::Ok(
+                        warp::reply::with_header(
+                            audio_data,
+                            "Content-Type",
+                            "audio/webm"
+                        )
+                    )
+                }
+                Err(e) => {
+                    tracing::error!("读取语音文件失败: {} - {}", voice_path, e);
+                    Err(warp::reject::not_found())
+                }
+            }
         });
 
     // HTML模板路由
