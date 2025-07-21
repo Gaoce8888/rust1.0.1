@@ -13,8 +13,8 @@ pub mod auth_simple;
 pub mod api_extended;
 pub mod api_real;
 
-// 客服认证路由模块
-pub mod kefu_auth;
+// 客服认证路由模块 - 暂时禁用，使用新版本
+// pub mod kefu_auth;
 
 use std::sync::Arc;
 use warp::Filter;
@@ -26,7 +26,8 @@ use crate::voice_message::VoiceMessageManager;
 use crate::storage::LocalStorage;
 use crate::ai::AIManager;
 use crate::handlers::ai::AIHandler;
-use crate::auth::kefu_auth::KefuAuthManager;
+use crate::auth::{KefuAuthManager, CustomerManager, KefuAuthApiRoutes, CustomerApiRoutes};
+use crate::redis_pool::RedisPoolManager;
 
 /// 路由构建器配置结构体
 pub struct RouteBuilderConfig {
@@ -38,6 +39,8 @@ pub struct RouteBuilderConfig {
     pub storage: Arc<LocalStorage>,
     pub ai_manager: Arc<AIManager>,
     pub kefu_auth_manager: Arc<KefuAuthManager>,
+    pub customer_manager: Arc<CustomerManager>,
+    pub redis_pool: Arc<RedisPoolManager>,
 }
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::LoadBalancer;
@@ -79,8 +82,14 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
     let ai_handler = AIHandler::new(config.ai_manager.clone());
     let ai_routes = ai_handler.routes();
     
-    // 客服认证路由
-    let kefu_auth_routes = kefu_auth::build_kefu_auth_routes(config.kefu_auth_manager.clone());
+    // 客服认证API路由（新版本）
+    let kefu_auth_api_routes = KefuAuthApiRoutes::with_manager(config.kefu_auth_manager.clone()).create_routes();
+    
+    // 客户管理API路由
+    let customer_api_routes = CustomerApiRoutes::new(config.redis_pool.clone(), config.kefu_auth_manager.clone()).create_routes();
+    
+    // 客服认证路由（旧版本，暂时禁用）
+    // let kefu_auth_routes = kefu_auth::build_kefu_auth_routes(config.kefu_auth_manager.clone());
     
     // 企业级路由 - 暂时禁用
     // let enterprise_routes = None;
@@ -114,16 +123,20 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
         .or(swagger_routes)
         // 3. 认证路由
         .or(auth_routes)
-        // 4. 客服认证路由
-        .or(kefu_auth_routes)
-        // 5. AI路由
+        // 4. 客服认证API路由（新版本）
+        .or(kefu_auth_api_routes)
+        // 5. 客户管理API路由
+        .or(customer_api_routes)
+        // 6. 客服认证路由（旧版本，暂时禁用）
+        // .or(kefu_auth_routes)
+        // 7. AI路由
         .or(ai_routes)
-        // 6. API路由
+        // 8. API路由
         .or(simple_api_routes)
         .or(extended_api_routes)
         .or(real_file_api_routes)
-        // 7. WebSocket路由
+        // 9. WebSocket路由
         .or(websocket_routes)
-        // 8. 前端路由（静态文件）放在最后
+        // 10. 前端路由（静态文件）放在最后
         .or(frontend_routes)
 }

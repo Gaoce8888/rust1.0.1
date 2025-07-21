@@ -5,12 +5,13 @@ use crate::config::{init_config, AppConfig};
 use crate::file_manager::FileManager;
 use crate::html_template_manager::HtmlTemplateManager;
 use crate::redis_client::RedisManager;
+use crate::redis_pool::{RedisPoolManager, RedisPoolConfig};
 use crate::storage::LocalStorage;
 use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
-use crate::auth::kefu_auth::KefuAuthManager;
+use crate::auth::{KefuAuthManager, CustomerManager, HeartbeatService, start_heartbeat_service_background};
 use crate::platform;
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
@@ -27,6 +28,8 @@ pub struct SystemComponents {
     /// Redis管理器，用于缓存和消息队列
     #[allow(dead_code)] // 系统核心组件，间接使用
     pub redis_manager: RedisManager,
+    /// Redis连接池管理器
+    pub redis_pool: Arc<RedisPoolManager>,
     /// 本地存储管理器
     #[allow(dead_code)] // 系统核心组件，间接使用
     pub storage: LocalStorage,
@@ -37,6 +40,8 @@ pub struct SystemComponents {
     pub ws_manager: Arc<WebSocketManager>,
     pub ai_manager: Arc<AIManager>,
     pub kefu_auth_manager: Arc<KefuAuthManager>,
+    pub customer_manager: Arc<CustomerManager>,
+    pub heartbeat_service: Arc<HeartbeatService>,
     // 企业级组件 - 暂时禁用以修复编译
     // pub load_balancer: Arc<LoadBalancer>,
     // pub websocket_pool: Arc<WebSocketConnectionPool>,
@@ -81,6 +86,19 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
         }
     };
 
+    // 初始化Redis连接池管理器
+    let redis_pool_config = RedisPoolConfig {
+        url: redis_url.clone(),
+        max_size: 10,
+        min_idle: Some(2),
+        connection_timeout: std::time::Duration::from_secs(5),
+        idle_timeout: Some(std::time::Duration::from_secs(300)),
+        max_lifetime: Some(std::time::Duration::from_secs(3600)),
+        recycle_timeout: std::time::Duration::from_secs(2),
+    };
+    let redis_pool = Arc::new(RedisPoolManager::new(redis_pool_config)?);
+    info!("✅ Redis连接池管理器初始化成功");
+
     // 初始化本地存储
     let storage = match LocalStorage::new(&config.storage.data_dir) {
         Ok(storage) => {
@@ -106,11 +124,11 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     };
 
     // 初始化HTML模板管理器
-    let html_manager = match HtmlTemplateManager::new(config.storage.clone()).await {
-        Ok(manager) => {
-            info!("HTML模板管理器初始化成功");
-            Arc::new(manager)
-        }
+            let html_manager = match HtmlTemplateManager::new(config.storage.clone()).await {
+            Ok(manager) => {
+                info!("HTML模板管理器初始化成功");
+                Arc::new(manager)
+            }
         Err(e) => {
             error!("HTML模板管理器初始化失败: {:?}", e);
             return Err(e);
@@ -130,48 +148,96 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     };
 
     // 初始化语音消息管理器
-    let voice_manager = match VoiceMessageManager::new(platform::get_data_dir().join("voice")) {
+    let voice_storage_path = std::path::PathBuf::from(&config.storage.data_dir).join("voice");
+    let voice_manager = match VoiceMessageManager::new(voice_storage_path) {
         Ok(manager) => {
-            info!("🎤 语音消息管理器初始化成功");
+            info!("语音消息管理器初始化成功");
             Arc::new(manager)
         }
         Err(e) => {
-            error!("🎤 语音消息管理器初始化失败: {:?}", e);
+            error!("语音消息管理器初始化失败: {:?}", e);
             return Err(anyhow::anyhow!("语音消息管理器初始化失败: {}", e));
         }
     };
 
-    // 创建WebSocket管理器
+    // 初始化WebSocket管理器
     let ws_manager = Arc::new(WebSocketManager::new(redis_manager.clone(), storage.clone()));
+    info!("WebSocket管理器初始化成功");
 
     // 初始化AI管理器
     let ai_manager = Arc::new(AIManager::new());
-    info!("🤖 AI管理器初始化成功");
+    info!("AI管理器初始化成功");
 
     // 初始化客服认证管理器
-    let kefu_auth_manager = if let Some(pool_manager) = redis_manager.get_pool_manager() {
-        let manager = KefuAuthManager::new(pool_manager);
-        match manager.initialize_default_accounts().await {
-            Ok(()) => {
-                info!("🔐 客服认证管理器初始化成功");
-                Arc::new(manager)
-            }
-            Err(e) => {
-                error!("🔐 客服认证管理器初始化失败: {:?}", e);
-                return Err(anyhow::anyhow!("客服认证管理器初始化失败: {}", e));
-            }
-        }
-    } else {
-        error!("🔐 Redis连接池未启用，无法初始化客服认证管理器");
-        return Err(anyhow::anyhow!("Redis连接池未启用"));
-    };
+    let kefu_auth_manager = Arc::new(KefuAuthManager::new(redis_pool.clone()));
+    
+    // 初始化默认客服账号
+    if let Err(e) = kefu_auth_manager.initialize_default_accounts().await {
+        error!("初始化默认客服账号失败: {:?}", e);
+        return Err(e);
+    }
+    info!("✅ 客服认证管理器初始化成功");
+
+    // 初始化客户管理器
+    let customer_manager = Arc::new(CustomerManager::new(redis_pool.clone(), kefu_auth_manager.clone()));
+    info!("✅ 客户管理器初始化成功");
+
+    // 初始化心跳检测服务
+    let heartbeat_service = Arc::new(HeartbeatService::new(redis_pool.clone(), kefu_auth_manager.clone()));
+    info!("✅ 心跳检测服务初始化成功");
 
     // 企业级组件初始化 - 暂时禁用以修复编译
-    // info!("🏢 开始初始化企业级组件...");
-    info!("🏢 企业级组件暂时禁用，正在修复编译错误...");
+    /*
+    // 初始化负载均衡器
+    let load_balancer_config = LoadBalancerConfig {
+        strategy: LoadBalancingStrategy::RoundRobin,
+        health_check_interval: Duration::from_secs(30),
+        max_failures: 3,
+    };
+    let load_balancer = Arc::new(LoadBalancer::new(load_balancer_config));
+
+    // 初始化WebSocket连接池
+    let pool_config = WebSocketPoolConfig {
+        max_connections: 1000,
+        connection_timeout: Duration::from_secs(30),
+        idle_timeout: Duration::from_secs(300),
+    };
+    let websocket_pool = Arc::new(WebSocketConnectionPool::new(pool_config));
+
+    // 初始化API路由
+    let api_routes = Arc::new(ApiRoutes::new(load_balancer.clone(), websocket_pool.clone()));
+
+    // 初始化HTTP回退管理器
+    let http_fallback = Arc::new(HttpFallbackManager::new());
+
+    // 初始化自动升级管理器
+    let auto_upgrade = Arc::new(AutoUpgradeManager::new());
+
+    // 初始化性能优化器
+    let optimizer_config = OptimizerConfig {
+        enable_compression: true,
+        enable_caching: true,
+        cache_ttl: Duration::from_secs(3600),
+    };
+    let performance_optimizer = Arc::new(PerformanceOptimizer::new(optimizer_config));
+
+    // 初始化健康监控器
+    let health_monitor = Arc::new(HealthMonitor::new());
+
+    // 初始化故障转移管理器
+    let failover_config = FailoverConfig {
+        enable_auto_failover: true,
+        failover_threshold: 3,
+        recovery_timeout: Duration::from_secs(60),
+    };
+    let failover_manager = Arc::new(FailoverManager::new(failover_config));
+    */
+
+    info!("🎉 所有系统组件初始化完成");
 
     Ok(SystemComponents {
         redis_manager,
+        redis_pool,
         storage,
         file_manager,
         html_manager,
@@ -180,7 +246,9 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
         ws_manager,
         ai_manager,
         kefu_auth_manager,
-        // 企业级组件 - 暂时禁用
+        customer_manager,
+        heartbeat_service,
+        // 企业级组件 - 暂时禁用以修复编译
         // load_balancer,
         // websocket_pool,
         // api_routes,
@@ -194,33 +262,18 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
 
 /// 启动后台任务
 pub async fn start_background_tasks(components: &SystemComponents) {
-    // 启动心跳检查
-    components.ws_manager.start_heartbeat_checker().await;
-    info!("✅ 基于会话的在线状态检测已启用 - 基于活动时间判断");
+    info!("🚀 启动后台任务...");
 
-    // 启动AI处理器
-    match components.ai_manager.start_processing().await { Err(e) => {
-        error!("🤖 AI处理器启动失败: {}", e);
-    } _ => {
-        info!("🤖 AI处理器已启动，开始处理任务队列");
-    }}
-
-    // 启动定期会话清理任务
-    {
-        let user_manager_clone = components.user_manager.clone();
-        tokio::spawn(async move {
-            let mut interval = tokio::time::interval(std::time::Duration::from_secs(3600)); // 每小时清理一次
-            loop {
-                interval.tick().await;
-                info!("🧹 开始定期清理过期会话...");
-                user_manager_clone.cleanup_expired_sessions().await;
-            }
-        });
-        info!("✅ 会话清理任务已启动，每小时清理一次过期会话");
+    // 启动心跳检测服务
+    if let Err(e) = start_heartbeat_service_background(
+        components.redis_pool.clone(),
+        components.kefu_auth_manager.clone(),
+    ).await {
+        error!("💥 启动心跳检测服务失败: {}", e);
     }
 
-    // 企业级组件启动 - 暂时禁用
-    // info!("🏢 启动企业级后台任务...");
-    // info!("✅ 企业级后台任务启动完成");
-    info!("🏢 企业级后台任务暂时禁用");
+    // 启动WebSocket心跳检查器
+    components.ws_manager.start_heartbeat_checker().await;
+
+    info!("✅ 后台任务启动完成");
 }

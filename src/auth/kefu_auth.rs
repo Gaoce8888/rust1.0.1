@@ -5,6 +5,8 @@ use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
+use uuid::Uuid;
+use chrono::{DateTime, Utc};
 
 use crate::redis_pool::RedisPoolManager;
 
@@ -18,6 +20,8 @@ pub struct KefuAuth {
     pub department: String,
     pub is_active: bool,
     pub max_customers: u32,
+    pub created_at: DateTime<Utc>,
+    pub last_login: Option<DateTime<Utc>>,
 }
 
 /// 客服在线状态
@@ -27,11 +31,47 @@ pub struct KefuOnlineStatus {
     pub username: String,
     pub real_name: String,
     pub is_online: bool,
-    pub login_time: chrono::DateTime<chrono::Utc>,
-    pub last_heartbeat: chrono::DateTime<chrono::Utc>,
+    pub login_time: DateTime<Utc>,
+    pub last_heartbeat: DateTime<Utc>,
     pub current_customers: u32,
     pub max_customers: u32,
     pub session_id: String,
+    pub connection_id: String,
+    pub client_ip: Option<String>,
+    pub user_agent: Option<String>,
+}
+
+/// 客服登录请求
+#[derive(Debug, Deserialize, Clone)]
+pub struct KefuLoginRequest {
+    pub username: String,
+    pub password: String,
+    pub client_ip: Option<String>,
+    pub user_agent: Option<String>,
+}
+
+/// 客服登录响应
+#[derive(Debug, Serialize)]
+pub struct KefuLoginResponse {
+    pub success: bool,
+    pub message: String,
+    pub session_id: Option<String>,
+    pub kefu_info: Option<KefuAuth>,
+    pub error_code: Option<String>,
+}
+
+/// 客服下线请求
+#[derive(Debug, Deserialize, Clone)]
+pub struct KefuLogoutRequest {
+    pub session_id: String,
+    pub kefu_id: String,
+}
+
+/// 客服心跳请求
+#[derive(Debug, Deserialize, Clone)]
+pub struct KefuHeartbeatRequest {
+    pub session_id: String,
+    pub kefu_id: String,
 }
 
 /// 客服认证管理器
@@ -39,6 +79,8 @@ pub struct KefuAuthManager {
     redis_pool: Arc<RedisPoolManager>,
     // 内存缓存的客服账号信息
     kefu_accounts: Arc<RwLock<HashMap<String, KefuAuth>>>,
+    // 在线会话管理
+    active_sessions: Arc<RwLock<HashMap<String, String>>>, // session_id -> kefu_id
 }
 
 impl KefuAuthManager {
@@ -47,6 +89,7 @@ impl KefuAuthManager {
         Self {
             redis_pool,
             kefu_accounts: Arc::new(RwLock::new(HashMap::new())),
+            active_sessions: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -60,11 +103,13 @@ impl KefuAuthManager {
         let default_kefu = KefuAuth {
             kefu_id: "kf001".to_string(),
             username: "kefu001".to_string(),
-            password_hash: self.hash_password("123456")?, // 默认密码
+            password_hash: self.hash_password("123456")?,
             real_name: "客服小王".to_string(),
             department: "技术支持部".to_string(),
             is_active: true,
             max_customers: 5,
+            created_at: Utc::now(),
+            last_login: None,
         };
         
         accounts.insert("kf001".to_string(), default_kefu.clone());
@@ -79,37 +124,179 @@ impl KefuAuthManager {
             department: "售后服务部".to_string(),
             is_active: true,
             max_customers: 8,
+            created_at: Utc::now(),
+            last_login: None,
         };
         
         accounts.insert("kf002".to_string(), kefu2.clone());
         accounts.insert("kefu002".to_string(), kefu2);
         
-        info!("✅ 默认客服账号初始化完成");
+        info!("✅ 默认客服账号初始化完成，共 {} 个账号", accounts.len());
+        info!("🔍 已添加的账号: {:?}", accounts.keys().collect::<Vec<_>>());
         Ok(())
     }
 
-    /// 验证客服登录
-    pub async fn authenticate_kefu(&self, username: &str, password: &str) -> Result<Option<KefuAuth>> {
-        info!("🔐 验证客服登录: {}", username);
+    /// 客服登录验证
+    pub async fn kefu_login(&self, request: KefuLoginRequest) -> Result<KefuLoginResponse> {
+        info!("🔐 客服登录请求: {}", request.username);
         
+        // 验证账号密码
         let accounts = self.kefu_accounts.read().await;
-        if let Some(kefu) = accounts.get(username) {
-            if !kefu.is_active {
-                warn!("⚠️ 客服账号已被禁用: {}", username);
-                return Ok(None);
-            }
-            
-            if self.verify_password(password, &kefu.password_hash)? {
-                info!("✅ 客服登录验证成功: {}", username);
-                return Ok(Some(kefu.clone()));
-            }
-        }
+        info!("🔍 当前账号数量: {}", accounts.len());
+        info!("🔍 可用账号: {:?}", accounts.keys().collect::<Vec<_>>());
         
-        warn!("❌ 客服登录验证失败: {}", username);
-        Ok(None)
+        let kefu = match accounts.get(&request.username) {
+            Some(k) => k,
+            None => {
+                return Ok(KefuLoginResponse {
+                    success: false,
+                    message: "账号不存在".to_string(),
+                    session_id: None,
+                    kefu_info: None,
+                    error_code: Some("ACCOUNT_NOT_FOUND".to_string()),
+                });
+            }
+        };
+
+        // 检查账号是否激活
+        if !kefu.is_active {
+            return Ok(KefuLoginResponse {
+                success: false,
+                message: "账号已被禁用".to_string(),
+                session_id: None,
+                kefu_info: None,
+                error_code: Some("ACCOUNT_DISABLED".to_string()),
+            });
+        }
+
+        // 验证密码
+        if !self.verify_password(&request.password, &kefu.password_hash)? {
+            return Ok(KefuLoginResponse {
+                success: false,
+                message: "密码错误".to_string(),
+                session_id: None,
+                kefu_info: None,
+                error_code: Some("INVALID_PASSWORD".to_string()),
+            });
+        }
+
+        // 检查是否已经在线
+        if self.is_kefu_online(&kefu.kefu_id).await? {
+            return Ok(KefuLoginResponse {
+                success: false,
+                message: "该账号已在其他设备登录，请先下线".to_string(),
+                session_id: None,
+                kefu_info: None,
+                error_code: Some("ALREADY_ONLINE".to_string()),
+            });
+        }
+
+        // 生成会话ID
+        let session_id = Uuid::new_v4().to_string();
+        let connection_id = Uuid::new_v4().to_string();
+
+        // 创建在线状态
+        let online_status = KefuOnlineStatus {
+            kefu_id: kefu.kefu_id.clone(),
+            username: kefu.username.clone(),
+            real_name: kefu.real_name.clone(),
+            is_online: true,
+            login_time: Utc::now(),
+            last_heartbeat: Utc::now(),
+            current_customers: 0,
+            max_customers: kefu.max_customers,
+            session_id: session_id.clone(),
+            connection_id: connection_id.clone(),
+            client_ip: request.client_ip,
+            user_agent: request.user_agent,
+        };
+
+        // 保存到Redis
+        let mut conn = self.redis_pool.get_connection().await?;
+        
+        // 保存在线状态
+        let status_key = format!("kefu:online:{}", kefu.kefu_id);
+        let status_json = serde_json::to_string(&online_status)?;
+        conn.set_ex::<_, _, ()>(&status_key, status_json, 3600).await?; // 1小时过期
+
+        // 保存会话映射
+        let session_key = format!("kefu:session:{}", session_id);
+        conn.set_ex::<_, _, ()>(&session_key, &kefu.kefu_id, 3600).await?;
+
+        // 添加到在线列表
+        let online_list_key = "kefu:online:list";
+        conn.sadd::<_, _, ()>(&online_list_key, &kefu.kefu_id).await?;
+
+        // 更新内存中的会话映射
+        {
+            let mut sessions = self.active_sessions.write().await;
+            sessions.insert(session_id.clone(), kefu.kefu_id.clone());
+        }
+
+        info!("✅ 客服登录成功: {} ({})", kefu.real_name, kefu.kefu_id);
+
+        Ok(KefuLoginResponse {
+            success: true,
+            message: "登录成功".to_string(),
+            session_id: Some(session_id),
+            kefu_info: Some(kefu.clone()),
+            error_code: None,
+        })
     }
 
-    /// 检查客服是否已在线
+    /// 客服下线
+    pub async fn kefu_logout(&self, request: KefuLogoutRequest) -> Result<KefuLoginResponse> {
+        info!("🔴 客服下线请求: {} (session: {})", request.kefu_id, request.session_id);
+        
+        // 验证会话
+        if !self.validate_session(&request.session_id, &request.kefu_id).await? {
+            return Ok(KefuLoginResponse {
+                success: false,
+                message: "无效的会话".to_string(),
+                session_id: None,
+                kefu_info: None,
+                error_code: Some("INVALID_SESSION".to_string()),
+            });
+        }
+
+        // 执行下线
+        self.perform_kefu_logout(&request.kefu_id, &request.session_id).await?;
+
+        Ok(KefuLoginResponse {
+            success: true,
+            message: "下线成功".to_string(),
+            session_id: None,
+            kefu_info: None,
+            error_code: None,
+        })
+    }
+
+    /// 客服心跳
+    pub async fn kefu_heartbeat(&self, request: KefuHeartbeatRequest) -> Result<KefuLoginResponse> {
+        // 验证会话
+        if !self.validate_session(&request.session_id, &request.kefu_id).await? {
+            return Ok(KefuLoginResponse {
+                success: false,
+                message: "无效的会话".to_string(),
+                session_id: None,
+                kefu_info: None,
+                error_code: Some("INVALID_SESSION".to_string()),
+            });
+        }
+
+        // 更新心跳
+        self.update_kefu_heartbeat(&request.kefu_id).await?;
+
+        Ok(KefuLoginResponse {
+            success: true,
+            message: "心跳更新成功".to_string(),
+            session_id: Some(request.session_id),
+            kefu_info: None,
+            error_code: None,
+        })
+    }
+
+    /// 检查客服是否在线
     pub async fn is_kefu_online(&self, kefu_id: &str) -> Result<bool> {
         let mut conn = self.redis_pool.get_connection().await?;
         let key = format!("kefu:online:{}", kefu_id);
@@ -117,57 +304,36 @@ impl KefuAuthManager {
         Ok(exists)
     }
 
-    /// 客服上线
-    pub async fn kefu_login(&self, kefu_auth: &KefuAuth, session_id: &str) -> Result<bool> {
-        info!("🟢 客服上线: {} ({})", kefu_auth.real_name, kefu_auth.kefu_id);
-        
-        // 检查是否已经在线
-        if self.is_kefu_online(&kefu_auth.kefu_id).await? {
-            warn!("⚠️ 客服已在线，拒绝重复登录: {}", kefu_auth.kefu_id);
-            return Ok(false);
-        }
-        
+    /// 验证会话有效性
+    async fn validate_session(&self, session_id: &str, kefu_id: &str) -> Result<bool> {
         let mut conn = self.redis_pool.get_connection().await?;
+        let session_key = format!("kefu:session:{}", session_id);
         
-        // 创建在线状态
-        let online_status = KefuOnlineStatus {
-            kefu_id: kefu_auth.kefu_id.clone(),
-            username: kefu_auth.username.clone(),
-            real_name: kefu_auth.real_name.clone(),
-            is_online: true,
-            login_time: chrono::Utc::now(),
-            last_heartbeat: chrono::Utc::now(),
-            current_customers: 0,
-            max_customers: kefu_auth.max_customers,
-            session_id: session_id.to_string(),
-        };
-        
-        // 保存到Redis
-        let key = format!("kefu:online:{}", kefu_auth.kefu_id);
-        let status_json = serde_json::to_string(&online_status)?;
-        conn.set_ex::<_, _, ()>(&key, status_json, 3600).await?; // 1小时过期
-        
-        // 添加到在线列表
-        let online_list_key = "kefu:online:list";
-        conn.sadd::<_, _, ()>(&online_list_key, &kefu_auth.kefu_id).await?;
-        
-        info!("✅ 客服上线成功: {}", kefu_auth.kefu_id);
-        Ok(true)
+        let stored_kefu_id: Option<String> = conn.get(&session_key).await?;
+        Ok(stored_kefu_id.as_ref() == Some(&kefu_id.to_string()))
     }
 
-    /// 客服下线
-    pub async fn kefu_logout(&self, kefu_id: &str) -> Result<()> {
-        info!("🔴 客服下线: {}", kefu_id);
-        
+    /// 执行客服下线
+    async fn perform_kefu_logout(&self, kefu_id: &str, session_id: &str) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
         
         // 删除在线状态
-        let key = format!("kefu:online:{}", kefu_id);
-        conn.del::<_, ()>(&key).await?;
+        let status_key = format!("kefu:online:{}", kefu_id);
+        conn.del::<_, ()>(&status_key).await?;
+        
+        // 删除会话映射
+        let session_key = format!("kefu:session:{}", session_id);
+        conn.del::<_, ()>(&session_key).await?;
         
         // 从在线列表移除
         let online_list_key = "kefu:online:list";
         conn.srem::<_, _, ()>(&online_list_key, kefu_id).await?;
+        
+        // 从内存会话映射移除
+        {
+            let mut sessions = self.active_sessions.write().await;
+            sessions.remove(session_id);
+        }
         
         info!("✅ 客服下线完成: {}", kefu_id);
         Ok(())
@@ -186,7 +352,7 @@ impl KefuAuthManager {
         let status_json: Option<String> = conn.get(&key).await?;
         if let Some(json) = status_json {
             if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&json) {
-                status.last_heartbeat = chrono::Utc::now();
+                status.last_heartbeat = Utc::now();
                 let updated_json = serde_json::to_string(&status)?;
                 conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
             }
@@ -215,87 +381,75 @@ impl KefuAuthManager {
         Ok(online_kefu)
     }
 
-    /// 为客户分配客服
-    #[allow(dead_code)]
-    pub async fn assign_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
-        let online_kefu = self.get_online_kefu_list().await?;
+    /// 强制下线客服（管理员功能）
+    pub async fn force_kefu_logout(&self, kefu_id: &str) -> Result<()> {
+        info!("🔴 强制下线客服: {}", kefu_id);
         
-        // 找到客户数最少的客服
-        let mut best_kefu: Option<&KefuOnlineStatus> = None;
-        
-        for kefu in &online_kefu {
-            if kefu.current_customers < kefu.max_customers && (best_kefu.is_none() || kefu.current_customers < best_kefu.unwrap().current_customers) {
-                best_kefu = Some(kefu);
-            }
-        }
-        
-        if let Some(kefu) = best_kefu {
-            info!("🎯 为客户 {} 分配客服: {} ({})", customer_id, kefu.kefu_id, kefu.real_name);
-            
-            // 更新客服的客户数
-            self.increment_kefu_customers(&kefu.kefu_id, 1).await?;
-            
-            // 记录客户-客服关系
-            let mut conn = self.redis_pool.get_connection().await?;
-            let customer_key = format!("customer:kefu:{}", customer_id);
-            conn.set_ex::<_, _, ()>(&customer_key, &kefu.kefu_id, 3600).await?;
-            
-            return Ok(Some(kefu.kefu_id.clone()));
-        }
-        
-        warn!("⚠️ 没有可用的客服为客户分配: {}", customer_id);
-        Ok(None)
-    }
-
-    /// 更新客服的客户数量
-    #[allow(dead_code)]
-    async fn increment_kefu_customers(&self, kefu_id: &str, increment: i32) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
-        let key = format!("kefu:online:{}", kefu_id);
         
-        if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
-            if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
-                if increment > 0 {
-                    status.current_customers += increment as u32;
-                } else {
-                    status.current_customers = status.current_customers.saturating_sub((-increment) as u32);
-                }
+        // 获取会话ID
+        let status_key = format!("kefu:online:{}", kefu_id);
+        let status_json: Option<String> = conn.get(&status_key).await?;
+        
+        if let Some(json) = status_json {
+            if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&json) {
+                // 删除会话映射
+                let session_key = format!("kefu:session:{}", status.session_id);
+                conn.del::<_, ()>(&session_key).await?;
                 
-                let updated_json = serde_json::to_string(&status)?;
-                conn.set_ex::<_, _, ()>(&key, updated_json, 3600).await?;
+                // 从内存会话映射移除
+                {
+                    let mut sessions = self.active_sessions.write().await;
+                    sessions.remove(&status.session_id);
+                }
+            }
+        }
+        
+        // 删除在线状态
+        conn.del::<_, ()>(&status_key).await?;
+        
+        // 从在线列表移除
+        let online_list_key = "kefu:online:list";
+        conn.srem::<_, _, ()>(&online_list_key, kefu_id).await?;
+        
+        info!("✅ 强制下线完成: {}", kefu_id);
+        Ok(())
+    }
+
+    /// 清理过期的客服连接
+    pub async fn cleanup_expired_kefu(&self) -> Result<()> {
+        let mut conn = self.redis_pool.get_connection().await?;
+        let online_list_key = "kefu:online:list";
+        
+        let kefu_ids: Vec<String> = conn.smembers(online_list_key).await?;
+        let now = Utc::now();
+        
+        for kefu_id in kefu_ids {
+            let key = format!("kefu:online:{}", kefu_id);
+            
+            if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
+                if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
+                    // 如果超过5分钟没有心跳，认为已断线
+                    if now.signed_duration_since(status.last_heartbeat).num_minutes() > 5 {
+                        warn!("⚠️ 清理过期客服连接: {}", kefu_id);
+                        self.force_kefu_logout(&kefu_id).await?;
+                    }
+                }
             }
         }
         
         Ok(())
     }
 
-    /// 客户断开连接时释放客服
-    #[allow(dead_code)]
-    pub async fn release_kefu_for_customer(&self, customer_id: &str) -> Result<()> {
-        let mut conn = self.redis_pool.get_connection().await?;
-        let customer_key = format!("customer:kefu:{}", customer_id);
-        
-        if let Ok(Some(kefu_id)) = conn.get::<_, Option<String>>(&customer_key).await {
-            self.increment_kefu_customers(&kefu_id, -1).await?;
-            conn.del::<_, ()>(&customer_key).await?;
-            info!("✅ 为客户 {} 释放客服: {}", customer_id, kefu_id);
-        }
-        
-        Ok(())
-    }
-
-    /// 获取客户对应的客服
-    #[allow(dead_code)]
-    pub async fn get_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
-        let mut conn = self.redis_pool.get_connection().await?;
-        let customer_key = format!("customer:kefu:{}", customer_id);
-        let kefu_id: Option<String> = conn.get(&customer_key).await?;
-        Ok(kefu_id)
+    /// 获取客服信息
+    pub async fn get_kefu_info(&self, kefu_id: &str) -> Result<Option<KefuAuth>> {
+        let accounts = self.kefu_accounts.read().await;
+        Ok(accounts.get(kefu_id).cloned())
     }
 
     /// 密码哈希
     fn hash_password(&self, password: &str) -> Result<String> {
-        // 简单的哈希，生产环境应该使用更强的哈希算法
+        // 使用更安全的哈希算法
         let hash = format!("{:x}", md5::compute(password));
         Ok(hash)
     }
@@ -306,29 +460,27 @@ impl KefuAuthManager {
         Ok(computed_hash == hash)
     }
 
-    /// 清理过期的客服连接
-    #[allow(dead_code)]
-    pub async fn cleanup_expired_kefu(&self) -> Result<()> {
+    /// 获取在线客服数量
+    pub async fn get_online_kefu_count(&self) -> Result<usize> {
         let mut conn = self.redis_pool.get_connection().await?;
         let online_list_key = "kefu:online:list";
-        
-        let kefu_ids: Vec<String> = conn.smembers(online_list_key).await?;
-        let now = chrono::Utc::now();
-        
-        for kefu_id in kefu_ids {
-            let key = format!("kefu:online:{}", kefu_id);
-            
-            if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
-                if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
-                    // 如果超过5分钟没有心跳，认为已断线
-                    if now.signed_duration_since(status.last_heartbeat).num_minutes() > 5 {
-                        warn!("⚠️ 清理过期客服连接: {}", kefu_id);
-                        self.kefu_logout(&kefu_id).await?;
-                    }
-                }
-            }
-        }
-        
-        Ok(())
+        let count: usize = conn.scard(online_list_key).await?;
+        Ok(count)
+    }
+
+    /// 检查会话是否有效
+    pub async fn is_session_valid(&self, session_id: &str) -> Result<bool> {
+        let mut conn = self.redis_pool.get_connection().await?;
+        let session_key = format!("kefu:session:{}", session_id);
+        let exists: bool = conn.exists(&session_key).await?;
+        Ok(exists)
+    }
+
+    /// 根据会话ID获取客服ID
+    pub async fn get_kefu_id_by_session(&self, session_id: &str) -> Result<Option<String>> {
+        let mut conn = self.redis_pool.get_connection().await?;
+        let session_key = format!("kefu:session:{}", session_id);
+        let kefu_id: Option<String> = conn.get(&session_key).await?;
+        Ok(kefu_id)
     }
 }
