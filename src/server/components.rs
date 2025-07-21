@@ -135,16 +135,16 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
             }
         };
 
-        let react_manager = match ReactTemplateManager::new(html_manager.clone(), config.storage.clone()).await {
-            Ok(manager) => {
-                info!("🎨 React模板管理器初始化成功");
-                Arc::new(manager)
-            },
-            Err(e) => {
-                error!("❌ React模板管理器初始化失败: {}", e);
-                return Err(anyhow!("React模板管理器初始化失败: {}", e));
-            }
-        };
+        // let react_manager = match ReactTemplateManager::new(html_manager.clone(), config.storage.clone()).await {
+        //     Ok(manager) => {
+        //         info!("🎨 React模板管理器初始化成功");
+        //         Arc::new(manager)
+        //     },
+        //     Err(e) => {
+        //         error!("❌ React模板管理器初始化失败: {}", e);
+        //         return Err(anyhow!("React模板管理器初始化失败: {}", e));
+        //     }
+        // };
 
     // 初始化用户管理器
     let user_config_path = std::path::PathBuf::from(&config.storage.data_dir).join("users.json");

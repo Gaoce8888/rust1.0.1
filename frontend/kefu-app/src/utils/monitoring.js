@@ -189,7 +189,9 @@ export const withPerformanceMonitoring = (Component, componentName) => {
     const startMark = `render-${componentName}-${Date.now()}`;
     performance.mark(startMark);
     
-    React.useEffect(() => {
+    // 注意：这个函数需要在React组件中使用，这里只是返回一个函数
+    // 实际的JSX渲染应该在组件中进行
+    return function renderComponent() {
       const endTime = performance.now();
       const endMark = `render-${componentName}-end-${Date.now()}`;
       performance.mark(endMark);
@@ -201,9 +203,10 @@ export const withPerformanceMonitoring = (Component, componentName) => {
         props: Object.keys(props),
         timestamp: new Date().toISOString(),
       });
-    });
-    
-    return <Component {...props} />;
+      
+      // 返回组件渲染函数，而不是直接渲染JSX
+      return Component(props);
+    };
   };
 };
 

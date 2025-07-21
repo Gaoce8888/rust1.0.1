@@ -21,7 +21,7 @@ import {
     AccordionItem,
     Switch,
     Slider,
-} from '@nextui-org/react';
+} from '@heroui/react';
 import aiReactService, { aiReactUtils } from '../utils/aiReactService';
 
 const AIComponentGenerator = ({ 

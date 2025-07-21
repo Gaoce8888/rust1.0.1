@@ -20,7 +20,7 @@ import {
   Textarea,
   Accordion,
   AccordionItem
-} from '@nextui-org/react';
+} from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { 
   CARD_SIZE_CONFIG, 

@@ -968,7 +968,7 @@ impl HtmlTemplateManager {
         };
 
         // 组合HTML和React组件
-        let combined_html = if let Some(ref react_data) = react_data {
+        let combined_html = if let Some(ref _react_data) = react_data {
             format!(
                 "{}\n<div id=\"react-container-{}\" class=\"react-component-container\"></div>",
                 html_content,
@@ -1066,7 +1066,7 @@ impl HtmlTemplateManager {
     fn generate_adaptive_styles(
         &self,
         adaptive_config: &AdaptiveConfig,
-        client_config: &Option<ClientConfig>,
+        _client_config: &Option<ClientConfig>,
     ) -> Result<String> {
         if !adaptive_config.enabled {
             return Ok(String::new());

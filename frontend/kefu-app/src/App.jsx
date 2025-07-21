@@ -245,16 +245,6 @@ export default function Component() {
     };
   }, [isLoggedIn, currentUser]);
 
-    // 连接
-    client.connect();
-    setWsClient(client);
-
-    return () => {
-      // 不要在组件卸载时断开连接，保持连接状态
-      // client.disconnect();
-    };
-  }, [isLoggedIn, currentUser]);
-
   // 处理接收到的消息
   const handleReceiveMessage = (data) => {
     try {

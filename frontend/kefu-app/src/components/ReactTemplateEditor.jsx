@@ -17,7 +17,7 @@ import {
   useDisclosure,
   Spinner,
   Alert
-} from '@nextui-org/react';
+} from '@heroui/react';
 import ReactCardComponents from './ReactCardComponents';
 
 // React模板编辑器

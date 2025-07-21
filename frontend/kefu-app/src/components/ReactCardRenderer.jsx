@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Card, CardBody, CardHeader, CardFooter, Button, Image, Avatar, Chip, Progress, Tabs, Tab, Modal, Spinner, Alert, Input, Textarea, Select, SelectItem, Switch, Slider, Divider, Accordion, AccordionItem } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, CardFooter, Button, Image, Avatar, Chip, Progress, Tabs, Tab, Modal, Spinner, Alert, Input, Textarea, Select, SelectItem, Switch, Slider, Divider, Accordion, AccordionItem } from '@heroui/react';
 import { useResizeObserver } from '../utils/performance';
 
 /**

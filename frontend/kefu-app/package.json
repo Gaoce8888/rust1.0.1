@@ -19,7 +19,7 @@
     "@heroui/react": "latest",
     "@iconify/react": "4.1.1",
     "clsx": "^2.1.0",
-    "framer-motion": "11.1.7",
+    "framer-motion": "^12.23.6",
     "fs-extra": "^11.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

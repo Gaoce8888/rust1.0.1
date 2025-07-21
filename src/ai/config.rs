@@ -258,7 +258,7 @@ pub struct AnthropicConfig {
 }
 
 /// Google AI配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct GoogleAIConfig {
     pub enabled: bool,
     pub api_key: String,
@@ -271,7 +271,7 @@ pub struct GoogleAIConfig {
 }
 
 /// Azure AI配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AzureAIConfig {
     pub enabled: bool,
     pub api_key: String,
@@ -304,7 +304,7 @@ pub struct CustomAIService {
 }
 
 /// 服务选择策略
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ServiceSelectionStrategy {
     pub strategy: String, // "round_robin", "load_balanced", "cost_optimized", "quality_optimized"
     pub weights: std::collections::HashMap<String, f32>,
@@ -313,7 +313,7 @@ pub struct ServiceSelectionStrategy {
 }
 
 /// 速率限制配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RateLimitingConfig {
     pub enabled: bool,
     pub requests_per_minute: u32,
@@ -324,7 +324,7 @@ pub struct RateLimitingConfig {
 }
 
 /// 缓存配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct CachingConfig {
     pub enabled: bool,
     pub cache_type: String, // "memory", "redis", "file"

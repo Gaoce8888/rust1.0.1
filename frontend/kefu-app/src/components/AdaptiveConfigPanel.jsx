@@ -16,7 +16,7 @@ import {
   CardBody,
   Chip,
   Textarea
-} from '@nextui-org/react';
+} from '@heroui/react';
 import adaptiveConfigManager, { adaptiveUtils } from '../utils/adaptiveConfig';
 
 /**

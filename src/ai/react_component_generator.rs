@@ -2,7 +2,7 @@ use crate::ai::config::{ReactComponentGenerationConfig, AIServiceIntegrationConf
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tracing::{error, info, warn};
+use tracing::{info, warn}; // 移除未使用的 error 导入
 use uuid::Uuid;
 
 /// React组件生成请求

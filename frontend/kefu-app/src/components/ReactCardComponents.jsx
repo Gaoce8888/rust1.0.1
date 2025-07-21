@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Card, CardBody, Button, Avatar, Chip, Image, Progress, Spinner } from '@nextui-org/react';
+import { Card, CardBody, Button, Avatar, Chip, Image, Progress, Spinner } from '@heroui/react';
 
 // 增强的卡片大小配置
 export const CARD_SIZE_CONFIG = {
