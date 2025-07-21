@@ -106,8 +106,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<LoadBalancerResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -132,8 +132,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<HealthMonitorResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -158,8 +158,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<PerformanceOptimizationResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -184,8 +184,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<FailoverResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -210,8 +210,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<AutoScalingResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -233,8 +233,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<HashMap<String, serde_json::Value>> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -259,8 +259,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<serde_json::Value> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -291,8 +291,8 @@ impl EnterpriseProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<HashMap<String, serde_json::Value>> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<LoadBalancerRequest, LoadBalancerResponse>(
                 api_request,
                 self.config.enterprise_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),

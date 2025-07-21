@@ -1,9 +1,9 @@
-use crate::api_gateway::{ApiRequest, ApiResponse, EnhancedServiceConfig};
+use crate::api_gateway::EnhancedServiceConfig;
+use crate::proxy::{ProxyService, ProxyError, handle_proxy_request, handle_json_request};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use anyhow::Result;
 
-/// AI组件生成请求
+// AI服务请求/响应结构体
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AiComponentGenerationRequest {
     pub prompt: String,
@@ -11,7 +11,6 @@ pub struct AiComponentGenerationRequest {
     pub style_config: HashMap<String, serde_json::Value>,
 }
 
-/// AI组件生成响应
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AiComponentGenerationResponse {
     pub component_code: String,
@@ -19,14 +18,12 @@ pub struct AiComponentGenerationResponse {
     pub metadata: HashMap<String, serde_json::Value>,
 }
 
-/// 智能回复请求
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SmartReplyRequest {
     pub message: String,
     pub context: HashMap<String, serde_json::Value>,
 }
 
-/// 智能回复响应
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SmartReplyResponse {
     pub reply: String,
@@ -34,7 +31,6 @@ pub struct SmartReplyResponse {
     pub suggestions: Vec<String>,
 }
 
-/// 语音转录请求
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VoiceTranscriptionRequest {
     pub audio_url: String,
@@ -42,7 +38,6 @@ pub struct VoiceTranscriptionRequest {
     pub format: String,
 }
 
-/// 语音转录响应
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VoiceTranscriptionResponse {
     pub transcription: String,
@@ -51,14 +46,12 @@ pub struct VoiceTranscriptionResponse {
     pub duration: f64,
 }
 
-/// 情感分析请求
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SentimentAnalysisRequest {
     pub text: String,
     pub context: Option<HashMap<String, serde_json::Value>>,
 }
 
-/// 情感分析响应
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SentimentAnalysisResponse {
     pub sentiment: String, // positive, negative, neutral
@@ -67,7 +60,6 @@ pub struct SentimentAnalysisResponse {
     pub keywords: Vec<String>,
 }
 
-/// AI代理服务
 pub struct AiProxy {
     config: EnhancedServiceConfig,
 }
@@ -76,31 +68,30 @@ impl AiProxy {
     pub fn new(config: EnhancedServiceConfig) -> Self {
         Self { config }
     }
+}
+
+#[async_trait::async_trait]
+impl ProxyService for AiProxy {
+    fn get_config(&self) -> &EnhancedServiceConfig {
+        &self.config
+    }
     
+    fn get_service_url(&self) -> &str {
+        &self.config.ai_service_url
+    }
+    
+    fn get_service_name(&self) -> &str {
+        "ai"
+    }
+}
+
+impl AiProxy {
     /// 生成AI组件
     pub async fn generate_component(
         &self,
         request: AiComponentGenerationRequest,
-    ) -> Result<AiComponentGenerationResponse, Box<dyn std::error::Error>> {
-        let api_request = ApiRequest {
-            service: "ai".to_string(),
-            endpoint: "generate-component".to_string(),
-            data: request,
-            timestamp: chrono::Utc::now().timestamp(),
-        };
-        
-        let response: ApiResponse<AiComponentGenerationResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
-                api_request,
-                self.config.ai_service_url.clone(),
-                std::time::Duration::from_secs(self.config.timeout_seconds),
-            ).await?;
-        
-        if response.success {
-            Ok(response.data.unwrap())
-        } else {
-            Err(response.error.unwrap_or("AI service error".to_string()).into())
-        }
+    ) -> Result<AiComponentGenerationResponse, ProxyError> {
+        handle_proxy_request(self, "component-generation", &request).await
     }
     
     /// 获取智能回复
@@ -108,31 +99,12 @@ impl AiProxy {
         &self,
         message: String,
         context: HashMap<String, serde_json::Value>,
-    ) -> Result<SmartReplyResponse, Box<dyn std::error::Error>> {
+    ) -> Result<SmartReplyResponse, ProxyError> {
         let request = SmartReplyRequest {
             message,
             context,
         };
-        
-        let api_request = ApiRequest {
-            service: "ai".to_string(),
-            endpoint: "smart-reply".to_string(),
-            data: request,
-            timestamp: chrono::Utc::now().timestamp(),
-        };
-        
-        let response: ApiResponse<SmartReplyResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
-                api_request,
-                self.config.ai_service_url.clone(),
-                std::time::Duration::from_secs(self.config.timeout_seconds),
-            ).await?;
-        
-        if response.success {
-            Ok(response.data.unwrap())
-        } else {
-            Err(response.error.unwrap_or("AI service error".to_string()).into())
-        }
+        handle_proxy_request(self, "smart-reply", &request).await
     }
     
     /// 语音转录
@@ -141,32 +113,13 @@ impl AiProxy {
         audio_url: String,
         language: Option<String>,
         format: String,
-    ) -> Result<VoiceTranscriptionResponse, Box<dyn std::error::Error>> {
+    ) -> Result<VoiceTranscriptionResponse, ProxyError> {
         let request = VoiceTranscriptionRequest {
             audio_url,
             language,
             format,
         };
-        
-        let api_request = ApiRequest {
-            service: "ai".to_string(),
-            endpoint: "voice-transcription".to_string(),
-            data: request,
-            timestamp: chrono::Utc::now().timestamp(),
-        };
-        
-        let response: ApiResponse<VoiceTranscriptionResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
-                api_request,
-                self.config.ai_service_url.clone(),
-                std::time::Duration::from_secs(self.config.timeout_seconds),
-            ).await?;
-        
-        if response.success {
-            Ok(response.data.unwrap())
-        } else {
-            Err(response.error.unwrap_or("AI service error".to_string()).into())
-        }
+        handle_proxy_request(self, "voice-transcription", &request).await
     }
     
     /// 情感分析
@@ -174,31 +127,12 @@ impl AiProxy {
         &self,
         text: String,
         context: Option<HashMap<String, serde_json::Value>>,
-    ) -> Result<SentimentAnalysisResponse, Box<dyn std::error::Error>> {
+    ) -> Result<SentimentAnalysisResponse, ProxyError> {
         let request = SentimentAnalysisRequest {
             text,
             context,
         };
-        
-        let api_request = ApiRequest {
-            service: "ai".to_string(),
-            endpoint: "sentiment-analysis".to_string(),
-            data: request,
-            timestamp: chrono::Utc::now().timestamp(),
-        };
-        
-        let response: ApiResponse<SentimentAnalysisResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
-                api_request,
-                self.config.ai_service_url.clone(),
-                std::time::Duration::from_secs(self.config.timeout_seconds),
-            ).await?;
-        
-        if response.success {
-            Ok(response.data.unwrap())
-        } else {
-            Err(response.error.unwrap_or("AI service error".to_string()).into())
-        }
+        handle_proxy_request(self, "sentiment-analysis", &request).await
     }
     
     /// 自动分类
@@ -206,30 +140,11 @@ impl AiProxy {
         &self,
         text: String,
         categories: Vec<String>,
-    ) -> Result<HashMap<String, f64>, Box<dyn std::error::Error>> {
+    ) -> Result<HashMap<String, f64>, ProxyError> {
         let request = serde_json::json!({
             "text": text,
             "categories": categories,
         });
-        
-        let api_request = ApiRequest {
-            service: "ai".to_string(),
-            endpoint: "auto-classify".to_string(),
-            data: request,
-            timestamp: chrono::Utc::now().timestamp(),
-        };
-        
-        let response: ApiResponse<HashMap<String, f64>> = 
-            crate::api_gateway::forward_to_enhanced_service(
-                api_request,
-                self.config.ai_service_url.clone(),
-                std::time::Duration::from_secs(self.config.timeout_seconds),
-            ).await?;
-        
-        if response.success {
-            Ok(response.data.unwrap())
-        } else {
-            Err(response.error.unwrap_or("AI service error".to_string()).into())
-        }
+        handle_json_request(self, "auto-classify", request).await
     }
 }

@@ -67,6 +67,26 @@ pub async fn forward_to_enhanced_service<T: Serialize + for<'de> Deserialize<'de
     Ok(api_response)
 }
 
+/// 转发到增强服务并返回响应类型
+pub async fn forward_to_enhanced_service_with_response<T: Serialize, R: for<'de> Deserialize<'de>>(
+    request: ApiRequest<T>,
+    enhanced_service_url: String,
+    timeout_duration: Duration,
+) -> Result<ApiResponse<R>, Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = timeout(
+        timeout_duration,
+        client
+            .post(&format!("{}/api/v1/{}", enhanced_service_url, request.endpoint))
+            .json(&request)
+            .send()
+    ).await??;
+    
+    let api_response: ApiResponse<R> = response.json().await?;
+    Ok(api_response)
+}
+
 /// 获取服务URL
 pub fn get_service_url(service_name: &str, config: &EnhancedServiceConfig) -> Option<String> {
     match service_name {
@@ -145,7 +165,7 @@ async fn handle_ai_request(
     match forward_to_enhanced_service(request, service_url, timeout_duration).await {
         Ok(response) => Ok(warp::reply::json(&response)),
         Err(e) => {
-            let error_response = ApiResponse {
+            let error_response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: false,
                 data: None,
                 error: Some(format!("AI service error: {}", e)),
@@ -177,7 +197,7 @@ async fn handle_react_card_request(
     match forward_to_enhanced_service(request, service_url, timeout_duration).await {
         Ok(response) => Ok(warp::reply::json(&response)),
         Err(e) => {
-            let error_response = ApiResponse {
+            let error_response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: false,
                 data: None,
                 error: Some(format!("React Card service error: {}", e)),
@@ -209,7 +229,7 @@ async fn handle_analytics_request(
     match forward_to_enhanced_service(request, service_url, timeout_duration).await {
         Ok(response) => Ok(warp::reply::json(&response)),
         Err(e) => {
-            let error_response = ApiResponse {
+            let error_response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: false,
                 data: None,
                 error: Some(format!("Analytics service error: {}", e)),
@@ -241,7 +261,7 @@ async fn handle_enterprise_request(
     match forward_to_enhanced_service(request, service_url, timeout_duration).await {
         Ok(response) => Ok(warp::reply::json(&response)),
         Err(e) => {
-            let error_response = ApiResponse {
+            let error_response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: false,
                 data: None,
                 error: Some(format!("Enterprise service error: {}", e)),

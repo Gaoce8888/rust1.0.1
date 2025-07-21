@@ -108,8 +108,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<AnalyticsEventResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -134,8 +134,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<UserBehaviorResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -160,8 +160,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<MessageAnalysisResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -186,8 +186,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<RealTimeMetricsResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -212,8 +212,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<SmartRecommendationResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -244,8 +244,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<HashMap<String, serde_json::Value>> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -276,8 +276,8 @@ impl AnalyticsProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<HashMap<String, serde_json::Value>> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<AnalyticsEventRequest, AnalyticsEventResponse>(
                 api_request,
                 self.config.analytics_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),

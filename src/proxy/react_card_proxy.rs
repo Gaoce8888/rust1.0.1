@@ -88,8 +88,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<ReactCardRenderResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -114,8 +114,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<ReactCardGenerationResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -140,8 +140,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<AdaptiveConfigResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -166,8 +166,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<CardTemplateResponse> = 
-            crate::api_gateway::forward_to_enhanced_service(
+                let response =
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -200,8 +200,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<serde_json::Value> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),
@@ -223,8 +223,8 @@ impl ReactCardProxy {
             timestamp: chrono::Utc::now().timestamp(),
         };
         
-        let response: ApiResponse<Vec<HashMap<String, serde_json::Value>>> = 
-            crate::api_gateway::forward_to_enhanced_service(
+        let response = 
+            crate::api_gateway::forward_to_enhanced_service_with_response::<ReactCardRenderRequest, ReactCardRenderResponse>(
                 api_request,
                 self.config.react_card_service_url.clone(),
                 std::time::Duration::from_secs(self.config.timeout_seconds),

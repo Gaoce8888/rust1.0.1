@@ -16,7 +16,7 @@ use crate::message::{
     UserInfo, UserType,
 };
 // use crate::message_queue::{MessageQueueManager, MessageStatusSyncer};  // 暂时禁用消息队列
-// use crate::redis_client::RedisManager;  // 暂时禁用Redis客户端
+use crate::redis_client::RedisManager;
 use crate::storage::LocalStorage;
 
 // 🚀 添加Redis事件处理支持
@@ -283,8 +283,8 @@ impl WebSocketManager {
         let senders_clone = self.senders.clone();
         let redis_clone = self.redis.clone();
         let storage_clone = self.storage.clone();
-        let _compressor_clone_send = self.compressor.clone();
-        let compressor_clone_recv = self.compressor.clone();
+        // let _compressor_clone_send = self.compressor.clone();
+        // let compressor_clone_recv = self.compressor.clone();
         let user_id_clone = user_id.clone();
 
         // 启动发送任务
@@ -344,10 +344,9 @@ impl WebSocketManager {
             senders: senders_clone,
             redis: redis_clone,
             storage: storage_clone,
-            compressor: compressor_clone_recv,
-            // 复用现有的message_queue和status_syncer
-            message_queue: self.message_queue.clone(),
-            status_syncer: self.status_syncer.clone(),
+            // compressor: compressor_clone_recv,
+            // message_queue: self.message_queue.clone(),
+            // status_syncer: self.status_syncer.clone(),
         });
 
         let receive_task = tokio::spawn(async move {
@@ -1656,7 +1655,7 @@ impl WebSocketManager {
         // 获取客服的活跃会话
         if let Ok(active_sessions) = redis.get_kefu_active_sessions(kefu_id).await {
             for customer_id in active_sessions.iter() {
-                if let Some(customer_conn) = connections.get(&customer_id) {
+                if let Some(customer_conn) = connections.get(customer_id) {
                     if customer_conn.user_type == UserType::Kehu {
                         // 获取最后一条消息
                         let last_message = self

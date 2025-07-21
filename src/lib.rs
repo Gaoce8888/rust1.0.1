@@ -23,6 +23,8 @@ pub mod storage;
 pub mod message;
 pub mod voice_message;
 pub mod html_template_manager;
+pub mod redis_client;
+pub mod redis_pool;
 // pub mod ai;  // 暂时禁用AI模块
 
 // 新增：API网关和代理模块
