@@ -360,6 +360,10 @@ export const withPerformanceMonitoring = (Component, componentName) => {
       startTime.current = performance.now();
     });
 
-    return <Component {...props} />;
+    // 注意：这个函数需要在React组件中使用，这里只是返回一个函数
+    // 实际的JSX渲染应该在组件中进行
+    return function renderComponent() {
+      return Component(props);
+    };
   });
 };

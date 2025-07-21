@@ -23,4 +23,4 @@ pub mod storage;
 pub mod message;
 pub mod voice_message;
 pub mod html_template_manager;
-pub mod ai;
+// pub mod ai;  // 暂时禁用AI模块

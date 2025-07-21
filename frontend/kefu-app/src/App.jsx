@@ -28,9 +28,9 @@ import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
 import { initializeMonitoring, monitorWebSocket } from "./utils/monitoring";
 import { validateMessageContent, validateCustomerData, escapeHtml } from "./utils/validation";
-import ReactCardRenderer from "./components/ReactCardRenderer";
-import AdaptiveConfigPanel from "./components/AdaptiveConfigPanel";
-import AIComponentGenerator from "./components/AIComponentGenerator";
+// import ReactCardRenderer from "./components/ReactCardRenderer";  // 暂时禁用
+// import AdaptiveConfigPanel from "./components/AdaptiveConfigPanel";  // 暂时禁用
+// import AIComponentGenerator from "./components/AIComponentGenerator";  // 暂时禁用
 import adaptiveConfigManager from "./utils/adaptiveConfig";
 
 // 主应用组件 - 客服聊天界面
@@ -972,8 +972,8 @@ export default function Component() {
                           base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
                         }}
                       />
-                      {/* React组件渲染器 */}
-                      <div className="mt-2 ml-12">
+                      {/* React组件渲染器 - 暂时禁用 */}
+                      {/* <div className="mt-2 ml-12">
                         <ReactCardRenderer
                           componentData={message.reactComponentData}
                           adaptiveStyles={message.adaptiveStyles}
@@ -981,7 +981,7 @@ export default function Component() {
                           onEvent={handleReactComponentEvent}
                           className="react-message-card"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   );
                 }
@@ -1250,7 +1250,8 @@ export default function Component() {
 
               <Divider />
 
-              <div>
+              {/* React卡片设置 - 暂时禁用 */}
+              {/* <div>
                 <h4 className="text-small font-medium mb-3">React卡片设置</h4>
                 <div className="space-y-3">
                   <div>
@@ -1281,7 +1282,7 @@ export default function Component() {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </ModalBody>
           <ModalFooter>
@@ -1303,20 +1304,20 @@ export default function Component() {
         </ModalContent>
       </Modal>
 
-      {/* 自适应配置面板 */}
-      <AdaptiveConfigPanel
+      {/* 自适应配置面板 - 暂时禁用 */}
+      {/* <AdaptiveConfigPanel
         isOpen={isAdaptiveConfigOpen}
         onClose={() => setIsAdaptiveConfigOpen(false)}
         onConfigChange={handleAdaptiveConfigChange}
-      />
+      /> */}
 
-      {/* AI组件生成器 */}
-      <AIComponentGenerator
+      {/* AI组件生成器 - 暂时禁用 */}
+      {/* <AIComponentGenerator
         isOpen={isAIGeneratorOpen}
         onClose={handleAIGeneratorClose}
         onComponentGenerated={handleComponentGenerated}
         currentUserId={currentUser?.id}
-      />
+      /> */}
     </div>
   );
 }

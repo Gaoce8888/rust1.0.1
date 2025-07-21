@@ -31,7 +31,7 @@ mod auth;
 // mod handlers;  // 暂时禁用，有编译错误
 mod routes;
 mod server;
-mod ai;
+// mod ai;  // 暂时禁用AI模块
 
 // Swagger文档模块
 mod swagger;
