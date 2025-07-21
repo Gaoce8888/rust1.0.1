@@ -1,0 +1,341 @@
+<div class="custom-card">
+    <div class="card-header">
+        <div class="header-icon">
+            {% if icon %}
+            <i class="icon {{ icon }}"></i>
+            {% endif %}
+        </div>
+        <div class="header-content">
+            <h3 class="card-title">{{ title | default(value="自定义标题") }}</h3>
+            {% if subtitle %}
+            <p class="card-subtitle">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+        {% if status %}
+        <div class="status-indicator status-{{ status.type | default(value="default") }}">
+            {{ status.text | default(value="状态") }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="card-body">
+        <div class="content-area">
+            {% if content %}
+            <div class="main-content">
+                {{ content | safe }}
+            </div>
+            {% endif %}
+            
+            {% if features %}
+            <div class="features-list">
+                {% for feature in features %}
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span class="feature-text">{{ feature }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if stats %}
+            <div class="stats-grid">
+                {% for stat in stats %}
+                <div class="stat-item">
+                    <div class="stat-value">{{ stat.value }}</div>
+                    <div class="stat-label">{{ stat.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if metadata %}
+        <div class="metadata-section">
+            {% for item in metadata %}
+            <div class="metadata-item">
+                <span class="metadata-key">{{ item.key }}:</span>
+                <span class="metadata-value">{{ item.value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="card-footer">
+        {% if primary_action %}
+        <button class="btn btn-primary">
+            {{ primary_action.text | default(value="主要操作") }}
+        </button>
+        {% endif %}
+        
+        {% if secondary_actions %}
+        <div class="secondary-actions">
+            {% for action in secondary_actions %}
+            <button class="btn btn-{{ action.type | default(value="secondary") }}">
+                {{ action.text }}
+            </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.custom-card {
+    max-width: 450px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.custom-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    flex-shrink: 0;
+}
+
+.icon {
+    font-size: 2rem;
+    opacity: 0.9;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.status-indicator {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.status-success {
+    background: rgba(56, 161, 105, 0.2);
+}
+
+.status-warning {
+    background: rgba(214, 158, 46, 0.2);
+}
+
+.status-danger {
+    background: rgba(229, 62, 62, 0.2);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.content-area {
+    margin-bottom: 1.5rem;
+}
+
+.main-content {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feature-icon {
+    color: #38a169;
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+.feature-text {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3182ce;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.metadata-section {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem;
+}
+
+.metadata-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.metadata-item:last-child {
+    margin-bottom: 0;
+}
+
+.metadata-key {
+    font-weight: 500;
+    color: #718096;
+}
+
+.metadata-value {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: #3182ce;
+    color: white;
+    flex: 1;
+}
+
+.btn-primary:hover {
+    background: #2c5aa0;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-success {
+    background: #38a169;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #2f855a;
+}
+
+.btn-warning {
+    background: #d69e2e;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #b7791f;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+}
+
+.secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+    .custom-card {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card-footer {
+        flex-direction: column;
+    }
+    
+    .secondary-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>

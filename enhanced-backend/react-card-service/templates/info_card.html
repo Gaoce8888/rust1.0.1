@@ -1,0 +1,240 @@
+<div class="info-card">
+    <div class="card-header">
+        <div class="header-content">
+            <h3 class="info-title">{{ title | default(value="信息标题") }}</h3>
+            <span class="info-badge">{{ badge | default(value="重要") }}</span>
+        </div>
+        <p class="info-subtitle">{{ subtitle | default(value="信息副标题") }}</p>
+    </div>
+    
+    <div class="card-body">
+        <div class="info-content">
+            <p class="info-text">{{ content | default(value="信息内容") }}</p>
+            
+            {% if details %}
+            <div class="info-details">
+                {% for detail in details %}
+                <div class="detail-item">
+                    <span class="detail-label">{{ detail.label }}:</span>
+                    <span class="detail-value">{{ detail.value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="info-tags">
+            {% for tag in tags %}
+            <span class="tag tag-{{ tag.type | default(value="default") }}">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="card-footer">
+        {% if actions %}
+        <div class="action-buttons">
+            {% for action in actions %}
+            <button class="btn btn-{{ action.type | default(value="secondary") }}">
+                {{ action.text }}
+            </button>
+            {% endfor %}
+        </div>
+        {% else %}
+        <button class="btn btn-primary">了解更多</button>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.info-card {
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3182ce;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.info-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.info-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.info-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.info-content {
+    margin-bottom: 1.5rem;
+}
+
+.info-text {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.info-details {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.detail-value {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.info-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.tag-default {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.tag-primary {
+    background: #bee3f8;
+    color: #2b6cb0;
+}
+
+.tag-success {
+    background: #c6f6d5;
+    color: #2f855a;
+}
+
+.tag-warning {
+    background: #fef5e7;
+    color: #c05621;
+}
+
+.tag-danger {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #3182ce;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2c5aa0;
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-success {
+    background: #38a169;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #2f855a;
+}
+
+.btn-warning {
+    background: #d69e2e;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #b7791f;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+}
+</style>
