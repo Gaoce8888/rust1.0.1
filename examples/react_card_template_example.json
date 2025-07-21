@@ -1,0 +1,87 @@
+{
+  "template_id": "react_card_example",
+  "name": "React卡片示例模板",
+  "description": "展示React卡片功能的示例模板",
+  "category": "react_components",
+  "content": "<div class=\"react-card-container\">{{content}}</div>",
+  "variables": [
+    {
+      "name": "content",
+      "var_type": "String",
+      "default_value": "这是一个React卡片示例",
+      "required": true,
+      "description": "卡片内容",
+      "validation": null
+    },
+    {
+      "name": "title",
+      "var_type": "String",
+      "default_value": "示例标题",
+      "required": false,
+      "description": "卡片标题",
+      "validation": null
+    },
+    {
+      "name": "image_url",
+      "var_type": "Url",
+      "default_value": "https://via.placeholder.com/300x200",
+      "required": false,
+      "description": "卡片图片URL",
+      "validation": "https?://.*"
+    }
+  ],
+  "css": ".react-card-container { padding: 16px; border-radius: 8px; background: #f8f9fa; }",
+  "javascript": null,
+  "thumbnail": "https://via.placeholder.com/200x150",
+  "is_active": true,
+  "created_by": "system",
+  "created_at": "2024-12-19T10:00:00Z",
+  "updated_at": "2024-12-19T10:00:00Z",
+  "version": 1,
+  "tags": ["react", "card", "example", "adaptive"],
+  "usage_count": 0,
+  "react_component": {
+    "component_name": "card",
+    "component_type": "card",
+    "props": {
+      "header": "{{title}}",
+      "content": "{{content}}",
+      "footer": "<Button color=\"primary\" size=\"sm\">查看详情</Button>",
+      "shadow": "sm",
+      "radius": "lg",
+      "className": "react-card-example"
+    },
+    "styles": {
+      "maxWidth": "400px",
+      "margin": "0 auto"
+    },
+    "events": {
+      "onClick": "handleCardClick",
+      "onButtonClick": "handleButtonClick"
+    },
+    "dependencies": ["@nextui-org/react"],
+    "version": "1.0.0"
+  },
+  "adaptive_config": {
+    "enabled": true,
+    "minWidth": 200,
+    "maxWidth": 600,
+    "minHeight": 100,
+    "maxHeight": 400,
+    "mode": "fit",
+    "containerType": "dialog",
+    "breakpoints": {
+      "768": {
+        "maxWidth": "300px",
+        "fontSize": "14px",
+        "padding": "12px"
+      },
+      "480": {
+        "maxWidth": "250px",
+        "fontSize": "12px",
+        "padding": "8px"
+      }
+    },
+    "customClasses": ["responsive-card", "adaptive-example"]
+  }
+}

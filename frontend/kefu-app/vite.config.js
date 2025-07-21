@@ -1,71 +1,76 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import { resolve } from 'path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
-  // 开发服务器配置
-  server: {
-    port: 3001,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:6006',
-        changeOrigin: true,
-      },
-      '/ws': {
-        target: 'ws://localhost:6006',
-        ws: true,
-      },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@hooks': resolve(__dirname, 'src/hooks'),
+      '@utils': resolve(__dirname, 'src/utils'),
+      '@services': resolve(__dirname, 'src/services'),
+      '@types': resolve(__dirname, 'src/types'),
     },
   },
-  
-  // 构建配置
   build: {
-    // 输出到独立的build目录
-    outDir: '../../static/kefu-build',
-    emptyOutDir: true,
-    
-    // 资源路径配置
-    assetsDir: 'assets',
-    
-    // 代码分割配置
+    // 启用代码分割
     rollupOptions: {
       output: {
         manualChunks: {
-          // 将React相关库打包到一起
+          // 将React相关库分离
           'react-vendor': ['react', 'react-dom'],
-          // 将UI库打包到一起
-          'ui-vendor': ['@heroui/react', '@iconify/react'],
+          // 将UI库分离
+          'ui-vendor': ['@heroui/react', 'framer-motion'],
+          // 将工具库分离
+          'utils-vendor': ['clsx', 'tailwind-merge', 'usehooks-ts'],
+          // 将图标库分离
+          'icons-vendor': ['@iconify/react'],
         },
-        // 自定义chunk文件名
-        chunkFileNames: 'js/[name]-[hash].js',
-        entryFileNames: 'js/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        // 优化chunk命名
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
-    
-    // 性能优化
+    // 启用Tree Shaking
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: true, // 生产环境移除console
         drop_debugger: true,
       },
     },
-    
-    // 生成source map用于调试
+    // 启用源码映射（开发环境）
     sourcemap: false,
+    // 设置chunk大小警告阈值
+    chunkSizeWarningLimit: 1000,
   },
-  
-  // 路径解析配置
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@services': path.resolve(__dirname, './src/services'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
+  // 开发服务器优化
+  server: {
+    port: 6005,
+    host: true,
+    // 启用HMR优化
+    hmr: {
+      overlay: false,
     },
+  },
+  // 预构建优化
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      '@heroui/react',
+      'framer-motion',
+      'clsx',
+      'tailwind-merge',
+    ],
+  },
+  // 性能优化
+  esbuild: {
+    // 移除开发环境的console和debugger
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
 })

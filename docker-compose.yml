@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # 主后端服务
+  core-backend:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ENHANCED_AI_SERVICE_URL=http://ai-service:8081
+      - ENHANCED_REACT_CARD_SERVICE_URL=http://react-card-service:8082
+      - ENHANCED_ANALYTICS_SERVICE_URL=http://analytics-service:8083
+      - ENHANCED_ENTERPRISE_SERVICE_URL=http://enterprise-service:8084
+      - RUST_LOG=info
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - kefu-network
+    volumes:
+      - ./logs:/app/logs
+
+  # AI服务
+  ai-service:
+    build: ./enhanced-backend/ai-service
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - RUST_LOG=info
+    networks:
+      - kefu-network
+    volumes:
+      - ./logs:/app/logs
+
+  # React卡片服务
+  react-card-service:
+    build: ./enhanced-backend/react-card-service
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - RUST_LOG=info
+    networks:
+      - kefu-network
+    volumes:
+      - ./logs:/app/logs
+      - react-card-templates:/app/templates
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 数据分析服务
+  analytics-service:
+    build: ./enhanced-backend/analytics-service
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - DATABASE_URL=${ANALYTICS_DATABASE_URL:-postgresql://analytics_user:analytics_password@analytics-db:5432/kefu_analytics}
+      - REDIS_URL=${ANALYTICS_REDIS_URL:-redis://analytics-redis:6379}
+      - RUST_LOG=info
+    depends_on:
+      - analytics-db
+      - analytics-redis
+    networks:
+      - kefu-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 企业级服务
+  enterprise-service:
+    build: ./enhanced-backend/enterprise-service
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - RUST_LOG=info
+    networks:
+      - kefu-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 前端应用
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8080
+      - REACT_APP_ENHANCED_SERVICES_ENABLED=true
+    depends_on:
+      - core-backend
+    networks:
+      - kefu-network
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+
+  # 数据库服务
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=kefu_core
+      - POSTGRES_USER=kefu_user
+      - POSTGRES_PASSWORD=kefu_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kefu-network
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - kefu-network
+    volumes:
+      - redis_data:/data
+
+  analytics-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=kefu_analytics
+      - POSTGRES_USER=analytics_user
+      - POSTGRES_PASSWORD=analytics_password
+    volumes:
+      - analytics_data:/var/lib/postgresql/data
+    networks:
+      - kefu-network
+    ports:
+      - "5433:5432"
+
+  analytics-redis:
+    image: redis:6-alpine
+    networks:
+      - kefu-network
+    volumes:
+      - analytics_redis_data:/data
+
+  # 监控服务
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - kefu-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - kefu-network
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
+  redis_data:
+  analytics_data:
+  analytics_redis_data:
+  prometheus_data:
+  grafana_data:
+  react-card-templates:
+
+networks:
+  kefu-network:
+    driver: bridge

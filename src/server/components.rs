@@ -1,16 +1,17 @@
 use std::sync::Arc;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use tracing::{info, error};
 use crate::config::{init_config, AppConfig};
 use crate::file_manager::FileManager;
 use crate::html_template_manager::HtmlTemplateManager;
+// use crate::react_template_manager::ReactTemplateManager;  // 暂时禁用
 use crate::redis_client::RedisManager;
 use crate::redis_pool::{RedisPoolManager, RedisPoolConfig};
 use crate::storage::LocalStorage;
 use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
-use crate::ai::AIManager;
+use crate::ai::{AIManager, EnhancedServiceConfig};
 use crate::auth::{KefuAuthManager, CustomerManager, HeartbeatService, start_heartbeat_service_background};
 use crate::platform;
 // Temporarily disabled enterprise modules for compilation
@@ -35,6 +36,7 @@ pub struct SystemComponents {
     pub storage: LocalStorage,
     pub file_manager: Arc<FileManager>,
     pub html_manager: Arc<HtmlTemplateManager>,
+    // pub react_manager: Arc<ReactTemplateManager>,  // 暂时禁用
     pub user_manager: Arc<UserManager>,
     pub voice_manager: Arc<VoiceMessageManager>,
     pub ws_manager: Arc<WebSocketManager>,
@@ -126,15 +128,23 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
 
     // 初始化HTML模板管理器
             let html_manager = match HtmlTemplateManager::new(config.storage.clone()).await {
-            Ok(manager) => {
-                info!("HTML模板管理器初始化成功");
-                Arc::new(manager)
+            Ok(manager) => Arc::new(manager),
+            Err(e) => {
+                error!("❌ HTML模板管理器初始化失败: {}", e);
+                return Err(anyhow!("HTML模板管理器初始化失败: {}", e));
             }
-        Err(e) => {
-            error!("HTML模板管理器初始化失败: {:?}", e);
-            return Err(e);
-        }
-    };
+        };
+
+        // let react_manager = match ReactTemplateManager::new(html_manager.clone(), config.storage.clone()).await {
+        //     Ok(manager) => {
+        //         info!("🎨 React模板管理器初始化成功");
+        //         Arc::new(manager)
+        //     },
+        //     Err(e) => {
+        //         error!("❌ React模板管理器初始化失败: {}", e);
+        //         return Err(anyhow!("React模板管理器初始化失败: {}", e));
+        //     }
+        // };
 
     // 初始化用户管理器
     let user_config_path = std::path::PathBuf::from(&config.storage.data_dir).join("users.json");
@@ -167,7 +177,7 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     info!("WebSocket管理器初始化成功");
 
     // 初始化AI管理器
-    let ai_manager = Arc::new(AIManager::new());
+    let ai_manager = Arc::new(AIManager::new(EnhancedServiceConfig::default()));
     info!("AI管理器初始化成功");
 
     // 初始化客服认证管理器

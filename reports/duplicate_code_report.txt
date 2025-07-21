@@ -1,0 +1,34 @@
+=== 重复代码检测报告 ===
+生成时间: Mon Jul 21 03:58:46 PM UTC 2025
+
+## 相似的函数模式
+### Redis操作模式
+/workspace/src/redis_pool.rs:    pub async fn get_connection(&self) -> Result<deadpool_redis::Connection> {
+/workspace/src/websocket_pool.rs:    pub async fn get_connection_info(&self, connection_id: &str) -> Option<WebSocketConnection> {
+/workspace/src/websocket_backup.rs:    pub async fn get_connection_stats(&self) -> ConnectionStats {
+/workspace/src/websocket.rs:    pub async fn get_connection_stats(&self) -> ConnectionStats {
+
+### 错误处理模式
+/workspace/src/health_monitor.rs:            Err(anyhow::anyhow!("Alert not found: {}", alert_id))
+/workspace/src/redis_pool.rs:                Err(anyhow::anyhow!("Redis连接获取超时"))
+/workspace/src/websocket_pool.rs:            return Err(anyhow::anyhow!("Connection pool is full"));
+/workspace/src/websocket_pool.rs:            return Err(anyhow::anyhow!("Too many connections from IP: {}", ip_address));
+/workspace/src/http_fallback.rs:            Err(anyhow::anyhow!("Session not found"))
+/workspace/src/http_fallback.rs:            Err(anyhow::anyhow!("Session not found"))
+/workspace/src/http_fallback.rs:            Err(anyhow::anyhow!("Session not found"))
+/workspace/src/websocket.rs:            return Err(anyhow::anyhow!("Failed to send welcome message"));
+/workspace/src/websocket.rs:            return Err(anyhow::anyhow!("No available kefu found"));
+/workspace/src/websocket.rs:        Err(anyhow::anyhow!("No available kefu found"))
+
+### 配置验证模式
+/workspace/src/websocket_pool.rs:            return Err(anyhow::anyhow!("Connection pool is full"));
+/workspace/src/websocket_pool.rs:            return Err(anyhow::anyhow!("Too many connections from IP: {}", ip_address));
+/workspace/src/websocket.rs:            return Err(anyhow::anyhow!("Failed to send welcome message"));
+/workspace/src/websocket.rs:            return Err(anyhow::anyhow!("No available kefu found"));
+/workspace/src/websocket.rs:            return Err(anyhow::anyhow!("发送者身份验证失败"));
+/workspace/src/auto_upgrade.rs:                return Err(anyhow::anyhow!("Unsupported upgrade target: {:?}", target_type));
+/workspace/src/auto_upgrade.rs:            return Err(anyhow::anyhow!("Session not found in upgrade queue"));
+/workspace/src/config/mod.rs:            return Err(anyhow::anyhow!("Primary domain cannot be empty"));
+/workspace/src/config/mod.rs:            return Err(anyhow::anyhow!("Server port cannot be 0"));
+/workspace/src/config/mod.rs:            return Err(anyhow::anyhow!("Development API URL cannot be empty"));
+

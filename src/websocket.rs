@@ -10,12 +10,12 @@ use chrono::Utc;
 use uuid::Uuid;
 use tracing::info;
 
-use crate::compression::{AdaptiveCompressor, CompressionConfig};
+// use crate::compression::{AdaptiveCompressor, CompressionConfig};  // 暂时禁用压缩功能
 use crate::message::{
     ChatMessage, ContentType, CustomerInfo, Message as AppMessage, OnlineStatus, UserConnection,
     UserInfo, UserType,
 };
-use crate::message_queue::{MessageQueueManager, MessageStatusSyncer};
+// use crate::message_queue::{MessageQueueManager, MessageStatusSyncer};  // 暂时禁用消息队列
 use crate::redis_client::RedisManager;
 use crate::storage::LocalStorage;
 
@@ -42,9 +42,9 @@ pub struct WebSocketManager {
     pub senders: UserSenders,
     pub redis: Arc<RwLock<RedisManager>>,
     pub storage: Arc<LocalStorage>,
-    pub compressor: Arc<RwLock<AdaptiveCompressor>>,
-    pub message_queue: Arc<MessageQueueManager>, // 企业级消息队列功能
-    pub status_syncer: Arc<MessageStatusSyncer>, // 企业级状态同步功能
+    // pub compressor: Arc<RwLock<AdaptiveCompressor>>,  // 暂时禁用压缩功能
+    // pub message_queue: Arc<MessageQueueManager>,  // 暂时禁用消息队列
+    // pub status_syncer: Arc<MessageStatusSyncer>,  // 暂时禁用状态同步
 }
 
 // 聊天消息参数结构体
@@ -78,24 +78,24 @@ struct VoiceMessageParams {
 
 impl WebSocketManager {
     pub fn new(redis: RedisManager, storage: LocalStorage) -> Self {
-        let compression_config = CompressionConfig::default();
-        let compressor = AdaptiveCompressor::new(compression_config);
+        // let compression_config = CompressionConfig::default();
+        // let compressor = AdaptiveCompressor::new(compression_config);
 
         // 创建消息队列管理器
-        let redis_conn = redis
-            .get_connection()
-            .expect("Failed to get Redis connection");
-        let message_queue = Arc::new(MessageQueueManager::new(redis_conn));
-        let status_syncer = Arc::new(MessageStatusSyncer::new(message_queue.clone()));
+        // let redis_conn = redis
+        //     .get_connection()
+        //     .expect("Failed to get Redis connection");
+        // let message_queue = Arc::new(MessageQueueManager::new(redis_conn));
+        // let status_syncer = Arc::new(MessageStatusSyncer::new(message_queue.clone()));
 
         Self {
             connections: Arc::new(RwLock::new(HashMap::new())),
             senders: Arc::new(RwLock::new(HashMap::new())),
             redis: Arc::new(RwLock::new(redis)),
             storage: Arc::new(storage),
-            compressor: Arc::new(RwLock::new(compressor)),
-            message_queue,
-            status_syncer,
+            // compressor: Arc::new(RwLock::new(compressor)),
+            // message_queue,
+            // status_syncer,
         }
     }
 
@@ -283,8 +283,8 @@ impl WebSocketManager {
         let senders_clone = self.senders.clone();
         let redis_clone = self.redis.clone();
         let storage_clone = self.storage.clone();
-        let _compressor_clone_send = self.compressor.clone();
-        let compressor_clone_recv = self.compressor.clone();
+        // let _compressor_clone_send = self.compressor.clone();
+        // let compressor_clone_recv = self.compressor.clone();
         let user_id_clone = user_id.clone();
 
         // 启动发送任务
@@ -344,10 +344,9 @@ impl WebSocketManager {
             senders: senders_clone,
             redis: redis_clone,
             storage: storage_clone,
-            compressor: compressor_clone_recv,
-            // 复用现有的message_queue和status_syncer
-            message_queue: self.message_queue.clone(),
-            status_syncer: self.status_syncer.clone(),
+            // compressor: compressor_clone_recv,
+            // message_queue: self.message_queue.clone(),
+            // status_syncer: self.status_syncer.clone(),
         });
 
         let receive_task = tokio::spawn(async move {
@@ -1655,8 +1654,8 @@ impl WebSocketManager {
 
         // 获取客服的活跃会话
         if let Ok(active_sessions) = redis.get_kefu_active_sessions(kefu_id).await {
-            for customer_id in active_sessions {
-                if let Some(customer_conn) = connections.get(&customer_id) {
+            for customer_id in active_sessions.iter() {
+                if let Some(customer_conn) = connections.get(customer_id) {
                     if customer_conn.user_type == UserType::Kehu {
                         // 获取最后一条消息
                         let last_message = self
@@ -1668,7 +1667,7 @@ impl WebSocketManager {
                             .unwrap_or_default();
 
                         customers.push(CustomerInfo {
-                            id: customer_id.clone(),
+                            id: customer_id.to_string(),
                             name: customer_conn.user_name.clone(),
                             status: customer_conn.status.clone(),
                             last_message,

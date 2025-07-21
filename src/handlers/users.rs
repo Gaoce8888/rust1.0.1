@@ -238,3 +238,12 @@ pub async fn handle_update_user_status(
 
     Ok(warp::reply::json(&response))
 }
+
+// TODO: 以下函数需要路由注册
+// - handle_list_users: 用户列表查询
+// - handle_create_user: 创建用户
+// - handle_get_user: 获取用户信息
+// - handle_update_user: 更新用户信息
+// - handle_delete_user: 删除用户
+// - handle_update_permissions: 更新用户权限
+// - handle_update_user_status: 更新用户状态

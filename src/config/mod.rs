@@ -14,12 +14,17 @@ use crate::config::address_manager::{
 
 
 /// 配置管理器
+#[allow(clippy::module_name_repetitions)]
 pub struct ConfigManager {
     address_manager: AddressManager,
 }
 
 impl ConfigManager {
     /// 创建新的配置管理器
+    ///
+    /// # Errors
+    ///
+    /// 当地址管理器创建失败时返回错误
     pub async fn new() -> anyhow::Result<Self> {
         let address_manager = AddressManager::new().await?;
         Ok(Self {
@@ -29,7 +34,8 @@ impl ConfigManager {
 
     /// 获取地址管理器
     #[allow(dead_code)]
-    pub fn address_manager(&self) -> &AddressManager {
+    #[must_use]
+    pub const fn address_manager(&self) -> &AddressManager {
         &self.address_manager
     }
 
@@ -40,6 +46,10 @@ impl ConfigManager {
     }
 
     /// 重新加载所有配置
+    ///
+    /// # Errors
+    ///
+    /// 当配置重新加载失败时返回错误
     #[allow(dead_code)]
     pub async fn reload_all(&mut self) -> anyhow::Result<()> {
         self.address_manager.reload_config().await?;
@@ -58,8 +68,8 @@ impl Default for ConfigManager {
         tokio::runtime::Runtime::new()
             .unwrap()
             .block_on(async {
-                ConfigManager::new().await.unwrap_or_else(|_| {
-                    ConfigManager {
+                Self::new().await.unwrap_or_else(|_| {
+                    Self {
                         address_manager: AddressManager::default(),
                     }
                 })
@@ -72,7 +82,12 @@ impl Default for ConfigManager {
 pub static mut GLOBAL_CONFIG: Option<ConfigManager> = None;
 
 /// 初始化全局配置
+///
+/// # Errors
+///
+/// 当全局配置初始化失败时返回错误
 #[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
 pub async fn init_global_config() -> anyhow::Result<()> {
     let config_manager = ConfigManager::new().await?;
     unsafe {
@@ -83,22 +98,31 @@ pub async fn init_global_config() -> anyhow::Result<()> {
 
 /// 获取全局配置管理器
 #[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
+#[must_use]
 pub fn get_global_config() -> Option<&'static ConfigManager> {
     unsafe { GLOBAL_CONFIG.as_ref() }
 }
 
 /// 获取全局配置管理器的可变引用
 #[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
+#[must_use]
 pub fn get_global_config_mut() -> Option<&'static mut ConfigManager> {
     unsafe { GLOBAL_CONFIG.as_mut() }
 }
 
 /// 配置验证器
 #[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
 pub struct ConfigValidator;
 
 impl ConfigValidator {
     /// 验证地址配置
+    ///
+    /// # Errors
+    ///
+    /// 当配置验证失败时返回错误
     #[allow(dead_code)]
     pub fn validate_address_config(config: &AddressConfig) -> anyhow::Result<()> {
         // 验证域名配置
@@ -124,7 +148,11 @@ impl ConfigValidator {
         Ok(())
     }
 
-    /// 验证WebSocket配置
+    /// `验证WebSocket配置`
+    ///
+    /// # Errors
+    ///
+    /// `当WebSocket配置验证失败时返回错误`
     #[allow(dead_code)]
     pub fn validate_websocket_config(config: &crate::config::address_manager::WebSocketConfig) -> anyhow::Result<()> {
         if config.heartbeat_interval == 0 {
@@ -139,6 +167,10 @@ impl ConfigValidator {
     }
 
     /// 验证安全配置
+    ///
+    /// # Errors
+    ///
+    /// 当安全配置验证失败时返回错误
     #[allow(dead_code)]
     pub fn validate_security_config(config: &crate::config::address_manager::SecurityConfig) -> anyhow::Result<()> {
         if config.rate_limit_window == 0 {
@@ -153,6 +185,10 @@ impl ConfigValidator {
     }
 
     /// 验证完整配置
+    ///
+    /// # Errors
+    ///
+    /// 当完整配置验证失败时返回错误
     #[allow(dead_code)]
     pub fn validate_full_config(config: &AddressConfig) -> anyhow::Result<()> {
         Self::validate_address_config(config)?;
@@ -164,11 +200,12 @@ impl ConfigValidator {
 
 /// 配置工具函数
 pub mod utils {
-    use super::*;
+    use super::AddressConfig;
     use std::collections::HashMap;
 
     /// 从环境变量构建配置
     #[allow(dead_code)]
+    #[must_use]
     pub fn build_config_from_env() -> AddressConfig {
         let mut config = AddressConfig::default();
         
@@ -184,20 +221,18 @@ pub mod utils {
         }
 
         if let Ok(api_url) = std::env::var("API_URL") {
-            match config.environment.current_environment.as_str() {
-                "development" => config.urls.dev_api_url = api_url,
-                "test" => config.urls.test_api_url = api_url,
-                "production" => config.urls.prod_api_url = api_url,
-                _ => config.urls.dev_api_url = api_url,
+            if config.environment.current_environment == "production" {
+                config.urls.prod_api_url = api_url;
+            } else {
+                config.urls.dev_api_url = api_url;
             }
         }
 
         if let Ok(ws_url) = std::env::var("WS_URL") {
-            match config.environment.current_environment.as_str() {
-                "development" => config.urls.dev_ws_url = ws_url,
-                "test" => config.urls.test_ws_url = ws_url,
-                "production" => config.urls.prod_ws_url = ws_url,
-                _ => config.urls.dev_ws_url = ws_url,
+            if config.environment.current_environment == "production" {
+                config.urls.prod_ws_url = ws_url;
+            } else {
+                config.urls.dev_ws_url = ws_url;
             }
         }
 
@@ -206,29 +241,19 @@ pub mod utils {
 
     /// 将配置转换为环境变量
     #[allow(dead_code)]
+    #[must_use]
     pub fn config_to_env_vars(config: &AddressConfig) -> HashMap<String, String> {
         let mut env_vars = HashMap::new();
         
         env_vars.insert("APP_ENV".to_string(), config.environment.current_environment.clone());
         env_vars.insert("SERVER_PORT".to_string(), config.ports.server_port.to_string());
         
-        match config.environment.current_environment.as_str() {
-            "development" => {
-                env_vars.insert("API_URL".to_string(), config.urls.dev_api_url.clone());
-                env_vars.insert("WS_URL".to_string(), config.urls.dev_ws_url.clone());
-            }
-            "test" => {
-                env_vars.insert("API_URL".to_string(), config.urls.test_api_url.clone());
-                env_vars.insert("WS_URL".to_string(), config.urls.test_ws_url.clone());
-            }
-            "production" => {
-                env_vars.insert("API_URL".to_string(), config.urls.prod_api_url.clone());
-                env_vars.insert("WS_URL".to_string(), config.urls.prod_ws_url.clone());
-            }
-            _ => {
-                env_vars.insert("API_URL".to_string(), config.urls.dev_api_url.clone());
-                env_vars.insert("WS_URL".to_string(), config.urls.dev_ws_url.clone());
-            }
+        if config.environment.current_environment == "production" {
+            env_vars.insert("API_URL".to_string(), config.urls.prod_api_url.clone());
+            env_vars.insert("WS_URL".to_string(), config.urls.prod_ws_url.clone());
+        } else {
+            env_vars.insert("API_URL".to_string(), config.urls.dev_api_url.clone());
+            env_vars.insert("WS_URL".to_string(), config.urls.dev_ws_url.clone());
         }
         
         env_vars
@@ -236,6 +261,7 @@ pub mod utils {
 
     /// 生成配置文档
     #[allow(dead_code)]
+    #[must_use]
     pub fn generate_config_docs(config: &AddressConfig) -> String {
         format!(
             "# 配置文档\n\n## 环境: {}\n## 服务器端口: {}\n## API URL: {}\n## WebSocket URL: {}",
@@ -280,4 +306,5 @@ mod tests {
 
 pub mod compatibility;
 
+#[allow(clippy::module_name_repetitions)]
 pub use compatibility::{AppConfig, StorageConfig, init_config};

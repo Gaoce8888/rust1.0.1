@@ -42,7 +42,7 @@ pub struct MessageCompressor {
 }
 
 impl MessageCompressor {
-    pub fn new(config: CompressionConfig) -> Self {
+    # pub fn new(config: CompressionConfig) -> Self {
         Self { config }
     }
 
@@ -320,7 +320,7 @@ pub struct AdaptiveCompressor {
 }
 
 impl AdaptiveCompressor {
-    pub fn new(config: CompressionConfig) -> Self {
+    # pub fn new(config: CompressionConfig) -> Self {
         Self {
             compressor: MessageCompressor::new(config),
             stats: CompressionStats::new(),

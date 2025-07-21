@@ -2,48 +2,322 @@
  * 优化状态管理Hook
  * 从企业级客服端案例移植的高性能状态管理
  */
-import { useRef, useCallback, useMemo, useEffect, useState } from 'react';
+import { useReducer, useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
-// 状态变化检测器
-class StateChangeDetector {
-  constructor(debounceMs = 50) {
-    this.debounceMs = debounceMs;
-    this.lastCheck = 0;
-    this.cache = new Map();
-  }
+// 优化的useReducer Hook
+export const useOptimizedReducer = (reducer, initialState, init) => {
+  const [state, dispatch] = useReducer(reducer, initialState, init);
   
-  detectChanges(newState) {
-    const now = Date.now();
-    const changes = [];
-    
-    // 防抖处理
-    if (now - this.lastCheck < this.debounceMs) {
-      return changes;
+  const optimizedDispatch = useCallback(dispatch, []);
+  
+  return [state, optimizedDispatch];
+};
+
+// 防抖状态Hook
+export const useDebouncedState = (initialValue, delay = 300) => {
+  const [value, setValue] = useState(initialValue);
+  const [debouncedValue, setDebouncedValue] = useState(initialValue);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-    
-    this.lastCheck = now;
-    
-    // 检测变化
-    if (typeof newState === 'object' && newState !== null) {
-      const oldState = this.cache.get('state');
-      if (oldState) {
-        Object.keys(newState).forEach(key => {
-          if (newState[key] !== oldState[key]) {
-            changes.push({
-              field: key,
-              oldValue: oldState[key],
-              newValue: newState[key],
-              timestamp: now
-            });
-          }
-        });
+
+    timeoutRef.current = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-      this.cache.set('state', { ...newState });
+    };
+  }, [value, delay]);
+
+  return [value, setValue, debouncedValue];
+};
+
+// 节流状态Hook
+export const useThrottledState = (initialValue, delay = 100) => {
+  const [value, setValue] = useState(initialValue);
+  const [throttledValue, setThrottledValue] = useState(initialValue);
+  const lastUpdateRef = useRef(0);
+
+  const setThrottledValueCallback = useCallback((newValue) => {
+    const now = Date.now();
+    if (now - lastUpdateRef.current >= delay) {
+      setThrottledValue(newValue);
+      lastUpdateRef.current = now;
     }
+  }, [delay]);
+
+  useEffect(() => {
+    setThrottledValueCallback(value);
+  }, [value, setThrottledValueCallback]);
+
+  return [value, setValue, throttledValue];
+};
+
+// 优化的列表状态Hook
+export const useOptimizedList = (initialItems = []) => {
+  const [items, setItems] = useState(initialItems);
+  const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  // 过滤和排序的缓存结果
+  const processedItems = useMemo(() => {
+    let result = [...items];
+
+    // 应用过滤器
+    if (Object.keys(filters).length > 0) {
+      result = result.filter(item => {
+        return Object.entries(filters).every(([key, value]) => {
+          if (!value) return true;
+          return item[key]?.toString().toLowerCase().includes(value.toLowerCase());
+        });
+      });
+    }
+
+    // 应用排序
+    if (sortBy) {
+      result.sort((a, b) => {
+        const aVal = a[sortBy];
+        const bVal = b[sortBy];
+        
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [items, filters, sortBy, sortDirection]);
+
+  const addItem = useCallback((item) => {
+    setItems(prev => [...prev, item]);
+  }, []);
+
+  const removeItem = useCallback((id) => {
+    setItems(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  const updateItem = useCallback((id, updates) => {
+    setItems(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  }, []);
+
+  const clearItems = useCallback(() => {
+    setItems([]);
+  }, []);
+
+  return {
+    items: processedItems,
+    originalItems: items,
+    filters,
+    sortBy,
+    sortDirection,
+    setFilters,
+    setSortBy,
+    setSortDirection,
+    addItem,
+    removeItem,
+    updateItem,
+    clearItems,
+    setItems
+  };
+};
+
+// 优化的表单状态Hook
+export const useOptimizedForm = (initialValues = {}, validationSchema = {}) => {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 验证函数
+  const validate = useCallback((fieldValues = values) => {
+    const newErrors = {};
     
-    return changes;
-  }
-}
+    Object.keys(validationSchema).forEach(field => {
+      const value = fieldValues[field];
+      const rules = validationSchema[field];
+      
+      if (rules.required && !value) {
+        newErrors[field] = rules.required;
+      } else if (rules.pattern && !rules.pattern.test(value)) {
+        newErrors[field] = rules.pattern.message;
+      } else if (rules.minLength && value.length < rules.minLength) {
+        newErrors[field] = `最少需要 ${rules.minLength} 个字符`;
+      } else if (rules.maxLength && value.length > rules.maxLength) {
+        newErrors[field] = `最多允许 ${rules.maxLength} 个字符`;
+      }
+    });
+    
+    return newErrors;
+  }, [values, validationSchema]);
+
+  // 设置字段值
+  const setFieldValue = useCallback((field, value) => {
+    setValues(prev => ({ ...prev, [field]: value }));
+    
+    // 如果字段已被触摸，立即验证
+    if (touched[field]) {
+      const fieldErrors = validate({ [field]: value });
+      setErrors(prev => ({ ...prev, [field]: fieldErrors[field] }));
+    }
+  }, [touched, validate]);
+
+  // 设置字段触摸状态
+  const setFieldTouched = useCallback((field, isTouched = true) => {
+    setTouched(prev => ({ ...prev, [field]: isTouched }));
+    
+    if (isTouched) {
+      const fieldErrors = validate({ [field]: values[field] });
+      setErrors(prev => ({ ...prev, [field]: fieldErrors[field] }));
+    }
+  }, [values, validate]);
+
+  // 提交表单
+  const handleSubmit = useCallback(async (onSubmit) => {
+    const formErrors = validate();
+    setErrors(formErrors);
+    
+    if (Object.keys(formErrors).length === 0) {
+      setIsSubmitting(true);
+      try {
+        await onSubmit(values);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  }, [values, validate]);
+
+  // 重置表单
+  const resetForm = useCallback((newValues = initialValues) => {
+    setValues(newValues);
+    setErrors({});
+    setTouched({});
+    setIsSubmitting(false);
+  }, [initialValues]);
+
+  return {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    setFieldValue,
+    setFieldTouched,
+    handleSubmit,
+    resetForm,
+    setValues,
+    setErrors,
+    setTouched
+  };
+};
+
+// 优化的异步数据Hook
+export const useOptimizedAsync = (fetcher, deps = [], options = {}) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
+  
+  const {
+    immediate = true,
+    cacheTime = 60000, // 1分钟缓存
+    retryCount = 3,
+    retryDelay = 1000
+  } = options;
+
+  const execute = useCallback(async (...args) => {
+    // 检查缓存
+    const now = Date.now();
+    if (cacheTime > 0 && lastFetchTime > 0 && (now - lastFetchTime) < cacheTime) {
+      return data;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    let lastError;
+    for (let i = 0; i < retryCount; i++) {
+      try {
+        const result = await fetcher(...args);
+        setData(result);
+        setLastFetchTime(now);
+        setLoading(false);
+        return result;
+      } catch (err) {
+        lastError = err;
+        if (i < retryCount - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
+        }
+      }
+    }
+
+    setError(lastError);
+    setLoading(false);
+    throw lastError;
+  }, [fetcher, cacheTime, lastFetchTime, data, retryCount, retryDelay]);
+
+  useEffect(() => {
+    if (immediate) {
+      execute();
+    }
+  }, [execute, immediate, ...deps]);
+
+  return {
+    data,
+    loading,
+    error,
+    execute,
+    refetch: execute
+  };
+};
+
+// 优化的本地存储Hook
+export const useOptimizedStorage = (key, initialValue, options = {}) => {
+  const {
+    storage = localStorage,
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+    onError = console.error
+  } = options;
+
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = storage.getItem(key);
+      return item ? deserialize(item) : initialValue;
+    } catch (error) {
+      onError(`Error reading localStorage key "${key}":`, error);
+      return initialValue;
+    }
+  });
+
+  const setValue = useCallback((value) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      storage.setItem(key, serialize(valueToStore));
+    } catch (error) {
+      onError(`Error setting localStorage key "${key}":`, error);
+    }
+  }, [key, storedValue, storage, serialize, onError]);
+
+  const removeValue = useCallback(() => {
+    try {
+      setStoredValue(initialValue);
+      storage.removeItem(key);
+    } catch (error) {
+      onError(`Error removing localStorage key "${key}":`, error);
+    }
+  }, [key, initialValue, storage, onError]);
+
+  return [storedValue, setValue, removeValue];
+};
 
 // 计算用户差异
 export const calculateUserDiffs = (prevUsers, newUsers) => {

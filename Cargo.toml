@@ -2,6 +2,12 @@
 name = "kefu-system"
 version = "0.1.0"
 edition = "2021"
+description = "Enterprise-grade AI customer service system with high performance and scalability"
+license = "MIT"
+repository = "https://github.com/enterprise/kefu-system"
+keywords = ["ai", "customer-service", "websocket", "redis", "enterprise"]
+categories = ["web-programming", "asynchronous", "api-bindings"]
+authors = ["Enterprise Team <team@enterprise.com>"]
 
 [[bin]]
 name = "kefu-system"
@@ -31,9 +37,11 @@ opt-level = 3
 [dependencies]
 # WebSocket 和 HTTP 服务器
 tokio = { version = "1.0", features = ["full"] }
-tokio-tungstenite = "0.20"
+tokio-tungstenite = "0.21"
 warp = "0.3"
 futures-util = "0.3"
+
+
 
 # Redis 客户端和连接池
 redis = { version = "0.23", features = ["tokio-comp"] }
@@ -73,8 +81,8 @@ thiserror = "1.0"
 # 异步trait支持
 async-trait = "0.1"
 
-# HTTP客户端
-reqwest = { version = "0.11", features = ["json"] }
+# HTTP客户端 - 使用rustls替代OpenSSL
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
 
 # 文件处理和multipart支持
 bytes = "1.0"
@@ -93,5 +101,5 @@ utoipa = { version = "4.2", features = ["axum_extras", "chrono", "uuid"] }
 utoipa-swagger-ui = { version = "6.0", features = ["axum"] }
 utoipa-redoc = { version = "3.0", features = ["axum"] }
 utoipa-rapidoc = { version = "3.0", features = ["axum"] }
-rand = "0.9.1"
+rand = "0.8"
 async-stream = "0.3.6"

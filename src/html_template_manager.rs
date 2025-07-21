@@ -38,6 +38,52 @@ pub struct HtmlTemplate {
     pub version: u32,
     pub tags: Vec<String>,
     pub usage_count: u64,
+    /// 新增：React组件配置
+    pub react_component: Option<ReactComponentConfig>,
+    /// 新增：自适应配置
+    pub adaptive_config: Option<AdaptiveConfig>,
+}
+
+/// React组件配置
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ReactComponentConfig {
+    /// 组件名称
+    pub component_name: String,
+    /// 组件类型：card, button, form, list, chart等
+    pub component_type: String,
+    /// 组件属性配置
+    pub props: HashMap<String, serde_json::Value>,
+    /// 组件样式配置
+    pub styles: Option<HashMap<String, serde_json::Value>>,
+    /// 组件事件处理
+    pub events: Option<HashMap<String, String>>,
+    /// 组件依赖
+    pub dependencies: Option<Vec<String>>,
+    /// 组件版本
+    pub version: Option<String>,
+}
+
+/// 自适应配置
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct AdaptiveConfig {
+    /// 是否启用自适应
+    pub enabled: bool,
+    /// 最小宽度
+    pub min_width: Option<u32>,
+    /// 最大宽度
+    pub max_width: Option<u32>,
+    /// 最小高度
+    pub min_height: Option<u32>,
+    /// 最大高度
+    pub max_height: Option<u32>,
+    /// 自适应模式：fit, scroll, scale
+    pub mode: String,
+    /// 容器类型：dialog, modal, inline
+    pub container_type: String,
+    /// 响应式断点
+    pub breakpoints: Option<HashMap<String, serde_json::Value>>,
+    /// 自定义CSS类
+    pub custom_classes: Option<Vec<String>>,
 }
 
 /// 模板变量定义
@@ -72,6 +118,25 @@ pub struct HtmlRenderRequest {
     pub user_id: String,
     pub callback_url: Option<String>,
     pub callback_data: Option<serde_json::Value>,
+    /// 新增：渲染模式
+    pub render_mode: Option<String>, // "html", "react", "hybrid"
+    /// 新增：客户端配置
+    pub client_config: Option<ClientConfig>,
+}
+
+/// 客户端配置
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ClientConfig {
+    /// 容器宽度
+    pub container_width: Option<u32>,
+    /// 容器高度
+    pub container_height: Option<u32>,
+    /// 设备类型
+    pub device_type: Option<String>, // "desktop", "tablet", "mobile"
+    /// 主题
+    pub theme: Option<String>, // "light", "dark", "auto"
+    /// 语言
+    pub language: Option<String>,
 }
 
 /// HTML模板渲染响应
@@ -84,6 +149,27 @@ pub struct HtmlRenderResponse {
     pub rendered_js: Option<String>,
     pub success: bool,
     pub message: String,
+    /// 新增：React组件数据
+    pub react_component_data: Option<ReactComponentData>,
+    /// 新增：自适应样式
+    pub adaptive_styles: Option<String>,
+}
+
+/// React组件数据
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ReactComponentData {
+    /// 组件名称
+    pub component_name: String,
+    /// 组件属性
+    pub props: serde_json::Value,
+    /// 组件样式
+    pub styles: Option<serde_json::Value>,
+    /// 组件事件
+    pub events: Option<serde_json::Value>,
+    /// 组件依赖
+    pub dependencies: Option<Vec<String>>,
+    /// 组件版本
+    pub version: Option<String>,
 }
 
 /// HTML模板创建请求
@@ -239,6 +325,8 @@ impl HtmlTemplateManager {
             version: 1,
             tags: request.tags,
             usage_count: 0,
+            react_component: None,
+            adaptive_config: None,
         };
 
         // 保存模板
@@ -465,8 +553,16 @@ impl HtmlTemplateManager {
         // 验证必需变量
         self.validate_template_variables(&template.variables, &request.variables)?;
 
-        // 渲染HTML内容
-        let rendered_html = self.render_content(&template.content, &request.variables)?;
+        // 确定渲染模式
+        let render_mode = request.render_mode.as_deref().unwrap_or("html");
+        
+        // 根据渲染模式处理
+        let (rendered_html, react_component_data, adaptive_styles) = match render_mode {
+            "react" => self.render_react_component(&template, &request).await?,
+            "hybrid" => self.render_hybrid(&template, &request).await?,
+            _ => self.render_html_only(&template, &request).await?,
+        };
+
         let rendered_css = if let Some(ref css) = template.css {
             Some(self.render_content(css, &request.variables)?)
         } else {
@@ -484,7 +580,7 @@ impl HtmlTemplateManager {
         // 更新使用计数
         self.increment_usage_count(&request.template_id).await?;
 
-        info!("HTML模板渲染成功: {}", message_id);
+        info!("HTML模板渲染成功: {} (模式: {})", message_id, render_mode);
 
         Ok(HtmlRenderResponse {
             message_id,
@@ -494,6 +590,8 @@ impl HtmlTemplateManager {
             rendered_js,
             success: true,
             message: "模板渲染成功".to_string(),
+            react_component_data,
+            adaptive_styles,
         })
     }
 
@@ -809,5 +907,306 @@ impl HtmlTemplateManager {
             self.save_template(&template_clone).await?;
         }
         Ok(())
+    }
+
+    /// 渲染纯HTML模式
+    async fn render_html_only(
+        &self,
+        template: &HtmlTemplate,
+        request: &HtmlRenderRequest,
+    ) -> Result<(String, Option<ReactComponentData>, Option<String>)> {
+        let rendered_html = self.render_content(&template.content, &request.variables)?;
+        Ok((rendered_html, None, None))
+    }
+
+    /// 渲染React组件模式
+    async fn render_react_component(
+        &self,
+        template: &HtmlTemplate,
+        request: &HtmlRenderRequest,
+    ) -> Result<(String, Option<ReactComponentData>, Option<String>)> {
+        // 检查是否有React组件配置
+        let react_config = template.react_component.as_ref()
+            .ok_or_else(|| anyhow!("模板未配置React组件"))?;
+
+        // 生成React组件数据
+        let component_data = self.generate_react_component_data(react_config, &request.variables)?;
+        
+        // 生成自适应样式
+        let adaptive_styles = if let Some(ref adaptive_config) = template.adaptive_config {
+            Some(self.generate_adaptive_styles(adaptive_config, &request.client_config)?)
+        } else {
+            None
+        };
+
+        // 生成容器HTML
+        let container_html = self.generate_react_container_html(&component_data, &adaptive_styles)?;
+
+        Ok((container_html, Some(component_data), adaptive_styles))
+    }
+
+    /// 渲染混合模式（HTML + React）
+    async fn render_hybrid(
+        &self,
+        template: &HtmlTemplate,
+        request: &HtmlRenderRequest,
+    ) -> Result<(String, Option<ReactComponentData>, Option<String>)> {
+        // 先渲染HTML内容
+        let html_content = self.render_content(&template.content, &request.variables)?;
+        
+        // 如果有React组件配置，添加React组件
+        let (react_data, adaptive_styles) = if let Some(ref react_config) = template.react_component {
+            let component_data = self.generate_react_component_data(react_config, &request.variables)?;
+            let styles = if let Some(ref adaptive_config) = template.adaptive_config {
+                Some(self.generate_adaptive_styles(adaptive_config, &request.client_config)?)
+            } else {
+                None
+            };
+            (Some(component_data), styles)
+        } else {
+            (None, None)
+        };
+
+        // 组合HTML和React组件
+        let combined_html = if let Some(ref _react_data) = react_data {
+            format!(
+                "{}\n<div id=\"react-container-{}\" class=\"react-component-container\"></div>",
+                html_content,
+                Uuid::new_v4().simple()
+            )
+        } else {
+            html_content
+        };
+
+        Ok((combined_html, react_data, adaptive_styles))
+    }
+
+    /// 生成React组件数据
+    fn generate_react_component_data(
+        &self,
+        react_config: &ReactComponentConfig,
+        variables: &HashMap<String, serde_json::Value>,
+    ) -> Result<ReactComponentData> {
+        // 处理组件属性，支持变量替换
+        let mut processed_props = HashMap::new();
+        for (key, value) in &react_config.props {
+            let processed_value = self.process_react_prop_value(value, variables)?;
+            processed_props.insert(key.clone(), processed_value);
+        }
+
+        // 处理样式
+        let processed_styles = if let Some(ref styles) = react_config.styles {
+            let mut processed = HashMap::new();
+            for (key, value) in styles {
+                let processed_value = self.process_react_prop_value(value, variables)?;
+                processed.insert(key.clone(), processed_value);
+            }
+            Some(serde_json::to_value(processed)?)
+        } else {
+            None
+        };
+
+        // 处理事件
+        let processed_events = if let Some(ref events) = react_config.events {
+            let mut processed = HashMap::new();
+            for (key, value) in events {
+                let processed_value = self.render_content(value, variables)?;
+                processed.insert(key.clone(), processed_value);
+            }
+            Some(serde_json::to_value(processed)?)
+        } else {
+            None
+        };
+
+        Ok(ReactComponentData {
+            component_name: react_config.component_name.clone(),
+            props: serde_json::to_value(processed_props)?,
+            styles: processed_styles,
+            events: processed_events,
+            dependencies: react_config.dependencies.clone(),
+            version: react_config.version.clone(),
+        })
+    }
+
+    /// 处理React属性值
+    fn process_react_prop_value(
+        &self,
+        value: &serde_json::Value,
+        variables: &HashMap<String, serde_json::Value>,
+    ) -> Result<serde_json::Value> {
+        match value {
+            serde_json::Value::String(s) => {
+                // 如果是字符串，尝试变量替换
+                let processed = self.render_content(s, variables)?;
+                Ok(serde_json::Value::String(processed))
+            }
+            serde_json::Value::Object(obj) => {
+                // 如果是对象，递归处理
+                let mut processed = HashMap::new();
+                for (key, val) in obj {
+                    let processed_val = self.process_react_prop_value(val, variables)?;
+                    processed.insert(key.clone(), processed_val);
+                }
+                Ok(serde_json::to_value(processed)?)
+            }
+            serde_json::Value::Array(arr) => {
+                // 如果是数组，递归处理每个元素
+                let mut processed = Vec::new();
+                for item in arr {
+                    let processed_item = self.process_react_prop_value(item, variables)?;
+                    processed.push(processed_item);
+                }
+                Ok(serde_json::to_value(processed)?)
+            }
+            _ => Ok(value.clone()), // 其他类型直接返回
+        }
+    }
+
+    /// 生成自适应样式
+    fn generate_adaptive_styles(
+        &self,
+        adaptive_config: &AdaptiveConfig,
+        _client_config: &Option<ClientConfig>,
+    ) -> Result<String> {
+        if !adaptive_config.enabled {
+            return Ok(String::new());
+        }
+
+        let mut styles = Vec::new();
+        
+        // 基础容器样式
+        styles.push(format!(
+            ".adaptive-container-{} {{",
+            Uuid::new_v4().simple()
+        ));
+        
+        // 设置最小/最大尺寸
+        if let Some(min_width) = adaptive_config.min_width {
+            styles.push(format!("  min-width: {}px;", min_width));
+        }
+        if let Some(max_width) = adaptive_config.max_width {
+            styles.push(format!("  max-width: {}px;", max_width));
+        }
+        if let Some(min_height) = adaptive_config.min_height {
+            styles.push(format!("  min-height: {}px;", min_height));
+        }
+        if let Some(max_height) = adaptive_config.max_height {
+            styles.push(format!("  max-height: {}px;", max_height));
+        }
+
+        // 根据自适应模式设置样式
+        match adaptive_config.mode.as_str() {
+            "fit" => {
+                styles.push("  width: 100%;".to_string());
+                styles.push("  height: auto;".to_string());
+                styles.push("  object-fit: contain;".to_string());
+            }
+            "scroll" => {
+                styles.push("  width: 100%;".to_string());
+                styles.push("  height: 100%;".to_string());
+                styles.push("  overflow: auto;".to_string());
+            }
+            "scale" => {
+                styles.push("  width: 100%;".to_string());
+                styles.push("  height: 100%;".to_string());
+                styles.push("  transform: scale(1);".to_string());
+                styles.push("  transform-origin: top left;".to_string());
+            }
+            _ => {
+                styles.push("  width: 100%;".to_string());
+                styles.push("  height: auto;".to_string());
+            }
+        }
+
+        // 根据容器类型设置样式
+        match adaptive_config.container_type.as_str() {
+            "dialog" => {
+                styles.push("  position: relative;".to_string());
+                styles.push("  margin: 10px;".to_string());
+                styles.push("  border-radius: 8px;".to_string());
+                styles.push("  box-shadow: 0 2px 10px rgba(0,0,0,0.1);".to_string());
+            }
+            "modal" => {
+                styles.push("  position: fixed;".to_string());
+                styles.push("  top: 50%;".to_string());
+                styles.push("  left: 50%;".to_string());
+                styles.push("  transform: translate(-50%, -50%);".to_string());
+                styles.push("  z-index: 1000;".to_string());
+            }
+            "inline" => {
+                styles.push("  display: inline-block;".to_string());
+                styles.push("  vertical-align: top;".to_string());
+            }
+            _ => {}
+        }
+
+        // 添加自定义CSS类
+        if let Some(ref custom_classes) = adaptive_config.custom_classes {
+            for class in custom_classes {
+                styles.push(format!("  /* 自定义类: {} */", class));
+            }
+        }
+
+        styles.push("}".to_string());
+
+        // 添加响应式断点
+        if let Some(ref breakpoints) = adaptive_config.breakpoints {
+            for (breakpoint, config) in breakpoints {
+                styles.push(format!("@media (max-width: {}px) {{", breakpoint));
+                if let Some(config_obj) = config.as_object() {
+                    for (property, value) in config_obj {
+                        styles.push(format!("  {}: {};", property, value));
+                    }
+                }
+                styles.push("}".to_string());
+            }
+        }
+
+        Ok(styles.join("\n"))
+    }
+
+    /// 生成React容器HTML
+    fn generate_react_container_html(
+        &self,
+        component_data: &ReactComponentData,
+        adaptive_styles: &Option<String>,
+    ) -> Result<String> {
+        let container_id = format!("react-container-{}", Uuid::new_v4().simple());
+        
+        let mut html = format!(
+            r#"<div id="{}" class="react-component-container">"#,
+            container_id
+        );
+
+        // 添加自适应样式
+        if let Some(ref styles) = adaptive_styles {
+            html.push_str(&format!("\n<style>{}</style>", styles));
+        }
+
+        // 添加组件数据
+        html.push_str(&format!(
+            r#"
+<script type="application/json" id="react-component-data-{}">
+{{
+  "componentName": "{}",
+  "props": {},
+  "styles": {},
+  "events": {},
+  "dependencies": {},
+  "version": "{}"
+}}
+</script>"#,
+            container_id,
+            component_data.component_name,
+            component_data.props,
+            component_data.styles.as_ref().unwrap_or(&serde_json::Value::Null),
+            component_data.events.as_ref().unwrap_or(&serde_json::Value::Null),
+            serde_json::to_value(component_data.dependencies.as_ref().unwrap_or(&Vec::new()))?,
+            component_data.version.as_deref().unwrap_or("1.0.0")
+        ));
+
+        html.push_str("\n</div>");
+        
+        Ok(html)
     }
 }

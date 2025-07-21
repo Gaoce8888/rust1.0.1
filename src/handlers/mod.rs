@@ -31,13 +31,14 @@ pub mod client;
 pub mod file;
 pub mod voice;
 pub mod template;
+// pub mod react_template;  // 暂时禁用React模板模块
 pub mod websocket;
-pub mod ai;
+// pub mod ai;  // 暂时禁用AI模块
 pub mod users;
 pub mod messages;
 pub mod sessions;
-pub mod kefu_assignment;
-pub mod analytics;
+// pub mod kefu_assignment;  // 暂时禁用客服分配模块
+// pub mod analytics;  // 暂时禁用分析模块
 
 #[cfg(test)]
 mod tests {

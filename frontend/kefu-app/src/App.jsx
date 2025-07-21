@@ -26,6 +26,12 @@ import MessagingChatMessage, { MessageType } from "./messaging-chat-message";
 import EnhancedPromptInput from "./enhanced-prompt-input";
 import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
+import { initializeMonitoring, monitorWebSocket } from "./utils/monitoring";
+import { validateMessageContent, validateCustomerData, escapeHtml } from "./utils/validation";
+// import ReactCardRenderer from "./components/ReactCardRenderer";  // 暂时禁用
+// import AdaptiveConfigPanel from "./components/AdaptiveConfigPanel";  // 暂时禁用
+// import AIComponentGenerator from "./components/AIComponentGenerator";  // 暂时禁用
+import adaptiveConfigManager from "./utils/adaptiveConfig";
 
 // 主应用组件 - 客服聊天界面
 export default function Component() {
@@ -37,6 +43,8 @@ export default function Component() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isAdaptiveConfigOpen, setIsAdaptiveConfigOpen] = React.useState(false);
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState(null);
   const [customers, setCustomers] = React.useState([]);
@@ -54,6 +62,11 @@ export default function Component() {
       '如果您还有其他问题，随时可以咨询我。'
     ]
   });
+
+  // 初始化监控系统
+  React.useEffect(() => {
+    initializeMonitoring();
+  }, []);
 
   // 检查登录状态
   React.useEffect(() => {
@@ -98,192 +111,285 @@ export default function Component() {
   React.useEffect(() => {
     if (!isLoggedIn || !currentUser) return;
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:6006/ws';
-    const client = getWebSocketClient(wsUrl, {
-      userId: currentUser?.id,
-      userType: currentUser?.type,
-      sessionToken: currentUser?.sessionToken,
-    });
+    let mounted = true; // 避免竞态条件
+    let client = null;
 
-    // 设置事件监听
-    client.on('connected', () => {
-      setConnectionStatus('connected');
-      console.log('WebSocket连接成功');
-      
-      // 连接成功后，请求在线用户列表
-      setTimeout(() => {
-        console.log('请求在线用户列表...');
-        client.send({
-          type: 'GetOnlineUsers',
-          user_id: currentUser?.id,
-          timestamp: new Date().toISOString()
+    const initWebSocket = async () => {
+      try {
+        const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:6006/ws';
+        client = getWebSocketClient(wsUrl, {
+          userId: currentUser?.id,
+          userType: currentUser?.type,
+          sessionToken: currentUser?.sessionToken,
         });
-      }, 500);
-    });
 
-    client.on('disconnected', () => {
-      setConnectionStatus('disconnected');
-      console.log('WebSocket连接断开');
-    });
-
-    client.on('error', (error) => {
-      console.error('WebSocket错误:', error);
-      setConnectionStatus('disconnected');
-    });
-
-    client.on('Chat', (data) => {
-      handleReceiveMessage(data);
-    });
-
-    client.on('message', (data) => {
-      handleReceiveMessage(data);
-    });
-    
-    // 监听在线用户列表更新
-    client.on('OnlineUsers', (data) => {
-      console.log('收到在线用户列表:', data);
-      if (data.users) {
-        // 过滤出客户列表（客服只需要看到客户）
-        const onlineCustomers = data.users.filter(user => user.user_type === 'Kehu');
-        updateOnlineCustomers(onlineCustomers);
-      }
-    });
-    
-    // 监听用户加入
-    client.on('UserJoined', (data) => {
-      console.log('用户加入:', data);
-      if (data.user_type === 'Kehu') {
-        // 如果是客户加入，添加到客户列表
-        addNewCustomer({
-          id: data.user_id,
-          name: data.user_name,
-          status: 'online',
-          lastMessage: '新客户上线',
-          timestamp: new Date(data.timestamp),
-          unreadCount: 0,
-          messages: []
+        // 设置事件监听
+        client.on('connected', () => {
+          if (!mounted) return;
+          setConnectionStatus('connected');
+          console.log('WebSocket连接成功');
+          
+          // 连接成功后，请求在线用户列表
+          setTimeout(() => {
+            if (!mounted) return;
+            console.log('请求在线用户列表...');
+            client?.send({
+              type: 'GetOnlineUsers',
+              user_id: currentUser?.id,
+              timestamp: new Date().toISOString()
+            });
+          }, 500);
         });
+
+        client.on('disconnected', () => {
+          if (!mounted) return;
+          setConnectionStatus('disconnected');
+          console.log('WebSocket连接断开');
+        });
+
+        client.on('error', (error) => {
+          if (!mounted) return;
+          console.error('WebSocket错误:', error);
+          setConnectionStatus('disconnected');
+        });
+
+        client.on('Chat', (data) => {
+          if (!mounted) return;
+          handleReceiveMessage(data);
+        });
+
+        client.on('message', (data) => {
+          if (!mounted) return;
+          handleReceiveMessage(data);
+        });
+        
+        // 监听在线用户列表更新
+        client.on('OnlineUsers', (data) => {
+          if (!mounted) return;
+          console.log('收到在线用户列表:', data);
+          if (data?.users) {
+            // 过滤出客户列表（客服只需要看到客户）
+            const onlineCustomers = data.users.filter(user => user?.user_type === 'Kehu');
+            updateOnlineCustomers(onlineCustomers);
+          }
+        });
+        
+        // 监听用户加入
+        client.on('UserJoined', (data) => {
+          if (!mounted) return;
+          console.log('用户加入:', data);
+          if (data?.user_type === 'Kehu') {
+            // 如果是客户加入，添加到客户列表
+            addNewCustomer({
+              id: data.user_id,
+              name: data.user_name,
+              status: 'online',
+              lastMessage: '新客户上线',
+              timestamp: new Date(data.timestamp),
+              unreadCount: 0,
+              messages: []
+            });
+          }
+        });
+        
+        // 监听用户离开
+        client.on('UserLeft', (data) => {
+          if (!mounted) return;
+          console.log('用户离开:', data);
+          if (data?.user_type === 'Kehu') {
+            // 如果是客户离开，更新客户状态
+            updateCustomerStatus(data.user_id, 'offline');
+          }
+        });
+        
+        // 监听状态更新
+        client.on('Status', (data) => {
+          if (!mounted) return;
+          console.log('用户状态更新:', data);
+          updateCustomerStatus(data.user_id, data.status);
+        });
+
+        // 添加调试监听器
+        client.on('message', (data) => {
+          if (!mounted) return;
+          console.log('收到WebSocket消息:', {
+            type: data.type,
+            data: data
+          });
+        });
+
+        setWsClient(client);
+        
+        // 监控WebSocket连接
+        monitorWebSocket(client);
+      } catch (error) {
+        if (mounted) {
+          console.error('WebSocket初始化失败:', error);
+          setConnectionStatus('error');
+        }
       }
-    });
-    
-    // 监听用户离开
-    client.on('UserLeft', (data) => {
-      console.log('用户离开:', data);
-      if (data.user_type === 'Kehu') {
-        // 如果是客户离开，更新客户状态
-        updateCustomerStatus(data.user_id, 'offline');
-      }
-    });
-    
-    // 监听状态更新
-    client.on('Status', (data) => {
-      console.log('用户状态更新:', data);
-      updateCustomerStatus(data.user_id, data.status);
-    });
+    };
 
-    // 添加调试监听器
-    client.on('message', (data) => {
-      console.log('收到WebSocket消息:', {
-        type: data.type,
-        data: data
-      });
-    });
+    initWebSocket();
 
-    // 连接
-    client.connect();
-    setWsClient(client);
-
+    // 清理函数
     return () => {
-      // 不要在组件卸载时断开连接，保持连接状态
-      // client.disconnect();
+      mounted = false;
+      if (client) {
+        try {
+          client.disconnect();
+        } catch (error) {
+          console.error('WebSocket断开连接失败:', error);
+        }
+      }
     };
   }, [isLoggedIn, currentUser]);
 
   // 处理接收到的消息
   const handleReceiveMessage = (data) => {
-    const newMessage = {
-      id: data.id,
-      type: data.messageType || MessageType.TEXT,
-      content: data.content,
-      senderId: data.senderId,
-      senderName: data.senderName,
-      senderAvatar: data.senderAvatar,
-      timestamp: new Date(data.timestamp),
-      imageUrl: data.imageUrl,
-      fileName: data.fileName,
-      fileSize: data.fileSize,
-      fileUrl: data.fileUrl,
-      voiceDuration: data.voiceDuration,
-      voiceUrl: data.voiceUrl,
-      status: 'delivered',
-    };
+    try {
+      // 输入验证
+      if (!data) {
+        console.warn('收到空消息数据');
+        return;
+      }
 
-    setMessages(prev => [...prev, newMessage]);
+      // 验证消息内容
+      const validatedContent = data?.content ? 
+        validateMessageContent(data.content, data.messageType || 'text') : '';
+
+      // 使用可选链操作符防止空指针访问
+      const newMessage = {
+        id: data?.id || Date.now().toString(),
+        type: data?.messageType || MessageType.TEXT,
+        content: escapeHtml(validatedContent), // 防XSS
+        senderId: data?.senderId || '',
+        senderName: escapeHtml(data?.senderName || '未知用户'), // 防XSS
+        senderAvatar: data?.senderAvatar || '',
+        timestamp: new Date(data?.timestamp || Date.now()),
+        imageUrl: data?.imageUrl || null,
+        fileName: data?.fileName || null,
+        fileSize: data?.fileSize || null,
+        fileUrl: data?.fileUrl || null,
+        voiceDuration: data?.voiceDuration || null,
+        voiceUrl: data?.voiceUrl || null,
+        status: 'delivered',
+        // 新增：React组件数据
+        reactComponentData: data?.reactComponentData || null,
+        adaptiveStyles: data?.adaptiveStyles || null
+      };
+
+      // 处理特殊消息类型
+      if (data?.messageType === 'html_template' && data?.reactComponentData) {
+        newMessage.type = 'react_component';
+      }
+
+      setMessages(prev => [...prev, newMessage]);
+    } catch (error) {
+      console.error('消息处理失败:', error);
+    }
   };
   
   // 更新在线客户列表
   const updateOnlineCustomers = (onlineCustomers) => {
+    // 数组访问安全检查
+    if (!Array.isArray(onlineCustomers)) {
+      console.warn('onlineCustomers 不是数组:', onlineCustomers);
+      return;
+    }
+
     setCustomers(prevCustomers => {
       // 创建一个新的客户列表
       const updatedCustomers = [...prevCustomers];
       
       // 标记所有客户为离线
       updatedCustomers.forEach(customer => {
-        customer.status = 'offline';
+        if (customer) {
+          customer.status = 'offline';
+        }
       });
       
       // 更新在线客户的状态
       onlineCustomers.forEach(onlineCustomer => {
-        const existingCustomer = updatedCustomers.find(c => c.id === onlineCustomer.user_id);
+        // 使用可选链操作符防止空指针访问
+        const customerId = onlineCustomer?.user_id;
+        const customerName = onlineCustomer?.user_name;
+        
+        if (!customerId || !customerName) {
+          console.warn('客户数据不完整:', onlineCustomer);
+          return;
+        }
+
+        const existingCustomer = updatedCustomers.find(c => c?.id === customerId);
         if (existingCustomer) {
           existingCustomer.status = 'online';
-          existingCustomer.name = onlineCustomer.user_name;
+          existingCustomer.name = customerName;
         } else {
           // 如果是新客户，添加到列表
-          updatedCustomers.push({
-            id: onlineCustomer.user_id,
-            name: onlineCustomer.user_name,
+          const newCustomer = {
+            id: customerId,
+            name: customerName,
             status: 'online',
-            avatar: onlineCustomer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(onlineCustomer.user_name)}&background=random`,
+            avatar: onlineCustomer?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=random`,
             lastMessage: '新客户',
-            timestamp: new Date(onlineCustomer.last_seen),
+            timestamp: new Date(onlineCustomer?.last_seen || Date.now()),
             unreadCount: 0,
             messages: []
-          });
+          };
+          updatedCustomers.push(newCustomer);
         }
       });
       
       // 按状态和时间排序：在线的在前，然后按最后活动时间降序
       return updatedCustomers.sort((a, b) => {
+        if (!a || !b) return 0;
         if (a.status === 'online' && b.status !== 'online') return -1;
         if (a.status !== 'online' && b.status === 'online') return 1;
-        return b.timestamp - a.timestamp;
+        return (b.timestamp || 0) - (a.timestamp || 0);
       });
     });
   };
   
+  // 生成默认头像URL
+  const generateAvatarUrl = (name) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+  };
+
   // 添加新客户
   const addNewCustomer = (newCustomer) => {
-    setCustomers(prevCustomers => {
-      // 检查客户是否已存在
-      const exists = prevCustomers.some(c => c.id === newCustomer.id);
-      if (exists) {
-        // 如果已存在，只更新状态
-        return prevCustomers.map(c => 
-          c.id === newCustomer.id 
-            ? { ...c, status: 'online', timestamp: newCustomer.timestamp }
-            : c
-        );
+    try {
+      // 输入验证
+      if (!newCustomer?.id || !newCustomer?.name) {
+        console.warn('客户数据不完整:', newCustomer);
+        return;
       }
-      
-      // 添加新客户
-      const customer = {
-        ...newCustomer,
-        avatar: newCustomer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCustomer.name)}&background=random`,
-      };
-      
-      return [customer, ...prevCustomers];
-    });
+
+      // 验证客户数据
+      const validatedCustomer = validateCustomerData(newCustomer);
+
+      setCustomers(prevCustomers => {
+        // 检查客户是否已存在
+        const exists = prevCustomers.some(c => c?.id === validatedCustomer.id);
+        if (exists) {
+          // 如果已存在，只更新状态
+          return prevCustomers.map(c => 
+            c?.id === validatedCustomer.id 
+              ? { ...c, status: 'online', timestamp: validatedCustomer.timestamp }
+              : c
+          );
+        }
+        
+        // 添加新客户
+        const customer = {
+          ...validatedCustomer,
+          avatar: validatedCustomer.avatar || generateAvatarUrl(validatedCustomer.name),
+        };
+        
+        return [customer, ...prevCustomers];
+      });
+    } catch (error) {
+      console.error('添加客户失败:', error);
+    }
   };
   
   // 更新客户状态
@@ -299,7 +405,16 @@ export default function Component() {
 
   // 发送消息
   const handleSendMessage = async (messageData) => {
-    if (!currentCustomer) return;
+    // 输入验证
+    if (!currentCustomer) {
+      console.warn('没有选择客户');
+      return;
+    }
+
+    if (!messageData?.content && !messageData?.imageUrl && !messageData?.fileUrl && !messageData?.voiceUrl) {
+      console.warn('消息内容不能为空');
+      return;
+    }
 
     const message = {
       id: Date.now().toString(),
@@ -307,19 +422,19 @@ export default function Component() {
             messageData.type === 'image' ? MessageType.IMAGE :
             messageData.type === 'file' ? MessageType.FILE :
             messageData.type === 'voice' ? MessageType.VOICE : MessageType.TEXT,
-      content: messageData.content,
-      senderId: currentUser?.id,
-      senderName: currentUser?.name,
-      senderAvatar: currentUser?.avatar,
+      content: messageData.content || '',
+      senderId: currentUser?.id || '',
+      senderName: currentUser?.name || '客服',
+      senderAvatar: currentUser?.avatar || '',
       timestamp: new Date(),
       customerId: currentCustomer.id,
       status: 'sending',
-      imageUrl: messageData.imageUrl,
-      fileName: messageData.fileName,
-      fileSize: messageData.fileSize,
-      fileUrl: messageData.fileUrl,
-      voiceDuration: messageData.voiceDuration,
-      voiceUrl: messageData.voiceUrl,
+      imageUrl: messageData.imageUrl || null,
+      fileName: messageData.fileName || null,
+      fileSize: messageData.fileSize || null,
+      fileUrl: messageData.fileUrl || null,
+      voiceDuration: messageData.voiceDuration || null,
+      voiceUrl: messageData.voiceUrl || null,
     };
 
     // 添加消息到当前客户的消息历史
@@ -340,7 +455,7 @@ export default function Component() {
         // 更新消息状态
         setCustomerMessages(prev => ({
           ...prev,
-          [currentCustomer.id]: prev[currentCustomer.id].map(msg => 
+          [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
             msg.id === message.id ? {...msg, status: 'sent'} : msg
           )
         }));
@@ -349,7 +464,7 @@ export default function Component() {
         setTimeout(() => {
           setCustomerMessages(prev => ({
             ...prev,
-            [currentCustomer.id]: prev[currentCustomer.id].map(msg => 
+            [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
               msg.id === message.id ? {...msg, status: 'sent'} : msg
             )
           }));
@@ -358,6 +473,13 @@ export default function Component() {
 
     } catch (error) {
       console.error('发送消息失败:', error);
+      // 更新消息状态为失败
+      setCustomerMessages(prev => ({
+        ...prev,
+        [currentCustomer.id]: (prev[currentCustomer.id] || []).map(msg => 
+          msg.id === message.id ? {...msg, status: 'failed'} : msg
+        )
+      }));
     }
   };
 
@@ -460,6 +582,124 @@ export default function Component() {
       ...prev,
       [key]: value
     }));
+  };
+
+  // 处理React组件事件
+  const handleReactComponentEvent = (eventData) => {
+    console.log('React组件事件:', eventData);
+    
+    try {
+      // 根据事件类型处理
+      switch (eventData.type) {
+        case 'click':
+          // 处理点击事件
+          if (eventData.data?.action) {
+            handleComponentAction(eventData.data.action, eventData.data);
+          }
+          break;
+        case 'change':
+          // 处理值变化事件
+          if (eventData.data?.value !== undefined) {
+            handleComponentValueChange(eventData.componentName, eventData.data.value);
+          }
+          break;
+        case 'submit':
+          // 处理表单提交事件
+          handleComponentSubmit(eventData.data);
+          break;
+        default:
+          console.log('未处理的事件类型:', eventData.type);
+      }
+    } catch (error) {
+      console.error('处理React组件事件失败:', error);
+    }
+  };
+
+  // 处理组件动作
+  const handleComponentAction = (action, data) => {
+    switch (action) {
+      case 'open_url':
+        if (data.url) {
+          window.open(data.url, '_blank');
+        }
+        break;
+      case 'send_message':
+        if (data.message) {
+          handleSendMessage({ content: data.message, type: 'text' });
+        }
+        break;
+      case 'show_modal':
+        // 可以在这里处理显示模态框的逻辑
+        break;
+      default:
+        console.log('未处理的组件动作:', action);
+    }
+  };
+
+  // 处理组件值变化
+  const handleComponentValueChange = (componentName, value) => {
+    console.log(`组件 ${componentName} 值变化:`, value);
+    // 可以在这里处理组件值变化的逻辑
+  };
+
+  // 处理组件表单提交
+  const handleComponentSubmit = (formData) => {
+    console.log('组件表单提交:', formData);
+    // 可以在这里处理表单提交的逻辑
+  };
+
+  // 处理自适应配置变更
+  const handleAdaptiveConfigChange = (newConfig) => {
+    console.log('自适应配置已更新:', newConfig);
+    // 可以在这里处理配置变更后的逻辑，比如重新渲染相关组件
+  };
+
+  // 处理AI生成器打开
+  const handleAIGeneratorOpen = () => {
+    setIsAIGeneratorOpen(true);
+  };
+
+  // 处理AI生成器关闭
+  const handleAIGeneratorClose = () => {
+    setIsAIGeneratorOpen(false);
+  };
+
+  // 处理AI生成的组件
+  const handleComponentGenerated = (componentData) => {
+    console.log('AI生成的组件:', componentData);
+    
+    // 将生成的组件作为消息发送给当前客户
+    if (currentCustomer) {
+      const messageData = {
+        type: 'react_component',
+        content: 'AI生成的React组件',
+        reactComponentData: componentData.component_data,
+        adaptiveStyles: componentData.adaptive_styles,
+        customerId: currentCustomer.id,
+        senderId: currentUser?.id,
+        senderName: currentUser?.name || '客服',
+        senderAvatar: currentUser?.avatar || generateAvatarUrl(currentUser?.name || '客服'),
+        timestamp: new Date().toISOString(),
+        status: 'sent'
+      };
+
+      // 添加到消息列表
+      setCustomerMessages(prev => ({
+        ...prev,
+        [currentCustomer.id]: [
+          ...(prev[currentCustomer.id] || []),
+          messageData
+        ]
+      }));
+
+      // 通过WebSocket发送给后端
+      if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+        wsClient.send(JSON.stringify({
+          type: 'send_message',
+          data: messageData
+        }));
+      }
+    }
   };
 
   // 处理登录成功
@@ -712,30 +952,66 @@ export default function Component() {
               )}
               
               {/* 渲染当前客户的消息 */}
-              {(customerMessages[currentCustomer.id] || []).map((message) => (
-                <MessagingChatMessage
-                  key={message.id}
-                  avatar={message.senderAvatar}
-                  name={message.senderName}
-                  time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                  message={message.content}
-                  messageType={message.type}
-                  isRTL={message.senderId === currentUser?.id}
-                  imageUrl={message.imageUrl}
-                  fileName={message.fileName}
-                  fileSize={message.fileSize}
-                  fileUrl={message.fileUrl}
-                  voiceDuration={message.voiceDuration}
-                  voiceUrl={message.voiceUrl}
-                  status={message.status}
-                  classNames={{
-                    base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
-                  }}
-                />
-              ))}
+              {(customerMessages[currentCustomer.id] || []).map((message) => {
+                // 处理React组件消息
+                if (message.type === 'react_component' && message.reactComponentData) {
+                  return (
+                    <div key={message.id} className="mb-4">
+                      <MessagingChatMessage
+                        avatar={message.senderAvatar}
+                        name={message.senderName}
+                        time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                        message=""
+                        messageType={MessageType.TEXT}
+                        isRTL={message.senderId === currentUser?.id}
+                        status={message.status}
+                        classNames={{
+                          base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
+                        }}
+                      />
+                      {/* React组件渲染器 - 暂时禁用 */}
+                      {/* <div className="mt-2 ml-12">
+                        <ReactCardRenderer
+                          componentData={message.reactComponentData}
+                          adaptiveStyles={message.adaptiveStyles}
+                          containerId={`react-${message.id}`}
+                          onEvent={handleReactComponentEvent}
+                          className="react-message-card"
+                        />
+                      </div> */}
+                    </div>
+                  );
+                }
+
+                // 处理普通消息
+                return (
+                  <MessagingChatMessage
+                    key={message.id}
+                    avatar={message.senderAvatar}
+                    name={message.senderName}
+                    time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                    message={message.content}
+                    messageType={message.type}
+                    isRTL={message.senderId === currentUser?.id}
+                    imageUrl={message.imageUrl}
+                    fileName={message.fileName}
+                    fileSize={message.fileSize}
+                    fileUrl={message.fileUrl}
+                    voiceDuration={message.voiceDuration}
+                    voiceUrl={message.voiceUrl}
+                    status={message.status}
+                    classNames={{
+                      base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
+                    }}
+                  />
+                );
+              })}
             </>
           )}
         </ScrollShadow>
@@ -748,7 +1024,7 @@ export default function Component() {
               <div className="flex flex-wrap gap-2">
                 {settings.quickReplies.slice(0, 3).map((reply, index) => (
                   <Button
-                    key={index}
+                    key={`quick-reply-${reply.substring(0, 10)}-${index}`}
                     size="sm"
                     variant="bordered"
                     className="text-tiny"
@@ -774,7 +1050,7 @@ export default function Component() {
                     <DropdownMenu>
                       {settings.quickReplies.slice(3).map((reply, index) => (
                         <DropdownItem
-                          key={index + 3}
+                          key={`settings-reply-${reply.substring(0, 10)}-${index + 3}`}
                           onClick={() => {
                             if (reply.trim()) {
                               handleSendMessage({
@@ -901,7 +1177,7 @@ export default function Component() {
                     <p className="text-tiny text-default-500 mb-2">设置常用的回复语句</p>
                     <div className="space-y-2">
                       {settings.quickReplies.map((reply, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                        <div key={`quick-reply-${reply.substring(0, 10)}-${index}`} className="flex items-center gap-2">
                           <input
                             type="text"
                             className="flex-1 p-2 text-small rounded-lg border border-divider bg-content2"
@@ -971,6 +1247,42 @@ export default function Component() {
                   </div>
                 </div>
               </div>
+
+              <Divider />
+
+              {/* React卡片设置 - 暂时禁用 */}
+              {/* <div>
+                <h4 className="text-small font-medium mb-3">React卡片设置</h4>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-small mb-2">自适应配置</p>
+                    <p className="text-tiny text-default-500 mb-2">配置React卡片的自适应行为和显示效果</p>
+                    <Button
+                      size="sm"
+                      variant="bordered"
+                      startContent={<Icon icon="solar:settings-line-duotone" width={16} />}
+                      onClick={() => setIsAdaptiveConfigOpen(true)}
+                      className="w-full"
+                    >
+                      配置自适应设置
+                    </Button>
+                  </div>
+                  
+                  <div>
+                    <p className="text-small mb-2">AI组件生成器</p>
+                    <p className="text-tiny text-default-500 mb-2">使用AI智能生成React组件</p>
+                    <Button
+                      size="sm"
+                      variant="bordered"
+                      startContent={<Icon icon="solar:magic-stick-line-duotone" width={16} />}
+                      onClick={handleAIGeneratorOpen}
+                      className="w-full"
+                    >
+                      打开AI生成器
+                    </Button>
+                  </div>
+                </div>
+              </div> */}
             </div>
           </ModalBody>
           <ModalFooter>
@@ -991,6 +1303,21 @@ export default function Component() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* 自适应配置面板 - 暂时禁用 */}
+      {/* <AdaptiveConfigPanel
+        isOpen={isAdaptiveConfigOpen}
+        onClose={() => setIsAdaptiveConfigOpen(false)}
+        onConfigChange={handleAdaptiveConfigChange}
+      /> */}
+
+      {/* AI组件生成器 - 暂时禁用 */}
+      {/* <AIComponentGenerator
+        isOpen={isAIGeneratorOpen}
+        onClose={handleAIGeneratorClose}
+        onComponentGenerated={handleComponentGenerated}
+        currentUserId={currentUser?.id}
+      /> */}
     </div>
   );
 }

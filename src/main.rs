@@ -13,6 +13,7 @@ mod config;
 mod file_manager;
 mod file_manager_ext;  // 新增：文件管理器扩展
 mod html_template_manager;
+// mod react_template_manager;  // 暂时禁用，有编译错误
 mod message;
 mod message_queue;
 mod redis_client;
@@ -27,10 +28,10 @@ mod platform;  // 新增：跨平台兼容性模块
 mod types;
 mod errors;
 mod auth;
-mod handlers;
+mod handlers;  // 处理器模块
 mod routes;
 mod server;
-mod ai;
+mod ai;  // AI模块
 
 // Swagger文档模块
 mod swagger;

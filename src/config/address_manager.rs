@@ -261,6 +261,10 @@ pub struct AddressManager {
 
 impl AddressManager {
     /// 创建新的地址管理器
+    ///
+    /// # Errors
+    ///
+    /// 当配置文件加载失败时返回错误
     pub async fn new() -> Result<Self> {
         let config = Self::load_config().await?;
         let environment = Self::detect_environment();
@@ -274,23 +278,62 @@ impl AddressManager {
 
     /// 加载配置文件
     async fn load_config() -> Result<AddressConfig> {
+        // 首先尝试从环境变量加载
+        if let Ok(config) = Self::load_from_env() {
+            tracing::info!("成功从环境变量加载配置");
+            return Ok(config);
+        }
+
         // 尝试从多个位置加载配置，使用跨平台路径
-        let config_toml = std::path::PathBuf::from("config").join("address_config.toml");
-        let config_json = std::path::PathBuf::from("config").join("address_config.json");
         let config_paths = [
-            config_toml.to_str().unwrap(),
-            config_json.to_str().unwrap(),
+            "config/default.toml",
+            "config/address_config.toml",
+            "config/config.toml",
+            "config/local.toml",
+            "./config/default.toml",
+            "./config/address_config.toml",
+            "./config/config.toml",
+            "./config/local.toml",
             "address_config.toml",
         ];
 
         for path in &config_paths {
             if let Ok(config) = Self::load_from_file(path).await {
+                tracing::info!("成功从配置文件加载: {}", path);
                 return Ok(config);
             }
         }
 
         // 如果文件不存在，返回默认配置
+        tracing::warn!("未找到配置文件，使用默认配置");
         Ok(Self::default_config())
+    }
+
+    /// 从环境变量加载配置
+    fn load_from_env() -> Result<AddressConfig> {
+        let mut config = Self::default_config();
+        
+        // 从环境变量更新配置
+        if let Ok(server_port) = env::var("SERVER_PORT") {
+            if let Ok(port) = server_port.parse::<u16>() {
+                config.ports.server_port = port;
+                config.ports.api_port = port;
+            }
+        }
+        
+        if let Ok(redis_url) = env::var("REDIS_URL") {
+            config.external_apis.redis_url = redis_url;
+        }
+        
+        if let Ok(database_url) = env::var("DATABASE_URL") {
+            config.external_apis.postgres_url = database_url;
+        }
+        
+        if let Ok(log_level) = env::var("RUST_LOG") {
+            config.logging.log_level = log_level;
+        }
+        
+        Ok(config)
     }
 
     /// 从文件加载配置
@@ -319,6 +362,7 @@ impl AddressManager {
     }
 
     /// 获取默认配置
+    #[allow(clippy::too_many_lines)]
     fn default_config() -> AddressConfig {
         AddressConfig {
             domains: DomainConfig {
@@ -586,38 +630,44 @@ impl AddressManager {
     pub async fn get_api_url(&self) -> String {
         let cache_key = format!("api_url_{}", self.environment);
         
-        if let Some(cached) = self.cache.read().await.get(&cache_key) {
-            return cached.clone();
+        {
+            let cache_guard = self.cache.read().await;
+            if let Some(cached) = cache_guard.get(&cache_key) {
+                return cached.clone();
+            }
         }
 
         let config = self.config.read().await;
         let url = match self.environment.as_str() {
-            "development" => config.urls.dev_api_url.clone(),
-            "test" => config.urls.test_api_url.clone(),
             "production" => config.urls.prod_api_url.clone(),
+            "development" | "test" => config.urls.dev_api_url.clone(),
             _ => config.urls.fallback_api_url.clone(),
         };
+        drop(config);
 
         self.cache.write().await.insert(cache_key, url.clone());
         url
     }
 
-    /// 获取WebSocket URL
+    /// `获取WebSocket` URL
     #[allow(dead_code)]
     pub async fn get_ws_url(&self) -> String {
         let cache_key = format!("ws_url_{}", self.environment);
         
-        if let Some(cached) = self.cache.read().await.get(&cache_key) {
-            return cached.clone();
+        {
+            let cache_guard = self.cache.read().await;
+            if let Some(cached) = cache_guard.get(&cache_key) {
+                return cached.clone();
+            }
         }
 
         let config = self.config.read().await;
         let url = match self.environment.as_str() {
-            "development" => config.urls.dev_ws_url.clone(),
-            "test" => config.urls.test_ws_url.clone(),
             "production" => config.urls.prod_ws_url.clone(),
+            "development" | "test" => config.urls.dev_ws_url.clone(),
             _ => config.urls.fallback_ws_url.clone(),
         };
+        drop(config);
 
         self.cache.write().await.insert(cache_key, url.clone());
         url
@@ -627,55 +677,61 @@ impl AddressManager {
     #[allow(dead_code)]
     pub async fn get_web_url(&self) -> String {
         let config = self.config.read().await;
-        match self.environment.as_str() {
-            "development" => config.urls.dev_web_url.clone(),
-            "test" => config.urls.test_web_url.clone(),
-            "production" => config.urls.prod_web_url.clone(),
-            _ => config.urls.dev_web_url.clone(),
-        }
+        let url = if self.environment == "production" {
+            config.urls.prod_web_url.clone()
+        } else {
+            config.urls.dev_web_url.clone()
+        };
+        drop(config);
+        url
     }
 
     /// 获取管理后台URL
     #[allow(dead_code)]
     pub async fn get_admin_url(&self) -> String {
         let config = self.config.read().await;
-        match self.environment.as_str() {
-            "development" => config.urls.dev_admin_url.clone(),
-            "test" => config.urls.test_admin_url.clone(),
-            "production" => config.urls.prod_admin_url.clone(),
-            _ => config.urls.dev_admin_url.clone(),
-        }
+        let url = if self.environment == "production" {
+            config.urls.prod_admin_url.clone()
+        } else {
+            config.urls.dev_admin_url.clone()
+        };
+        drop(config);
+        url
     }
 
     /// 获取CORS允许的源
     #[allow(dead_code)]
     pub async fn get_cors_origins(&self) -> Vec<String> {
         let config = self.config.read().await;
-        match self.environment.as_str() {
-            "development" => config.cors.dev_origins.clone(),
-            "test" => config.cors.test_origins.clone(),
-            "production" => config.cors.prod_origins.clone(),
-            _ => config.cors.dev_origins.clone(),
-        }
+        let origins = if self.environment == "production" {
+            config.cors.prod_origins.clone()
+        } else {
+            config.cors.dev_origins.clone()
+        };
+        drop(config);
+        origins
     }
 
     /// 获取服务器端口
     #[allow(dead_code)]
     pub async fn get_server_port(&self) -> u16 {
         let config = self.config.read().await;
-        match self.environment.as_str() {
-            "development" => config.ports.dev_port,
-            "test" => config.ports.test_port,
-            "production" => config.ports.server_port,
-            _ => config.ports.dev_port,
-        }
+        let port = if self.environment == "production" {
+            config.ports.server_port
+        } else {
+            config.ports.dev_port
+        };
+        drop(config);
+        port
     }
 
-    /// 获取WebSocket配置
+    /// `获取WebSocket配置`
     #[allow(dead_code)]
     pub async fn get_websocket_config(&self) -> WebSocketConfig {
         let config = self.config.read().await;
-        config.websocket.clone()
+        let ws_config = config.websocket.clone();
+        drop(config);
+        ws_config
     }
 
     /// 获取外部API配置
@@ -701,24 +757,28 @@ impl AddressManager {
 
     /// 获取当前环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn get_environment(&self) -> &str {
         &self.environment
     }
 
     /// 检查是否为开发环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_development(&self) -> bool {
         self.environment == "development"
     }
 
     /// 检查是否为生产环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_production(&self) -> bool {
         self.environment == "production"
     }
 
     /// 检查是否为测试环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_test(&self) -> bool {
         self.environment == "test"
     }
@@ -730,6 +790,10 @@ impl AddressManager {
     }
 
     /// 更新配置
+    ///
+    /// # Errors
+    ///
+    /// 当配置更新失败时返回错误
     #[allow(dead_code)]
     pub async fn update_config(&self, new_config: AddressConfig) -> Result<()> {
         *self.config.write().await = new_config;
@@ -738,6 +802,10 @@ impl AddressManager {
     }
 
     /// 重新加载配置
+    ///
+    /// # Errors
+    ///
+    /// 当配置文件重新加载失败时返回错误
     #[allow(dead_code)]
     pub async fn reload_config(&self) -> Result<()> {
         let new_config = Self::load_config().await?;
@@ -763,9 +831,9 @@ impl Default for AddressManager {
         tokio::runtime::Runtime::new()
             .unwrap()
             .block_on(async {
-                AddressManager::new().await.unwrap_or_else(|_| {
+                Self::new().await.unwrap_or_else(|_| {
                     let config = AddressConfig::default();
-                    AddressManager {
+                    Self {
                         config: Arc::new(RwLock::new(config)),
                         environment: "development".to_string(),
                         cache: Arc::new(RwLock::new(HashMap::new())),
