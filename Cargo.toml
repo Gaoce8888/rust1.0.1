@@ -2,6 +2,11 @@
 name = "kefu-system"
 version = "0.1.0"
 edition = "2021"
+description = "Enterprise Customer Service System with real-time messaging, ticketing, and analytics"
+license = "MIT"
+repository = "https://github.com/kefu-system/kefu-system"
+keywords = ["customer-service", "messaging", "ticketing", "real-time", "chat"]
+categories = ["web-programming", "web-programming::websocket", "network-programming"]
 
 [[bin]]
 name = "kefu-system"

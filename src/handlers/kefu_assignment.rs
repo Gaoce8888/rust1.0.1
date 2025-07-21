@@ -58,7 +58,7 @@ pub async fn handle_get_kefu_customers(
         Err(e) => {
             tracing::error!("获取客服客户列表失败: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("获取客服客户列表失败: {}", e),
+                format!("获取客服客户列表失败: {e}"),
                 Some(500)
             )))
         }
@@ -117,7 +117,7 @@ pub async fn handle_get_kefu_workload(
         Err(e) => {
             tracing::error!("获取客服工作负载失败: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("获取客服工作负载失败: {}", e),
+                format!("获取客服工作负载失败: {e}"),
                 Some(500)
             )))
         }
@@ -135,7 +135,7 @@ pub async fn handle_switch_customer(
             if success {
                 let response = ApiResponse {
                     success: true,
-                    message: format!("客服 {} 已成功切换到客户 {}", kefu_id, customer_id),
+                    message: format!("客服 {kefu_id} 已成功切换到客户 {customer_id}"),
                     data: Some(serde_json::json!({
                         "kefu_id": kefu_id,
                         "customer_id": customer_id,
@@ -154,7 +154,7 @@ pub async fn handle_switch_customer(
         Err(e) => {
             tracing::error!("客服切换客户错误: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("客服切换客户失败: {}", e),
+                format!("客服切换客户失败: {e}"),
                 Some(500)
             )))
         }
@@ -225,7 +225,7 @@ pub async fn handle_get_waiting_customers(
                     // 获取等待信息
                     let waiting_info = match redis.get_async_connection().await {
                         Ok(mut conn) => {
-                            if let Ok(info_json) = conn.get(&format!("waiting:{}", customer_id)).await {
+                            if let Ok(info_json) = conn.get(&format!("waiting:{customer_id}")).await {
                                 serde_json::from_str::<serde_json::Value>(&info_json).unwrap_or_default()
                             } else {
                                 serde_json::json!({})
@@ -258,7 +258,7 @@ pub async fn handle_get_waiting_customers(
         Err(e) => {
             tracing::error!("获取等待客户列表失败: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("获取等待客户列表失败: {}", e),
+                format!("获取等待客户列表失败: {e}"),
                 Some(500)
             )))
         }
@@ -312,7 +312,7 @@ pub async fn handle_assign_customer(
             Err(e) => {
                 tracing::error!("自动分配客服失败: {:?}", e);
                 return Err(warp::reject::custom(crate::types::api::ApiError::new(
-                    format!("自动分配客服失败: {}", e),
+                    format!("自动分配客服失败: {e}"),
                     Some(500)
                 )));
             }
@@ -321,10 +321,10 @@ pub async fn handle_assign_customer(
     
     // 建立会话
     match ws_manager.establish_session(&customer_id, &assigned_kefu_id, &None).await {
-        Ok(_) => {
+        Ok(()) => {
             let response = ApiResponse {
                 success: true,
-                message: format!("客户 {} 已成功分配给客服 {}", customer_id, assigned_kefu_id),
+                message: format!("客户 {customer_id} 已成功分配给客服 {assigned_kefu_id}"),
                 data: Some(serde_json::json!({
                     "customer_id": customer_id,
                     "assigned_kefu_id": assigned_kefu_id,
@@ -339,7 +339,7 @@ pub async fn handle_assign_customer(
         Err(e) => {
             tracing::error!("建立会话失败: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("分配客户失败: {}", e),
+                format!("分配客户失败: {e}"),
                 Some(500)
             )))
         }

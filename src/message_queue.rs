@@ -167,7 +167,7 @@ impl MessageQueueManager {
         limit: usize,
     ) -> Result<Vec<EnhancedMessage>> {
         let mut conn = self.connection.lock().await;
-        let queue_key = format!("msg_queue:{}", user_id);
+        let queue_key = format!("msg_queue:{user_id}");
 
         let mut messages = Vec::new();
 
@@ -198,7 +198,7 @@ impl MessageQueueManager {
         let mut conn = self.connection.lock().await;
 
         // 从待确认队列中移除
-        let pending_key = format!("pending:{}", message_id);
+        let pending_key = format!("pending:{message_id}");
         conn.del::<_, ()>(&pending_key)?;
 
         // 从内存中移除
@@ -208,7 +208,7 @@ impl MessageQueueManager {
                 message.status = MessageStatus::Delivered;
 
                 // 更新消息状态到持久化存储
-                let status_key = format!("msg_status:{}", message_id);
+                let status_key = format!("msg_status:{message_id}");
                 conn.set_ex::<_, _, ()>(&status_key, "delivered", 86400)?; // 24小时
             }
         }
@@ -267,7 +267,7 @@ impl MessageQueueManager {
         let mut conn = self.connection.lock().await;
 
         // 获取用户的最新消息状态
-        let sync_key = format!("sync:{}", user_id);
+        let sync_key = format!("sync:{user_id}");
         let last_sync: Option<u64> = conn.get(&sync_key)?;
         let last_sync_time = last_sync.unwrap_or(0);
 
@@ -275,7 +275,7 @@ impl MessageQueueManager {
         let mut recent_messages = Vec::new();
 
         // 从历史消息中查找
-        let history_key = format!("history:{}", user_id);
+        let history_key = format!("history:{user_id}");
         let messages: Vec<String> = conn.lrange(&history_key, 0, -1)?;
 
         for message_json in messages {
@@ -294,7 +294,7 @@ impl MessageQueueManager {
         conn.set::<_, _, ()>(&sync_key, now)?;
 
         // 按时间戳排序
-        recent_messages.sort_by_key(|m| m.timestamp());
+        recent_messages.sort_by_key(EnhancedMessage::timestamp);
 
         Ok(recent_messages)
     }
@@ -395,10 +395,10 @@ impl MessageQueueManager {
     pub async fn get_queue_stats(&self, user_id: &str) -> Result<QueueStats> {
         let mut conn = self.connection.lock().await;
 
-        let queue_key = format!("msg_queue:{}", user_id);
+        let queue_key = format!("msg_queue:{user_id}");
         let pending_count: u64 = conn.llen(&queue_key)?;
 
-        let unread_key = format!("unread:{}", user_id);
+        let unread_key = format!("unread:{user_id}");
         let unread_count: u64 = conn.get(&unread_key).unwrap_or(0);
 
         let pending_messages = self.pending_messages.read().await;

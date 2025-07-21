@@ -116,8 +116,8 @@ pub async fn handle_online_users(
                 user_type: user_obj.get("user_type")?.as_str()?.to_string(),
                 connected_at: user_obj.get("connected_at")?.as_str()?.to_string(),
                 last_activity: user_obj.get("last_activity")?.as_str()?.to_string(),
-                ip_address: user_obj.get("ip_address").and_then(|v| v.as_str()).map(|s| s.to_string()),
-                client_info: user_obj.get("client_info").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                ip_address: user_obj.get("ip_address").and_then(|v| v.as_str()).map(std::string::ToString::to_string),
+                client_info: user_obj.get("client_info").and_then(|v| v.as_str()).map(std::string::ToString::to_string),
             })
         })
         .collect();

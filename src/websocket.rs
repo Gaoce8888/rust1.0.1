@@ -249,16 +249,16 @@ impl WebSocketManager {
                 
                 if let Some(kefu_id) = available_kefu {
                     tracing::info!("🤝 为客户分配客服: {} <-> {}", user_id, kefu_id);
-                    match self.establish_session(&user_id, &kefu_id, &zhanghao).await { Err(e) => {
+                    if let Err(e) = self.establish_session(&user_id, &kefu_id, &zhanghao).await {
                         tracing::warn!("⚠️ 建立会话失败: {}, error: {:?}", user_id, e);
-                    } _ => {
+                    } else {
                         tracing::info!("✅ 会话建立成功: {} <-> {}", user_id, kefu_id);
                         
                         // 通知客服端更新客户列表
                         if let Some(kefu_sender) = self.get_user_sender(&kefu_id).await {
                             self.send_online_users(&kefu_sender).await?;
                         }
-                    }}
+                    }
                 } else {
                     tracing::warn!("⚠️ 没有可用客服，客户 {} 暂时无法分配", user_id);
                 }
@@ -360,7 +360,7 @@ impl WebSocketManager {
                             "📥 收到WebSocket消息从 {}: 长度={}",
                             user_id_clone,
                             if msg.is_text() {
-                                msg.to_str().map(|s| s.len()).unwrap_or(0)
+                                msg.to_str().map(str::len).unwrap_or(0)
                             } else {
                                 0
                             }
@@ -396,7 +396,7 @@ impl WebSocketManager {
         if message.is_text() {
             let text = message
                 .to_str()
-                .map_err(|_| anyhow::anyhow!("Invalid UTF-8"))?;
+                .map_err(|()| anyhow::anyhow!("Invalid UTF-8"))?;
 
             // 更新心跳时间
             self.update_heartbeat(user_id).await;
@@ -592,7 +592,7 @@ impl WebSocketManager {
 
                 // 创建系统消息通知回调已处理
                 let system_msg = AppMessage::System {
-                    content: format!("HTML回调处理完成: {} - {}", action, template_id),
+                    content: format!("HTML回调处理完成: {action} - {template_id}"),
                     timestamp: Utc::now(),
                 };
 
@@ -922,18 +922,15 @@ impl WebSocketManager {
         tracing::info!("📤 尝试发送{}消息给: {}", message_type, user_id);
 
         if let Some(sender) = senders.get(user_id) {
-            match sender.send(message) {
-                Ok(_) => {
-                    tracing::info!("✅ 成功发送{}消息给: {}", message_type, user_id);
-                }
-                Err(_) => {
-                    tracing::error!("❌ 发送{}消息失败给: {} (通道关闭)", message_type, user_id);
-                    // 生产级错误处理：移除无效的发送器
-                    drop(senders);
-                    let mut senders_write = self.senders.write().await;
-                    senders_write.remove(user_id);
-                    tracing::warn!("🧹 已移除失效的发送器: {}", user_id);
-                }
+            if let Ok(()) = sender.send(message) {
+                tracing::info!("✅ 成功发送{}消息给: {}", message_type, user_id);
+            } else {
+                tracing::error!("❌ 发送{}消息失败给: {} (通道关闭)", message_type, user_id);
+                // 生产级错误处理：移除无效的发送器
+                drop(senders);
+                let mut senders_write = self.senders.write().await;
+                senders_write.remove(user_id);
+                tracing::warn!("🧹 已移除失效的发送器: {}", user_id);
             }
         } else {
             let available_users: Vec<String> = senders.keys().cloned().collect();
@@ -1555,12 +1552,12 @@ impl WebSocketManager {
                 .await;
 
             match session_result {
-                Ok(_) => {
+                Ok(()) => {
                     tracing::info!("✅ 客服{}成功切换到客户: {}", kefu_id, real_customer_id);
 
                     // 发送切换成功通知给客服
                     let switch_notification = AppMessage::System {
-                        content: format!("✅ 已切换到客户: {}", real_customer_id),
+                        content: format!("✅ 已切换到客户: {real_customer_id}"),
                         timestamp: Utc::now(),
                     };
                     self.send_to_user(kefu_id, switch_notification).await?;
@@ -1832,7 +1829,7 @@ impl WebSocketManager {
     /// 用户上线时的实时通知
     pub async fn notify_user_online(&self, user_id: &str, user_name: &str, user_type: &UserType) -> Result<()> {
         let notification = AppMessage::System {
-            content: format!("🟢 {}({}) 已上线", user_name, user_id),
+            content: format!("🟢 {user_name}({user_id}) 已上线"),
             timestamp: Utc::now(),
         };
 
@@ -1872,7 +1869,7 @@ impl WebSocketManager {
     /// 用户下线时的实时通知
     pub async fn notify_user_offline(&self, user_id: &str, user_name: &str, _user_type: &UserType) -> Result<()> {
         let notification = AppMessage::System {
-            content: format!("🔴 {}({}) 已下线", user_name, user_id),
+            content: format!("🔴 {user_name}({user_id}) 已下线"),
             timestamp: Utc::now(),
         };
 
@@ -1977,7 +1974,7 @@ impl WebSocketManager {
         let mut success_count = 0;
         
         let broadcast_message = AppMessage::System {
-            content: format!("系统广播: {}", message),
+            content: format!("系统广播: {message}"),
             timestamp: Utc::now(),
         };
         
@@ -1998,7 +1995,7 @@ impl WebSocketManager {
         connections.get(user_id).map(|conn| conn.last_heartbeat)
     }
 
-    /// 获取WebSocket服务运行时间
+    /// `获取WebSocket服务运行时间`
     /// 用于健康检查和监控
     pub async fn get_uptime(&self) -> std::time::Duration {
         // 这里可以添加服务启动时间的跟踪

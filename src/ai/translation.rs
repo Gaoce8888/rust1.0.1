@@ -45,7 +45,7 @@ impl TranslationProcessor {
     }
 
     fn generate_cache_key(&self, text: &str, source_lang: &str, target_lang: &str) -> String {
-        format!("{}:{}:{}", source_lang, target_lang, text)
+        format!("{source_lang}:{target_lang}:{text}")
     }
 
     async fn check_cache(&self, text: &str, source_lang: &str, target_lang: &str) -> Option<CachedTranslation> {
@@ -177,7 +177,7 @@ impl TranslationProcessor {
             .unwrap()
             .as_secs());
         
-        let sign_str = format!("{}{}{}{}", app_id, text, salt, secret_key);
+        let sign_str = format!("{app_id}{text}{salt}{secret_key}");
         let sign = format!("{:x}", md5::compute(sign_str));
         
         let params = vec![
@@ -233,7 +233,7 @@ impl TranslationProcessor {
             translation_config.api_endpoint, target_lang);
         
         if source_lang != "auto" {
-            url = format!("{}&from={}", url, source_lang);
+            url = format!("{url}&from={source_lang}");
         }
         
         let body = serde_json::json!([{
@@ -289,9 +289,9 @@ impl TranslationProcessor {
         ]);
         
         let translated = if let Some(translation) = translation_dict.get(text.to_lowercase().as_str()) {
-            translation.to_string()
+            (*translation).to_string()
         } else {
-            format!("[本地翻译] {}", text)
+            format!("[本地翻译] {text}")
         };
         
         Ok(TranslationResult {

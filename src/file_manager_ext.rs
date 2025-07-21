@@ -54,7 +54,7 @@ impl FileManagerExt for FileManager {
                     _ => None,
                 }
             }),
-            uploaded_by: user_id.map(|s| s.to_string()),
+            uploaded_by: user_id.map(std::string::ToString::to_string),
             page: 1,
             limit: 100,
             sort_by: "uploaded_at".to_string(),
@@ -194,7 +194,7 @@ impl FileManagerExt for FileManager {
     }
 }
 
-/// 创建增强的FileManager
+/// `创建增强的FileManager`
 #[allow(dead_code)]
 pub fn create_enhanced_file_manager(config: crate::config::StorageConfig) -> Result<Arc<FileManager>> {
     let manager = FileManager::new(config)?;

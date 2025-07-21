@@ -14,12 +14,16 @@ use crate::config::address_manager::{
 
 
 /// 配置管理器
-pub struct ConfigManager {
+pub struct Manager {
     address_manager: AddressManager,
 }
 
-impl ConfigManager {
+impl Manager {
     /// 创建新的配置管理器
+    /// 
+    /// # Errors
+    /// 
+    /// Returns an error if address manager initialization fails
     pub async fn new() -> anyhow::Result<Self> {
         let address_manager = AddressManager::new().await?;
         Ok(Self {
@@ -29,7 +33,7 @@ impl ConfigManager {
 
     /// 获取地址管理器
     #[allow(dead_code)]
-    pub fn address_manager(&self) -> &AddressManager {
+    #[must_use] pub fn address_manager(&self) -> &AddressManager {
         &self.address_manager
     }
 
@@ -53,13 +57,13 @@ impl ConfigManager {
     }
 }
 
-impl Default for ConfigManager {
+impl Default for Manager {
     fn default() -> Self {
         tokio::runtime::Runtime::new()
             .unwrap()
             .block_on(async {
-                ConfigManager::new().await.unwrap_or_else(|_| {
-                    ConfigManager {
+                Manager::new().await.unwrap_or_else(|_| {
+                    Manager {
                         address_manager: AddressManager::default(),
                     }
                 })
@@ -69,12 +73,12 @@ impl Default for ConfigManager {
 
 /// 全局配置实例
 #[allow(dead_code)]
-pub static mut GLOBAL_CONFIG: Option<ConfigManager> = None;
+pub static mut GLOBAL_CONFIG: Option<Manager> = None;
 
 /// 初始化全局配置
 #[allow(dead_code)]
 pub async fn init_global_config() -> anyhow::Result<()> {
-    let config_manager = ConfigManager::new().await?;
+    let config_manager = Manager::new().await?;
     unsafe {
         GLOBAL_CONFIG = Some(config_manager);
     }
@@ -83,13 +87,13 @@ pub async fn init_global_config() -> anyhow::Result<()> {
 
 /// 获取全局配置管理器
 #[allow(dead_code)]
-pub fn get_global_config() -> Option<&'static ConfigManager> {
+#[must_use] pub fn get_global_config() -> Option<&'static Manager> {
     unsafe { GLOBAL_CONFIG.as_ref() }
 }
 
 /// 获取全局配置管理器的可变引用
 #[allow(dead_code)]
-pub fn get_global_config_mut() -> Option<&'static mut ConfigManager> {
+#[must_use] pub fn get_global_config_mut() -> Option<&'static mut Manager> {
     unsafe { GLOBAL_CONFIG.as_mut() }
 }
 
@@ -124,7 +128,7 @@ impl ConfigValidator {
         Ok(())
     }
 
-    /// 验证WebSocket配置
+    /// `验证WebSocket配置`
     #[allow(dead_code)]
     pub fn validate_websocket_config(config: &crate::config::address_manager::WebSocketConfig) -> anyhow::Result<()> {
         if config.heartbeat_interval == 0 {
@@ -164,12 +168,12 @@ impl ConfigValidator {
 
 /// 配置工具函数
 pub mod utils {
-    use super::*;
+    use super::AddressConfig;
     use std::collections::HashMap;
 
     /// 从环境变量构建配置
     #[allow(dead_code)]
-    pub fn build_config_from_env() -> AddressConfig {
+    #[must_use] pub fn build_config_from_env() -> AddressConfig {
         let mut config = AddressConfig::default();
         
         // 从环境变量更新配置
@@ -206,7 +210,7 @@ pub mod utils {
 
     /// 将配置转换为环境变量
     #[allow(dead_code)]
-    pub fn config_to_env_vars(config: &AddressConfig) -> HashMap<String, String> {
+    #[must_use] pub fn config_to_env_vars(config: &AddressConfig) -> HashMap<String, String> {
         let mut env_vars = HashMap::new();
         
         env_vars.insert("APP_ENV".to_string(), config.environment.current_environment.clone());
@@ -236,7 +240,7 @@ pub mod utils {
 
     /// 生成配置文档
     #[allow(dead_code)]
-    pub fn generate_config_docs(config: &AddressConfig) -> String {
+    #[must_use] pub fn generate_config_docs(config: &AddressConfig) -> String {
         format!(
             "# 配置文档\n\n## 环境: {}\n## 服务器端口: {}\n## API URL: {}\n## WebSocket URL: {}",
             config.environment.current_environment,

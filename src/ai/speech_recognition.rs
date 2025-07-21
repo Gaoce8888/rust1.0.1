@@ -250,7 +250,7 @@ impl SpeechProcessor {
             text: text.to_string(),
             confidence,
             language: language.to_string(),
-            duration_ms: word_timestamps.last().map(|w| w.end_time_ms).unwrap_or(0),
+            duration_ms: word_timestamps.last().map_or(0, |w| w.end_time_ms),
             word_timestamps,
             speaker_segments: vec![], // 需要额外解析
             provider: "google".to_string(),

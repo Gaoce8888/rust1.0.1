@@ -12,25 +12,25 @@ fn humanize_duration(duration: Duration) -> String {
     let total_seconds = duration.num_seconds();
     
     if total_seconds < 60 {
-        format!("{}秒", total_seconds)
+        format!("{total_seconds}秒")
     } else if total_seconds < 3600 {
         let minutes = total_seconds / 60;
-        format!("{}分钟", minutes)
+        format!("{minutes}分钟")
     } else if total_seconds < 86400 {
         let hours = total_seconds / 3600;
         let minutes = (total_seconds % 3600) / 60;
         if minutes > 0 {
-            format!("{}小时{}分钟", hours, minutes)
+            format!("{hours}小时{minutes}分钟")
         } else {
-            format!("{}小时", hours)
+            format!("{hours}小时")
         }
     } else {
         let days = total_seconds / 86400;
         let hours = (total_seconds % 86400) / 3600;
         if hours > 0 {
-            format!("{}天{}小时", days, hours)
+            format!("{days}天{hours}小时")
         } else {
-            format!("{}天", days)
+            format!("{days}天")
         }
     }
 }
@@ -153,11 +153,11 @@ impl UserManager {
 
     // Redis键名规范
     fn online_key(user_id: &str) -> String {
-        format!("online:user:{}", user_id)
+        format!("online:user:{user_id}")
     }
 
     fn session_key(session_id: &str) -> String {
-        format!("session:{}", session_id)
+        format!("session:{session_id}")
     }
 
     #[allow(dead_code)]
@@ -175,17 +175,14 @@ impl UserManager {
         info!("🔐 尝试登录: 用户名={}", username);
         
         // 查找用户
-        let user = match self.users.iter().find(|u| u.username == username && u.status == "active") {
-            Some(user) => user.clone(),
-            None => {
-                warn!("❌ 登录失败: 用户名不存在或已禁用 - {}", username);
-                return LoginResponse {
-                    success: false,
-                    message: "用户名或密码错误".to_string(),
-                    session_id: None,
-                    user: None,
-                };
-            }
+        let user = if let Some(user) = self.users.iter().find(|u| u.username == username && u.status == "active") { user.clone() } else {
+            warn!("❌ 登录失败: 用户名不存在或已禁用 - {}", username);
+            return LoginResponse {
+                success: false,
+                message: "用户名或密码错误".to_string(),
+                session_id: None,
+                user: None,
+            };
         };
 
         // 验证密码
@@ -264,66 +261,56 @@ impl UserManager {
             .arg(self.session_ttl)
             .query(&mut conn);
 
-        match set_result {
-            Ok(_) => {
-                // 成功设置在线状态，保存会话数据
-                let session_key = Self::session_key(&session_id);
-                let _: RedisResult<()> = conn.set_ex(&session_key, session_data, self.session_ttl as usize);
-                
-                info!("✅ 登录成功: 用户={}, 会话ID={}", username, session_id);
-                
-                LoginResponse {
-                    success: true,
-                    message: "登录成功".to_string(),
-                    session_id: Some(session_id),
-                    user: Some(UserInfo {
-                        id: user.id.clone(),
-                        username: user.username.clone(),
-                        display_name: user.display_name.clone(),
-                        role: user.role.clone(),
-                        permissions: user.permissions.clone(),
-                    }),
-                }
+        if let Ok(_) = set_result {
+            // 成功设置在线状态，保存会话数据
+            let session_key = Self::session_key(&session_id);
+            let _: RedisResult<()> = conn.set_ex(&session_key, session_data, self.session_ttl as usize);
+            
+            info!("✅ 登录成功: 用户={}, 会话ID={}", username, session_id);
+            
+            LoginResponse {
+                success: true,
+                message: "登录成功".to_string(),
+                session_id: Some(session_id),
+                user: Some(UserInfo {
+                    id: user.id.clone(),
+                    username: user.username.clone(),
+                    display_name: user.display_name.clone(),
+                    role: user.role.clone(),
+                    permissions: user.permissions.clone(),
+                }),
             }
-            Err(_) => {
-                // 用户已在线，获取现有会话信息
-                if let Ok(existing_session_id) = conn.get::<_, String>(&online_key) {
-                    let session_key = Self::session_key(&existing_session_id);
-                    if let Ok(session_data) = conn.get::<_, String>(&session_key) {
-                        if let Ok(existing_session) = serde_json::from_str::<Session>(&session_data) {
-                            let ip_info = existing_session.ip_address.as_ref()
-                                .map(|ip| format!("IP: {}", ip))
-                                .unwrap_or_else(|| "IP: 未知".to_string());
-                            
-                            let login_time = existing_session.created_at.format("%Y-%m-%d %H:%M:%S");
-                            let last_activity_time = existing_session.last_activity.format("%Y-%m-%d %H:%M:%S");
-                            let inactive_duration = now - existing_session.last_activity;
-                            let activity_duration = humanize_duration(inactive_duration);
-                            
-                            warn!("⚠️ 拒绝登录：用户{}已在线", username);
-                            
-                            return LoginResponse {
-                                success: false,
-                                message: format!("该账号已在其他设备登录\n\n在线状态:\n• {}\n• 登录时间: {}\n• 最后活动: {} ({}前)\n• 会话ID: {}", 
-                                    ip_info,
-                                    login_time,
-                                    last_activity_time,
-                                    activity_duration,
-                                    existing_session_id),
-                                session_id: None,
-                                user: None,
-                            };
-                        }
+        } else {
+            // 用户已在线，获取现有会话信息
+            if let Ok(existing_session_id) = conn.get::<_, String>(&online_key) {
+                let session_key = Self::session_key(&existing_session_id);
+                if let Ok(session_data) = conn.get::<_, String>(&session_key) {
+                    if let Ok(existing_session) = serde_json::from_str::<Session>(&session_data) {
+                        let ip_info = existing_session.ip_address.as_ref().map_or_else(|| "IP: 未知".to_string(), |ip| format!("IP: {ip}"));
+                        
+                        let login_time = existing_session.created_at.format("%Y-%m-%d %H:%M:%S");
+                        let last_activity_time = existing_session.last_activity.format("%Y-%m-%d %H:%M:%S");
+                        let inactive_duration = now - existing_session.last_activity;
+                        let activity_duration = humanize_duration(inactive_duration);
+                        
+                        warn!("⚠️ 拒绝登录：用户{}已在线", username);
+                        
+                        return LoginResponse {
+                            success: false,
+                            message: format!("该账号已在其他设备登录\n\n在线状态:\n• {ip_info}\n• 登录时间: {login_time}\n• 最后活动: {last_activity_time} ({activity_duration}前)\n• 会话ID: {existing_session_id}"),
+                            session_id: None,
+                            user: None,
+                        };
                     }
                 }
-                
-                // 无法获取会话信息，返回通用错误
-                LoginResponse {
-                    success: false,
-                    message: "该账号已在其他设备登录".to_string(),
-                    session_id: None,
-                    user: None,
-                }
+            }
+            
+            // 无法获取会话信息，返回通用错误
+            LoginResponse {
+                success: false,
+                message: "该账号已在其他设备登录".to_string(),
+                session_id: None,
+                user: None,
             }
         }
     }

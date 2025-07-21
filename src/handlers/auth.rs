@@ -123,29 +123,26 @@ pub async fn handle_validate_session(
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("🔍 处理会话验证请求: 会话ID={}", session_id);
     
-    match user_manager.validate_session(&session_id).await {
-        Some(session) => {
-            info!("✅ 会话验证成功: {}", session.username);
-            let user_info = crate::user_manager::UserInfo {
-                id: session.user_id.clone(),
-                username: session.username.clone(),
-                display_name: session.display_name.clone(),
-                role: session.role.clone(),
-                permissions: vec![], // 这里可以添加权限逻辑
-            };
-            Ok(warp::reply::json(&serde_json::json!({
-                "success": true,
-                "message": "会话有效",
-                "data": user_info
-            })))
-        }
-        None => {
-            warn!("❌ 会话验证失败: {}", session_id);
-            Ok(warp::reply::json(&serde_json::json!({
-                "success": false,
-                "message": "会话无效或已过期"
-            })))
-        }
+    if let Some(session) = user_manager.validate_session(&session_id).await {
+        info!("✅ 会话验证成功: {}", session.username);
+        let user_info = crate::user_manager::UserInfo {
+            id: session.user_id.clone(),
+            username: session.username.clone(),
+            display_name: session.display_name.clone(),
+            role: session.role.clone(),
+            permissions: vec![], // 这里可以添加权限逻辑
+        };
+        Ok(warp::reply::json(&serde_json::json!({
+            "success": true,
+            "message": "会话有效",
+            "data": user_info
+        })))
+    } else {
+        warn!("❌ 会话验证失败: {}", session_id);
+        Ok(warp::reply::json(&serde_json::json!({
+            "success": false,
+            "message": "会话无效或已过期"
+        })))
     }
 }
 
@@ -265,32 +262,29 @@ pub async fn handle_user_online_info(
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("📊 处理用户在线信息获取请求: 用户名={}, 请求者={}", username, user_info.name);
     
-    match user_manager.get_user_online_info(&username).await {
-        Some((session_id, last_activity, ip_address)) => {
-            let online_info = UserOnlineInfo {
-                success: true,
-                username: username.clone(),
-                session_id,
-                last_activity,
-                ip_address,
-                is_truly_online: true,
-                check_time: chrono::Utc::now(),
-            };
-            
-            info!("✅ 用户在线信息获取成功: {}", username);
-            Ok(warp::reply::json(&online_info))
-        }
-        None => {
-            let offline_info = UserOfflineInfo {
-                success: true,
-                username: username.clone(),
-                is_online: false,
-                message: "用户不在线".to_string(),
-                check_time: chrono::Utc::now(),
-            };
-            
-            info!("📴 用户不在线: {}", username);
-            Ok(warp::reply::json(&offline_info))
-        }
+    if let Some((session_id, last_activity, ip_address)) = user_manager.get_user_online_info(&username).await {
+        let online_info = UserOnlineInfo {
+            success: true,
+            username: username.clone(),
+            session_id,
+            last_activity,
+            ip_address,
+            is_truly_online: true,
+            check_time: chrono::Utc::now(),
+        };
+        
+        info!("✅ 用户在线信息获取成功: {}", username);
+        Ok(warp::reply::json(&online_info))
+    } else {
+        let offline_info = UserOfflineInfo {
+            success: true,
+            username: username.clone(),
+            is_online: false,
+            message: "用户不在线".to_string(),
+            check_time: chrono::Utc::now(),
+        };
+        
+        info!("📴 用户不在线: {}", username);
+        Ok(warp::reply::json(&offline_info))
     }
 } 

@@ -175,7 +175,7 @@ pub fn normalize_path(path: &str) -> String {
     
     #[cfg(not(target_os = "windows"))]
     {
-        path.replace("\\", "/")
+        path.replace('\\', "/")
     }
 }
 
@@ -207,7 +207,7 @@ pub fn is_linux() -> bool {
     }
 }
 
-/// 检查是否为macOS平台
+/// `检查是否为macOS平台`
 #[allow(dead_code)]
 pub fn is_macos() -> bool {
     #[cfg(target_os = "macos")]

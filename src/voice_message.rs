@@ -95,13 +95,13 @@ pub struct VoiceMessageStats {
 /// 语音消息管理器
 pub struct VoiceMessageManager {
     storage_path: PathBuf,
-    /// 最大文件大小限制（字节）- 在validate_voice_file中使用
+    /// 最大文件大小限制（字节）- `在validate_voice_file中使用`
     #[allow(dead_code)]
     max_file_size: u64,
-    /// 最大语音时长限制（秒）- 在validate_voice_file中使用
+    /// 最大语音时长限制（秒）- `在validate_voice_file中使用`
     #[allow(dead_code)]
     max_duration: u32,
-    /// 支持的语音格式列表 - 在validate_voice_file中使用
+    /// 支持的语音格式列表 - `在validate_voice_file中使用`
     #[allow(dead_code)]
     supported_formats: Vec<String>,
 }
@@ -229,7 +229,7 @@ impl VoiceMessageManager {
 
         // 保存文件
         match fs::write(&file_path, &request.audio_data) {
-            Ok(_) => {
+            Ok(()) => {
                 info!("🎤 语音文件保存成功: {:?}", file_path);
             }
             Err(e) => {
@@ -239,7 +239,7 @@ impl VoiceMessageManager {
         }
 
         // 生成访问URL
-        let access_url = format!("/api/voice/download/{}", file_id);
+        let access_url = format!("/api/voice/download/{file_id}");
 
         // 创建语音消息对象
         let voice_message = VoiceMessage {
@@ -403,7 +403,7 @@ impl VoiceMessageManager {
                     total_size += voice_message.file_size;
                     
                     if let Some(duration) = voice_message.duration {
-                        total_duration += duration as u64;
+                        total_duration += u64::from(duration);
                     }
 
                     // 检查是否是今天的消息
@@ -451,7 +451,7 @@ impl VoiceMessageManager {
         if !metadata_dir.exists() {
             let _ = fs::create_dir_all(&metadata_dir);
         }
-        metadata_dir.join(format!("{}.json", voice_id))
+        metadata_dir.join(format!("{voice_id}.json"))
     }
 
     /// 保存语音消息元数据

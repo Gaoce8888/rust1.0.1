@@ -81,9 +81,9 @@ pub async fn handle_client_register(
     });
     
     // 存储客户端信息
-    let storage_key = format!("client:{}", client_id);
+    let storage_key = format!("client:{client_id}");
     match storage.set(&storage_key, &client_data.to_string()).await {
-        Ok(_) => {
+        Ok(()) => {
             info!("✅ 客户端信息已存储: {}", client_id);
         }
         Err(e) => {
@@ -206,7 +206,7 @@ struct LocationInfo {
     timezone: Option<String>,
 }
 
-/// 获取简化的地理位置数据库 (企业级实现应使用真实的GeoIP数据库)
+/// 获取简化的地理位置数据库 (`企业级实现应使用真实的GeoIP数据库`)
 fn get_location_database() -> HashMap<String, LocationInfo> {
     let mut db = HashMap::new();
     

@@ -112,7 +112,7 @@ impl KefuAuthManager {
     /// 检查客服是否已在线
     pub async fn is_kefu_online(&self, kefu_id: &str) -> Result<bool> {
         let mut conn = self.redis_pool.get_connection().await?;
-        let key = format!("kefu:online:{}", kefu_id);
+        let key = format!("kefu:online:{kefu_id}");
         let exists: bool = conn.exists(&key).await?;
         Ok(exists)
     }
@@ -162,7 +162,7 @@ impl KefuAuthManager {
         let mut conn = self.redis_pool.get_connection().await?;
         
         // 删除在线状态
-        let key = format!("kefu:online:{}", kefu_id);
+        let key = format!("kefu:online:{kefu_id}");
         conn.del::<_, ()>(&key).await?;
         
         // 从在线列表移除
@@ -180,7 +180,7 @@ impl KefuAuthManager {
         }
         
         let mut conn = self.redis_pool.get_connection().await?;
-        let key = format!("kefu:online:{}", kefu_id);
+        let key = format!("kefu:online:{kefu_id}");
         
         // 获取当前状态
         let status_json: Option<String> = conn.get(&key).await?;
@@ -204,7 +204,7 @@ impl KefuAuthManager {
         let mut online_kefu = Vec::new();
         
         for kefu_id in kefu_ids {
-            let key = format!("kefu:online:{}", kefu_id);
+            let key = format!("kefu:online:{kefu_id}");
             if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
                 if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
                     online_kefu.push(status);
@@ -237,7 +237,7 @@ impl KefuAuthManager {
             
             // 记录客户-客服关系
             let mut conn = self.redis_pool.get_connection().await?;
-            let customer_key = format!("customer:kefu:{}", customer_id);
+            let customer_key = format!("customer:kefu:{customer_id}");
             conn.set_ex::<_, _, ()>(&customer_key, &kefu.kefu_id, 3600).await?;
             
             return Ok(Some(kefu.kefu_id.clone()));
@@ -251,7 +251,7 @@ impl KefuAuthManager {
     #[allow(dead_code)]
     async fn increment_kefu_customers(&self, kefu_id: &str, increment: i32) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
-        let key = format!("kefu:online:{}", kefu_id);
+        let key = format!("kefu:online:{kefu_id}");
         
         if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
             if let Ok(mut status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {
@@ -273,7 +273,7 @@ impl KefuAuthManager {
     #[allow(dead_code)]
     pub async fn release_kefu_for_customer(&self, customer_id: &str) -> Result<()> {
         let mut conn = self.redis_pool.get_connection().await?;
-        let customer_key = format!("customer:kefu:{}", customer_id);
+        let customer_key = format!("customer:kefu:{customer_id}");
         
         if let Ok(Some(kefu_id)) = conn.get::<_, Option<String>>(&customer_key).await {
             self.increment_kefu_customers(&kefu_id, -1).await?;
@@ -288,7 +288,7 @@ impl KefuAuthManager {
     #[allow(dead_code)]
     pub async fn get_kefu_for_customer(&self, customer_id: &str) -> Result<Option<String>> {
         let mut conn = self.redis_pool.get_connection().await?;
-        let customer_key = format!("customer:kefu:{}", customer_id);
+        let customer_key = format!("customer:kefu:{customer_id}");
         let kefu_id: Option<String> = conn.get(&customer_key).await?;
         Ok(kefu_id)
     }
@@ -316,7 +316,7 @@ impl KefuAuthManager {
         let now = chrono::Utc::now();
         
         for kefu_id in kefu_ids {
-            let key = format!("kefu:online:{}", kefu_id);
+            let key = format!("kefu:online:{kefu_id}");
             
             if let Ok(Some(status_json)) = conn.get::<_, Option<String>>(&key).await {
                 if let Ok(status) = serde_json::from_str::<KefuOnlineStatus>(&status_json) {

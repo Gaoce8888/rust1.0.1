@@ -190,7 +190,7 @@ pub async fn handle_delete_message(
     
     let response = ApiResponse {
         success: true,
-        message: format!("消息 {} 已删除", message_id),
+        message: format!("消息 {message_id} 已删除"),
         data: Some(serde_json::json!({
             "message_id": message_id,
             "deleted_at": Utc::now()
@@ -210,7 +210,7 @@ pub async fn handle_bulk_delete_messages(
     
     let response = ApiResponse {
         success: true,
-        message: format!("已删除 {} 条消息", deleted_count),
+        message: format!("已删除 {deleted_count} 条消息"),
         data: Some(serde_json::json!({
             "deleted_count": deleted_count,
             "deleted_ids": message_ids,
@@ -231,7 +231,7 @@ pub async fn handle_mark_messages_read(
     
     let response = ApiResponse {
         success: true,
-        message: format!("已标记 {} 条消息为已读", marked_count),
+        message: format!("已标记 {marked_count} 条消息为已读"),
         data: Some(serde_json::json!({
             "marked_count": marked_count,
             "message_ids": message_ids,

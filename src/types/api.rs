@@ -62,7 +62,7 @@ pub struct SystemHealth {
     pub redis: bool,
     /// 存储状态
     pub storage: bool,
-    /// WebSocket服务状态
+    /// `WebSocket服务状态`
     pub websocket: bool,
     /// 内存使用情况
     pub memory_usage: Option<MemoryUsage>,

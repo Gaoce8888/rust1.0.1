@@ -6,7 +6,7 @@ use crate::auth::websocket::{parse_websocket_connection, validate_kefu_websocket
 use crate::auth::kefu_auth::KefuAuthManager;
 use crate::errors::InvalidParams;
 
-/// 构建WebSocket路由
+/// `构建WebSocket路由`
 pub fn build_websocket_routes(
     ws_manager: Arc<WebSocketManager>,
     kefu_auth_manager: Arc<KefuAuthManager>,
@@ -25,7 +25,7 @@ pub fn build_websocket_routes(
         })
 }
 
-/// 处理WebSocket连接
+/// `处理WebSocket连接`
 async fn handle_websocket(
     ws: warp::ws::Ws,
     query: WebSocketParams,
@@ -54,7 +54,7 @@ async fn handle_websocket(
         Err(e) => {
             tracing::error!("WebSocket认证失败: {}", e);
             return Err(warp::reject::custom(InvalidParams { 
-                message: format!("Authentication error: {}", e) 
+                message: format!("Authentication error: {e}") 
             }));
         }
     }

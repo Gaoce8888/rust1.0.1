@@ -64,9 +64,7 @@ pub async fn handle_list_sessions(
                 for customer in customers {
                     // 获取客服信息
                     let connections = ws_manager.connections.read().await;
-                    let kefu_name = connections.get(&kefu_id)
-                        .map(|conn| conn.user_name.clone())
-                        .unwrap_or_else(|| "未知客服".to_string());
+                    let kefu_name = connections.get(&kefu_id).map_or_else(|| "未知客服".to_string(), |conn| conn.user_name.clone());
                     
                     sessions.push(SessionInfo {
                         session_id: format!("{}:{}", customer.id, kefu_id),
@@ -102,7 +100,7 @@ pub async fn handle_list_sessions(
                     for customer_id in active_sessions {
                         if let Some(customer_conn) = connections.get(&customer_id) {
                             sessions.push(SessionInfo {
-                                session_id: format!("{}:{}", customer_id, user_id),
+                                session_id: format!("{customer_id}:{user_id}"),
                                 kefu_id: user_id.clone(),
                                 kefu_name: connection.user_name.clone(),
                                 kehu_id: customer_id.clone(),
@@ -308,7 +306,7 @@ pub async fn handle_get_session_messages(
             "from": msg.from,
             "to": msg.to,
             "content": msg.content,
-            "content_type": msg.content_type.map(|ct| format!("{:?}", ct)),
+            "content_type": msg.content_type.map(|ct| format!("{ct:?}")),
             "timestamp": msg.timestamp,
             "url": msg.url
         }))
@@ -376,7 +374,7 @@ pub async fn handle_transfer_session(
             if success {
                 let response = ApiResponse {
                     success: true,
-                    message: format!("会话已成功转接给客服 {}", to_kefu_id),
+                    message: format!("会话已成功转接给客服 {to_kefu_id}"),
                     data: Some(serde_json::json!({
                         "session_id": session_id,
                         "from_kefu_id": from_kefu_id,
@@ -397,7 +395,7 @@ pub async fn handle_transfer_session(
         Err(e) => {
             tracing::error!("会话转接错误: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("会话转接失败: {}", e),
+                format!("会话转接失败: {e}"),
                 Some(500)
             )))
         }
@@ -424,7 +422,7 @@ pub async fn handle_end_session(
     // 清除会话关系
     let redis = ws_manager.redis.write().await;
     match redis.clear_session(kehu_id, kefu_id).await {
-        Ok(_) => {
+        Ok(()) => {
             let response = ApiResponse {
                 success: true,
                 message: "会话已结束".to_string(),
@@ -440,7 +438,7 @@ pub async fn handle_end_session(
         Err(e) => {
             tracing::error!("结束会话失败: {:?}", e);
             Err(warp::reject::custom(crate::types::api::ApiError::new(
-                format!("结束会话失败: {}", e),
+                format!("结束会话失败: {e}"),
                 Some(500)
             )))
         }

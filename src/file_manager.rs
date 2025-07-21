@@ -245,7 +245,7 @@ impl FileManager {
         fs::create_dir_all(&storage_dir)?;
 
         let file_path = storage_dir.join(&file_name);
-        let relative_path = format!("{}/{}", date_path, file_name);
+        let relative_path = format!("{date_path}/{file_name}");
 
         // 计算校验和
         let checksum = self.calculate_checksum(&request.content);
@@ -256,7 +256,7 @@ impl FileManager {
         // 创建文件信息
         let expires_at = request
             .expires_days
-            .map(|days| now + chrono::Duration::days(days as i64));
+            .map(|days| now + chrono::Duration::days(i64::from(days)));
 
         let file_info = FileInfo {
             id: file_id.clone(),
@@ -268,7 +268,7 @@ impl FileManager {
             file_size: request.content.len() as u64,
             uploaded_by: request.uploaded_by.clone(),
             uploaded_at: now,
-            access_url: format!("/api/files/{}", file_id),
+            access_url: format!("/api/files/{file_id}"),
             checksum: checksum.clone(),
             is_public: request.is_public,
             download_count: 0,
@@ -412,21 +412,21 @@ impl FileManager {
         Path::new(filename)
             .extension()
             .and_then(|ext| ext.to_str())
-            .map(|s| s.to_lowercase())
+            .map(str::to_lowercase)
     }
 
     #[allow(dead_code)]
     fn calculate_checksum(&self, content: &[u8]) -> String {
         // 简化版本使用简单的校验和
-        let sum: u32 = content.iter().map(|&b| b as u32).sum();
-        format!("{:08x}", sum)
+        let sum: u32 = content.iter().map(|&b| u32::from(b)).sum();
+        format!("{sum:08x}")
     }
 
     #[allow(dead_code)]
     fn get_metadata_path(&self, file_id: &str) -> PathBuf {
         self.base_path
             .join("metadata")
-            .join(format!("{}.json", file_id))
+            .join(format!("{file_id}.json"))
     }
 
     #[allow(dead_code)]
