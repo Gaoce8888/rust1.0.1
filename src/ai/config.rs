@@ -371,7 +371,7 @@ impl AIConfig {
     }
 
     /// 从环境变量加载API密钥等敏感信息
-    fn load_secrets_from_env(&mut self) {
+    pub fn load_secrets_from_env(&mut self) {
         // OpenAI API Key
         if let Ok(key) = std::env::var("OPENAI_API_KEY") {
             if self.intent_recognition.model_type == "openai" && self.intent_recognition.api_key.is_empty() {

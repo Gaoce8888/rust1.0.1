@@ -258,9 +258,9 @@ pub async fn handle_export_messages(
             for msg in messages {
                 csv_data.push_str(&format!(
                     "{},{},{},{},{},{},{}\n",
-                    msg.id,
-                    msg.sender_id,
-                    msg.receiver_id,
+                    msg.id.as_deref().unwrap_or(""),
+                    msg.from,
+                    msg.to.as_deref().unwrap_or(""),
                     msg.content.replace(",", "，").replace("\n", " "),
                     msg.message_type,
                     msg.timestamp.to_rfc3339(),

@@ -4,6 +4,7 @@ use crate::websocket::WebSocketManager;
 use crate::user_manager::UserManager;
 use crate::storage::LocalStorage;
 use crate::file_manager::FileManager;
+use crate::types::api::ApiError;
 
 // 导入系统扩展处理器
 
@@ -220,11 +221,18 @@ pub fn build_extended_api_routes(
 
     let redis_keys = warp::path!("api" / "redis" / "keys")
         .and(warp::get())
-        .and(warp::query())
+        .and(warp::query::<std::collections::HashMap<String, String>>())
         .and(with_ws_manager(ws_manager.clone()))
-        .and_then(|query: std::collections::HashMap<String, String>, ws_manager| {
-            let pattern = query.get("pattern").cloned();
-            handle_redis_keys(pattern, ws_manager)
+        .and_then(|query: std::collections::HashMap<String, String>, ws_manager: Arc<WebSocketManager>| async move {
+            // 转换query为serde_json::Value
+            let request = serde_json::json!({
+                "pattern": query.get("pattern").cloned().unwrap_or_else(|| "*".to_string()),
+                "db": query.get("db").and_then(|v| v.parse::<i64>().ok()).unwrap_or(0),
+                "limit": query.get("limit").and_then(|v| v.parse::<usize>().ok()).unwrap_or(100),
+                "with_ttl": query.get("with_ttl").map(|v| v == "true").unwrap_or(false),
+                "with_type": query.get("with_type").map(|v| v == "true").unwrap_or(false),
+            });
+            handle_redis_keys(request, ws_manager).await
         });
 
     // 组合所有路由
@@ -469,15 +477,16 @@ async fn handle_system_maintenance(request: serde_json::Value) -> Result<impl wa
                 warp::reject::custom(crate::error::ApiError::InternalError)
             })?;
             
-        // 广播维护通知
-        if let Ok(ws_manager) = crate::websocket::WS_MANAGER.get() {
-            let _ = ws_manager.broadcast_system_message(&serde_json::json!({
-                "type": "maintenance",
-                "enabled": true,
-                "message": message,
-                "estimated_duration": estimated_duration
-            })).await;
-        }
+        // 广播维护通知 - 注释掉或使用其他方式
+        // TODO: 需要通过其他方式获取WebSocketManager实例来广播消息
+        // if let Ok(ws_manager) = crate::websocket::WS_MANAGER.get() {
+        //     let _ = ws_manager.broadcast_system_message(&serde_json::json!({
+        //         "type": "maintenance",
+        //         "enabled": true,
+        //         "message": message,
+        //         "estimated_duration": estimated_duration
+        //     })).await;
+        // }
         
         Ok(warp::reply::json(&serde_json::json!({
             "success": true,
@@ -488,14 +497,15 @@ async fn handle_system_maintenance(request: serde_json::Value) -> Result<impl wa
         // 关闭维护模式
         tokio::fs::remove_file(maintenance_file).await.ok();
         
-        // 广播恢复通知
-        if let Ok(ws_manager) = crate::websocket::WS_MANAGER.get() {
-            let _ = ws_manager.broadcast_system_message(&serde_json::json!({
-                "type": "maintenance",
-                "enabled": false,
-                "message": "系统已恢复正常"
-            })).await;
-        }
+        // 广播恢复通知 - 注释掉或使用其他方式
+        // TODO: 需要通过其他方式获取WebSocketManager实例来广播消息
+        // if let Ok(ws_manager) = crate::websocket::WS_MANAGER.get() {
+        //     let _ = ws_manager.broadcast_system_message(&serde_json::json!({
+        //         "type": "maintenance",
+        //         "enabled": false,
+        //         "message": "系统已恢复正常"
+        //     })).await;
+        // }
         
         Ok(warp::reply::json(&serde_json::json!({
             "success": true,
@@ -831,7 +841,7 @@ async fn handle_redis_keys(request: serde_json::Value, ws_manager: Arc<WebSocket
                 // 获取类型
                 if with_type {
                     if let Ok(key_type) = redis.get_key_type(&key).await {
-                        info["type"] = key_type.into();
+                        info["type"] = key_type.clone().into();
                         
                         // 根据类型获取大小
                         match key_type.as_str() {

@@ -318,7 +318,7 @@ impl SpeechProcessor {
         })
     }
 
-    async fn process_local(&self, audio_data: &[u8], language: &str) -> Result<String> {
+    async fn process_local(&self, _audio_data: &[u8], _language: &str) -> Result<String> {
         // 本地语音识别实现
         // 这里应该集成实际的本地语音识别库，如：
         // - DeepSpeech
@@ -327,7 +327,7 @@ impl SpeechProcessor {
         
         // 目前返回错误，提示需要配置实际的语音识别服务
         Err(anyhow::anyhow!(
-            "本地语音识别未配置。请配置语音识别服务提供商（Azure、Google、AWS或百度）或集成本地语音识别库。"
+            "本地语音识别未配置。请配置语音识别服务提供商（Azure、Google或百度）。"
         ))
     }
 
@@ -393,7 +393,12 @@ impl AIProcessor for SpeechProcessor {
             "azure" => self.recognize_speech_azure(&audio_data, &language, &audio_metadata.format).await?,
             "google" => self.recognize_speech_google(&audio_data, &language, &audio_metadata.format).await?,
             "baidu" => self.recognize_speech_baidu(&audio_data, &language, &audio_metadata.format).await?,
-            _ => self.process_local(&audio_data, &language).await?,
+            _ => {
+                // 对于本地处理，返回错误而不是处理
+                return Err(anyhow::anyhow!(
+                    "本地语音识别未配置。请配置语音识别服务提供商（Azure、Google或百度）。"
+                ));
+            }
         };
         
         // 后处理结果

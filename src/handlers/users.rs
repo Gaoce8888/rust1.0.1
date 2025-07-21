@@ -282,3 +282,20 @@ pub async fn handle_get_users(
             })
         })
         .collect();
+
+    let response = ApiResponse {
+        success: true,
+        message: "获取用户列表成功".to_string(),
+        data: Some(serde_json::json!({
+            "users": users,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total": total,
+                "total_pages": (total as f64 / page_size as f64).ceil() as u32,
+            }
+        })),
+    };
+
+    Ok(warp::reply::json(&response))
+}

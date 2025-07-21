@@ -1,0 +1,74 @@
+# 多阶段构建，用于生产环境
+# 第一阶段：构建
+FROM rust:1.82-slim AS builder
+
+# 安装构建依赖
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建工作目录
+WORKDIR /usr/src/app
+
+# 复制依赖配置文件
+COPY Cargo.toml Cargo.lock ./
+
+# 创建src目录并添加占位文件以缓存依赖
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+
+# 构建依赖（利用Docker层缓存）
+RUN cargo build --release
+RUN rm -f target/release/deps/kefu_system*
+
+# 复制源代码
+COPY src ./src
+COPY config ./config
+
+# 使用时间戳强制重新编译
+RUN touch src/main.rs
+
+# 生产编译
+RUN cargo build --release
+
+# 第二阶段：运行时镜像
+FROM debian:bookworm-slim
+
+# 安装运行时依赖
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建非root用户
+RUN useradd -m -u 1001 -s /bin/bash kefu
+
+# 创建必要的目录
+RUN mkdir -p /app/config /app/logs /app/uploads/images /app/uploads/files /app/uploads/voices /app/backups \
+    && chown -R kefu:kefu /app
+
+WORKDIR /app
+
+# 从构建阶段复制二进制文件
+COPY --from=builder /usr/src/app/target/release/kefu-system /app/kefu-system
+
+# 复制配置文件
+COPY --chown=kefu:kefu config /app/config
+COPY --chown=kefu:kefu static /app/static
+
+# 设置用户
+USER kefu
+
+# 暴露端口
+EXPOSE 8080
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# 设置默认环境变量
+ENV RUST_LOG=info
+ENV RUST_BACKTRACE=1
+
+# 启动命令
+CMD ["./kefu-system"]

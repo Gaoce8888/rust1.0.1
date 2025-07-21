@@ -278,7 +278,7 @@ impl TranslationProcessor {
         })
     }
 
-    async fn translate_local(&self, text: &str, source_lang: &str, target_lang: &str) -> Result<TranslationResult> {
+    async fn translate_local(&self, _text: &str, _source_lang: &str, _target_lang: &str) -> Result<TranslationResult> {
         // 本地翻译实现
         // 这里应该集成实际的本地翻译库或模型
         // 目前返回错误，提示需要配置实际的翻译服务
