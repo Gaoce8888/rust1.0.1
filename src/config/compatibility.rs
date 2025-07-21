@@ -48,6 +48,7 @@ pub struct FrontendConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct FrontendFeatures {
     #[serde(rename = "imageUpload")]
     pub image_upload: bool,
@@ -184,9 +185,14 @@ pub struct CompressionConfig {
 }
 
 impl AppConfig {
+    /// 从文件加载配置
+    /// 
+    /// # Errors
+    /// 
+    /// 当文件读取失败或JSON解析失败时返回错误
     pub fn load_from_file<P: AsRef<std::path::Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         let content = std::fs::read_to_string(path)?;
-        let config: AppConfig = serde_json::from_str(&content)?;
+        let config: Self = serde_json::from_str(&content)?;
         Ok(config)
     }
 
@@ -202,15 +208,20 @@ impl AppConfig {
         }
     }
 
-    pub fn get() -> &'static AppConfig {
+    pub fn get() -> &'static Self {
         static CONFIG: std::sync::OnceLock<AppConfig> = std::sync::OnceLock::new();
         CONFIG.get_or_init(|| {
-            AppConfig::load_from_file("config/app-config.json")
-                .unwrap_or_else(|_| AppConfig::default())
+            Self::load_from_file("config/app-config.json")
+                .unwrap_or_else(|_| Self::default())
         })
     }
 
-    pub fn init(config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
+    /// 初始化配置
+    /// 
+    /// # Errors
+    /// 
+    /// 当配置设置失败时返回错误
+    pub fn init(config: Self) -> Result<(), Box<dyn std::error::Error>> {
         static CONFIG: std::sync::OnceLock<AppConfig> = std::sync::OnceLock::new();
         CONFIG.set(config).map_err(|_| "Failed to set config".into())
     }
@@ -247,7 +258,7 @@ impl Default for AppConfig {
                     offline_support: true,
                 },
                 upload: UploadConfig {
-                    max_file_size: 10485760,
+                    max_file_size: 10_485_760,
                     allowed_types: vec!["image/*".to_string(), "audio/*".to_string()],
                     compression_enabled: true,
                     compression_quality: 0.8,
@@ -260,12 +271,12 @@ impl Default for AppConfig {
                 reconnect_interval: 5000,
                 max_reconnect_attempts: 5,
                 message_timeout: 10000,
-                max_message_size: 1048576,
+                max_message_size: 1_048_576,
             },
             redis: RedisConfig {
                 host: "127.0.0.1".to_string(),
                 port: 6379,
-                password: "".to_string(),
+                password: String::new(),
                 database: 0,
                 pool: RedisPoolConfig {
                     max_size: 10,
@@ -278,7 +289,7 @@ impl Default for AppConfig {
                 data_dir: "./data".to_string(),
                 blobs_dir: "./data/blobs".to_string(),
                 snapshot_interval: 3600,
-                max_snapshot_size: 104857600,
+                max_snapshot_size: 104_857_600,
             },
             security: SecurityConfig {
                 jwt_secret: "your-secret-key".to_string(),
@@ -296,7 +307,7 @@ impl Default for AppConfig {
                 file: FileLogConfig {
                     enabled: true,
                     path: "./logs/app.log".to_string(),
-                    max_size: 10485760,
+                    max_size: 10_485_760,
                     max_files: 10,
                 },
             },
@@ -315,6 +326,11 @@ impl Default for AppConfig {
     }
 }
 
+/// 初始化配置系统
+/// 
+/// # Errors
+/// 
+/// 当配置文件加载或初始化失败时返回错误
 pub fn init_config() -> Result<(), Box<dyn std::error::Error>> {
     let config = AppConfig::load_from_file("config/app-config.json")?;
     AppConfig::init(config)?;

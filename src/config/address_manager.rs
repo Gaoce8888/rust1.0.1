@@ -261,6 +261,13 @@ pub struct AddressManager {
 
 impl AddressManager {
     /// 创建新的地址管理器
+    /// 
+    /// # Errors
+    /// 
+    /// 当配置文件加载失败时返回错误，可能的原因包括：
+    /// - 配置文件不存在
+    /// - 配置文件格式错误
+    /// - 文件系统权限问题
     pub async fn new() -> Result<Self> {
         let config = Self::load_config().await?;
         let environment = Self::detect_environment();
@@ -295,10 +302,14 @@ impl AddressManager {
     async fn load_from_file(path: &str) -> Result<AddressConfig> {
         let content = tokio::fs::read_to_string(path).await?;
         
-        if path.ends_with(".toml") {
+        if std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("toml")) {
             let config: AddressConfig = toml::from_str(&content)?;
             Ok(config)
-        } else if path.ends_with(".json") {
+        } else if std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("json")) {
             let config: AddressConfig = serde_json::from_str(&content)?;
             Ok(config)
         } else {
@@ -313,6 +324,7 @@ impl AddressManager {
     }
 
     /// 获取默认配置
+    #[allow(clippy::too_many_lines)]
     fn default_config() -> AddressConfig {
         AddressConfig {
             domains: DomainConfig {
@@ -451,8 +463,8 @@ impl AddressManager {
                 enabled: false,
                 proxy_host: "127.0.0.1".to_string(),
                 proxy_port: 8080,
-                proxy_username: "".to_string(),
-                proxy_password: "".to_string(),
+                proxy_username: String::new(),
+                proxy_password: String::new(),
                 reverse_proxy_enabled: true,
                 nginx_config_path: "/etc/nginx/sites-available/ylqkf.com".to_string(),
                 nginx_ssl_config_path: "/etc/nginx/sites-available/ylqkf.com-ssl".to_string(),
@@ -489,7 +501,7 @@ impl AddressManager {
                 reconnect_interval: 5000,
                 max_reconnect_attempts: 5,
                 message_timeout: 10000,
-                max_message_size: 1048576,
+                max_message_size: 1_048_576,
                 ws_path: "/ws".to_string(),
                 ws_upgrade_path: "/ws/upgrade".to_string(),
                 ws_fallback_path: "/ws/fallback".to_string(),
@@ -548,7 +560,7 @@ impl AddressManager {
                 log_file_path: "./logs/app.log".to_string(),
                 access_log_path: "./logs/access.log".to_string(),
                 error_log_path: "./logs/error.log".to_string(),
-                max_log_size: 10485760,
+                max_log_size: 10_485_760,
                 max_log_files: 5,
                 log_retention_days: 30,
             },
@@ -580,10 +592,14 @@ impl AddressManager {
     pub async fn get_api_url(&self) -> String {
         let cache_key = format!("api_url_{}", self.environment);
         
-        if let Some(cached) = self.cache.read().await.get(&cache_key) {
+        // Check cache first
+        let cache_guard = self.cache.read().await;
+        if let Some(cached) = cache_guard.get(&cache_key) {
             return cached.clone();
         }
+        drop(cache_guard);
 
+        // Get URL from config
         let config = self.config.read().await;
         let url = match self.environment.as_str() {
             "development" => config.urls.dev_api_url.clone(),
@@ -591,20 +607,26 @@ impl AddressManager {
             "production" => config.urls.prod_api_url.clone(),
             _ => config.urls.fallback_api_url.clone(),
         };
+        drop(config);
 
+        // Cache the result
         self.cache.write().await.insert(cache_key, url.clone());
         url
     }
 
-    /// 获取WebSocket URL
+    /// 获取`WebSocket` URL
     #[allow(dead_code)]
     pub async fn get_ws_url(&self) -> String {
         let cache_key = format!("ws_url_{}", self.environment);
         
-        if let Some(cached) = self.cache.read().await.get(&cache_key) {
+        // Check cache first
+        let cache_guard = self.cache.read().await;
+        if let Some(cached) = cache_guard.get(&cache_key) {
             return cached.clone();
         }
+        drop(cache_guard);
 
+        // Get URL from config
         let config = self.config.read().await;
         let url = match self.environment.as_str() {
             "development" => config.urls.dev_ws_url.clone(),
@@ -612,7 +634,9 @@ impl AddressManager {
             "production" => config.urls.prod_ws_url.clone(),
             _ => config.urls.fallback_ws_url.clone(),
         };
+        drop(config);
 
+        // Cache the result
         self.cache.write().await.insert(cache_key, url.clone());
         url
     }
@@ -622,7 +646,6 @@ impl AddressManager {
     pub async fn get_web_url(&self) -> String {
         let config = self.config.read().await;
         match self.environment.as_str() {
-            "development" => config.urls.dev_web_url.clone(),
             "test" => config.urls.test_web_url.clone(),
             "production" => config.urls.prod_web_url.clone(),
             _ => config.urls.dev_web_url.clone(),
@@ -634,7 +657,6 @@ impl AddressManager {
     pub async fn get_admin_url(&self) -> String {
         let config = self.config.read().await;
         match self.environment.as_str() {
-            "development" => config.urls.dev_admin_url.clone(),
             "test" => config.urls.test_admin_url.clone(),
             "production" => config.urls.prod_admin_url.clone(),
             _ => config.urls.dev_admin_url.clone(),
@@ -646,7 +668,6 @@ impl AddressManager {
     pub async fn get_cors_origins(&self) -> Vec<String> {
         let config = self.config.read().await;
         match self.environment.as_str() {
-            "development" => config.cors.dev_origins.clone(),
             "test" => config.cors.test_origins.clone(),
             "production" => config.cors.prod_origins.clone(),
             _ => config.cors.dev_origins.clone(),
@@ -658,14 +679,13 @@ impl AddressManager {
     pub async fn get_server_port(&self) -> u16 {
         let config = self.config.read().await;
         match self.environment.as_str() {
-            "development" => config.ports.dev_port,
             "test" => config.ports.test_port,
             "production" => config.ports.server_port,
             _ => config.ports.dev_port,
         }
     }
 
-    /// 获取WebSocket配置
+    /// 获取`WebSocket`配置
     #[allow(dead_code)]
     pub async fn get_websocket_config(&self) -> WebSocketConfig {
         let config = self.config.read().await;
@@ -695,24 +715,28 @@ impl AddressManager {
 
     /// 获取当前环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn get_environment(&self) -> &str {
         &self.environment
     }
 
     /// 检查是否为开发环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_development(&self) -> bool {
         self.environment == "development"
     }
 
     /// 检查是否为生产环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_production(&self) -> bool {
         self.environment == "production"
     }
 
     /// 检查是否为测试环境
     #[allow(dead_code)]
+    #[must_use]
     pub fn is_test(&self) -> bool {
         self.environment == "test"
     }
@@ -724,6 +748,10 @@ impl AddressManager {
     }
 
     /// 更新配置
+    /// 
+    /// # Errors
+    /// 
+    /// 目前此方法不会返回错误，但预留了错误处理能力以支持未来的配置验证和持久化功能
     #[allow(dead_code)]
     pub async fn update_config(&self, new_config: AddressConfig) -> Result<()> {
         *self.config.write().await = new_config;
@@ -732,6 +760,13 @@ impl AddressManager {
     }
 
     /// 重新加载配置
+    /// 
+    /// # Errors
+    /// 
+    /// 当配置文件重新加载失败时返回错误，可能的原因包括：
+    /// - 配置文件不存在
+    /// - 配置文件格式错误
+    /// - 文件系统权限问题
     #[allow(dead_code)]
     pub async fn reload_config(&self) -> Result<()> {
         let new_config = Self::load_config().await?;
@@ -757,9 +792,9 @@ impl Default for AddressManager {
         tokio::runtime::Runtime::new()
             .unwrap()
             .block_on(async {
-                AddressManager::new().await.unwrap_or_else(|_| {
+                Self::new().await.unwrap_or_else(|_| {
                     let config = AddressConfig::default();
-                    AddressManager {
+                    Self {
                         config: Arc::new(RwLock::new(config)),
                         environment: "development".to_string(),
                         cache: Arc::new(RwLock::new(HashMap::new())),
