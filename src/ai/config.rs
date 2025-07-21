@@ -262,7 +262,7 @@ impl Default for SentimentAnalysisConfig {
             enabled: true,
             model_type: "transformer".to_string(),
             api_endpoint: "https://api.huggingface.co/models".to_string(),
-            api_key: "".to_string(),
+            api_key: String::new(),
             supported_languages: vec!["zh".to_string(), "en".to_string()],
             confidence_threshold: 0.7,
             sentiment_categories: vec![
@@ -281,7 +281,7 @@ impl Default for AutoReplyConfig {
             enabled: true,
             model_type: "openai".to_string(),
             api_endpoint: "https://api.openai.com/v1/chat/completions".to_string(),
-            api_key: "".to_string(),
+            api_key: String::new(),
             max_response_length: 500,
             temperature: 0.7,
             top_p: 0.9,

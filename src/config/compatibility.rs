@@ -48,6 +48,7 @@ pub struct FrontendConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct FrontendFeatures {
     #[serde(rename = "imageUpload")]
     pub image_upload: bool,
@@ -184,9 +185,14 @@ pub struct CompressionConfig {
 }
 
 impl AppConfig {
+    /// 从文件加载配置
+    ///
+    /// # Errors
+    ///
+    /// 当文件读取或JSON解析失败时返回错误
     pub fn load_from_file<P: AsRef<std::path::Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         let content = std::fs::read_to_string(path)?;
-        let config: AppConfig = serde_json::from_str(&content)?;
+        let config: Self = serde_json::from_str(&content)?;
         Ok(config)
     }
 
@@ -202,17 +208,22 @@ impl AppConfig {
         }
     }
 
-    pub fn get() -> &'static AppConfig {
+    pub fn get() -> &'static Self {
         static CONFIG: std::sync::OnceLock<AppConfig> = std::sync::OnceLock::new();
         CONFIG.get_or_init(|| {
             // 使用相对路径，支持跨平台
             let config_path = std::path::PathBuf::from("config").join("app-config.json");
-            AppConfig::load_from_file(config_path)
-                .unwrap_or_else(|_| AppConfig::default())
+            Self::load_from_file(config_path)
+                .unwrap_or_else(|_| Self::default())
         })
     }
 
-    pub fn init(config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
+    /// 初始化配置
+    ///
+    /// # Errors
+    ///
+    /// 当配置初始化失败时返回错误
+    pub fn init(config: Self) -> Result<(), Box<dyn std::error::Error>> {
         static CONFIG: std::sync::OnceLock<AppConfig> = std::sync::OnceLock::new();
         CONFIG.set(config).map_err(|_| "Failed to set config".into())
     }
@@ -317,6 +328,12 @@ impl Default for AppConfig {
     }
 }
 
+/// 初始化配置
+///
+/// # Errors
+///
+/// 当配置初始化失败时返回错误
+#[allow(clippy::module_name_repetitions)]
 pub fn init_config() -> Result<(), Box<dyn std::error::Error>> {
     // 使用相对路径，支持跨平台
     let config_path = std::path::PathBuf::from("config").join("app-config.json");
