@@ -1,7 +1,7 @@
-module.exports = {
+export default {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
@@ -9,7 +9,7 @@ module.exports = {
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
   },
   transform: {
-    '^.+\.(js|jsx)$': 'babel-jest',
+    '^.+\\.(js|jsx)$': 'babel-jest',
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
@@ -22,6 +22,12 @@ module.exports = {
       functions: 70,
       lines: 70,
       statements: 70,
+    },
+  },
+  extensionsToTreatAsEsm: ['.jsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
     },
   },
 };

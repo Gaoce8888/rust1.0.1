@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CustomerList } from '../components/CustomerList';
+import { CustomerList } from '../CustomerList';
 
 const mockCustomers = [
   {
