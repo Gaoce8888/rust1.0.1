@@ -4,6 +4,7 @@ use tracing::{info, error};
 use crate::config::{init_config, AppConfig};
 use crate::file_manager::FileManager;
 use crate::html_template_manager::HtmlTemplateManager;
+use crate::react_template_manager::ReactTemplateManager;
 use crate::redis_client::RedisManager;
 use crate::redis_pool::{RedisPoolManager, RedisPoolConfig};
 use crate::storage::LocalStorage;
@@ -35,6 +36,7 @@ pub struct SystemComponents {
     pub storage: LocalStorage,
     pub file_manager: Arc<FileManager>,
     pub html_manager: Arc<HtmlTemplateManager>,
+    pub react_manager: Arc<ReactTemplateManager>,
     pub user_manager: Arc<UserManager>,
     pub voice_manager: Arc<VoiceMessageManager>,
     pub ws_manager: Arc<WebSocketManager>,
@@ -126,15 +128,23 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
 
     // 初始化HTML模板管理器
             let html_manager = match HtmlTemplateManager::new(config.storage.clone()).await {
-            Ok(manager) => {
-                info!("HTML模板管理器初始化成功");
-                Arc::new(manager)
+            Ok(manager) => Arc::new(manager),
+            Err(e) => {
+                error!("❌ HTML模板管理器初始化失败: {}", e);
+                return Err(anyhow!("HTML模板管理器初始化失败: {}", e));
             }
-        Err(e) => {
-            error!("HTML模板管理器初始化失败: {:?}", e);
-            return Err(e);
-        }
-    };
+        };
+
+        let react_manager = match ReactTemplateManager::new(html_manager.clone(), config.storage.clone()).await {
+            Ok(manager) => {
+                info!("🎨 React模板管理器初始化成功");
+                Arc::new(manager)
+            },
+            Err(e) => {
+                error!("❌ React模板管理器初始化失败: {}", e);
+                return Err(anyhow!("React模板管理器初始化失败: {}", e));
+            }
+        };
 
     // 初始化用户管理器
     let user_config_path = std::path::PathBuf::from(&config.storage.data_dir).join("users.json");

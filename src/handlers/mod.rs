@@ -31,6 +31,7 @@ pub mod client;
 pub mod file;
 pub mod voice;
 pub mod template;
+pub mod react_template;
 pub mod websocket;
 pub mod ai;
 pub mod users;

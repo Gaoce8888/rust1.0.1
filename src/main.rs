@@ -13,6 +13,7 @@ mod config;
 mod file_manager;
 mod file_manager_ext;  // 新增：文件管理器扩展
 mod html_template_manager;
+mod react_template_manager;
 mod message;
 mod message_queue;
 mod redis_client;

@@ -1,5 +1,6 @@
 // 原始模块暂时禁用
 // pub mod api;
+pub mod react_template;
 // pub mod auth;
 pub mod frontend;
 pub mod websocket;

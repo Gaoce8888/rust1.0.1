@@ -3,6 +3,8 @@ use warp::Filter;
 use crate::websocket::WebSocketManager;
 use crate::file_manager::FileManager;
 use crate::html_template_manager::HtmlTemplateManager;
+use crate::react_template_manager::ReactTemplateManager;
+use crate::routes::react_template;
 use crate::voice_message::VoiceMessageManager;
 use crate::auth::middleware::extract_user_info;
 use crate::handlers::system::*;
@@ -12,6 +14,7 @@ pub fn build_api_routes(
     ws_manager: Arc<WebSocketManager>,
     file_manager: Arc<FileManager>,
     html_manager: Arc<HtmlTemplateManager>,
+    react_manager: Arc<ReactTemplateManager>,
     voice_manager: Arc<VoiceMessageManager>,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
@@ -113,6 +116,9 @@ pub fn build_api_routes(
             Ok(warp::reply::json(&response))
         });
 
+    // React模板路由
+    let react_template_routes = react_template::create_react_template_routes(react_manager.clone());
+
     // 组合所有路由
     config_route
         .or(users_route)
@@ -122,4 +128,5 @@ pub fn build_api_routes(
         .or(file_list_route)
         .or(voice_list_route)
         .or(template_list_route)
+        .or(react_template_routes)
 } 
