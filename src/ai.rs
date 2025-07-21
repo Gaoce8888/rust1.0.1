@@ -120,106 +120,106 @@ impl AIManager {
         }
     }
 
-    /// 提交AI任务
-    pub async fn submit_task(
-        &self,
-        _task_type: AITaskType,
-        _user_id: String,
-        _message_id: String,
-        _input_data: serde_json::Value,
-        _priority: Option<u8>,
-    ) -> Result<String, SimpleProxyError> {
-        let task_id = uuid::Uuid::new_v4().to_string();
-        
-        // 这里可以添加任务队列逻辑
-        // 目前直接返回任务ID
-        Ok(task_id)
-    }
+    // /// 提交AI任务
+    // pub async fn submit_task(
+    //     &self,
+    //     _task_type: AITaskType,
+    //     _user_id: String,
+    //     _message_id: String,
+    //     _input_data: serde_json::Value,
+    //     _priority: Option<u8>,
+    // ) -> Result<String, SimpleProxyError> {
+    //     let task_id = uuid::Uuid::new_v4().to_string();
+    //     
+    //     // 这里可以添加任务队列逻辑
+    //     // 目前直接返回任务ID
+    //     Ok(task_id)
+    // }
 
-    /// 获取任务状态
-    pub async fn get_task_status(&self, _task_id: &str) -> Result<TaskStatus, SimpleProxyError> {
-        // 这里可以添加任务状态查询逻辑
-        // 目前返回默认状态
-        Ok(TaskStatus::Completed)
-    }
+    // /// 获取任务状态
+    // pub async fn get_task_status(&self, _task_id: &str) -> Result<TaskStatus, SimpleProxyError> {
+    //     // 这里可以添加任务状态查询逻辑
+    //     // 目前返回默认状态
+    //     Ok(TaskStatus::Completed)
+    // }
 
-    /// 获取任务结果
-    pub async fn get_task_result(&self, _task_id: &str) -> Result<serde_json::Value, SimpleProxyError> {
-        // 这里可以添加任务结果查询逻辑
-        // 目前返回空结果
-        Ok(serde_json::json!({}))
-    }
+    // /// 获取任务结果
+    // pub async fn get_task_result(&self, _task_id: &str) -> Result<serde_json::Value, SimpleProxyError> {
+    //     // 这里可以添加任务结果查询逻辑
+    //     // 目前返回空结果
+    //     Ok(serde_json::json!({}))
+    // }
 
-    /// 取消任务
-    pub async fn cancel_task(&self, _task_id: &str) -> Result<bool, SimpleProxyError> {
-        // 这里可以添加任务取消逻辑
-        // 目前返回成功
-        Ok(true)
-    }
+    // /// 取消任务
+    // pub async fn cancel_task(&self, _task_id: &str) -> Result<bool, SimpleProxyError> {
+    //     // 这里可以添加任务取消逻辑
+    //     // 目前返回成功
+    //     Ok(true)
+    // }
 
-    /// 获取配置
-    pub fn get_config(&self) -> &AIConfig {
-        &self.config
-    }
+    // /// 获取配置
+    // pub fn get_config(&self) -> &AIConfig {
+    //     &self.config
+    // }
 
-    /// 更新配置
-    pub fn update_config(&mut self, config: AIConfig) {
-        self.config = config;
-    }
+    // /// 更新配置
+    // pub fn update_config(&mut self, config: AIConfig) {
+    //     self.config = config;
+    // }
 
-    /// 获取统计信息
-    pub async fn get_statistics(&self) -> Result<serde_json::Value, SimpleProxyError> {
-        // 这里可以添加统计信息收集逻辑
-        // 目前返回空统计
-        Ok(serde_json::json!({
-            "total_tasks": 0,
-            "completed_tasks": 0,
-            "failed_tasks": 0,
-            "pending_tasks": 0,
-        }))
-    }
+    // /// 获取统计信息
+    // pub async fn get_statistics(&self) -> Result<serde_json::Value, SimpleProxyError> {
+    //     // 这里可以添加统计信息收集逻辑
+    //     // 目前返回空统计
+    //     Ok(serde_json::json!({
+    //         "total_tasks": 0,
+    //         "completed_tasks": 0,
+    //         "failed_tasks": 0,
+    //         "pending_tasks": 0,
+    //     }))
+    // }
 
-    /// 批量处理消息
-    pub async fn batch_process(
-        &self,
-        messages: Vec<BatchMessage>,
-        priority: Option<u8>,
-    ) -> Result<BatchProcessResponse, SimpleProxyError> {
-        let mut submitted_tasks = Vec::new();
-        let mut failed_tasks = Vec::new();
+    // /// 批量处理消息
+    // pub async fn batch_process(
+    //     &self,
+    //     messages: Vec<BatchMessage>,
+    //     priority: Option<u8>,
+    // ) -> Result<BatchProcessResponse, SimpleProxyError> {
+    //     let mut submitted_tasks = Vec::new();
+    //     let mut failed_tasks = Vec::new();
 
-        for message in &messages {
-            for task_type in &message.task_types {
-                match self.submit_task(
-                    task_type.clone(),
-                    message.user_id.clone(),
-                    message.message_id.clone(),
-                    serde_json::json!({
-                        "text": message.text,
-                        "metadata": message.metadata,
-                    }),
-                    priority,
-                ).await {
-                    Ok(task_id) => submitted_tasks.push(task_id),
-                    Err(_) => failed_tasks.push(format!("{}-{:?}", message.message_id, task_type)),
-                }
-            }
-        }
+    //     for message in &messages {
+    //         for task_type in &message.task_types {
+    //             match self.submit_task(
+    //                 task_type.clone(),
+    //                 message.user_id.clone(),
+    //                 message.message_id.clone(),
+    //                 serde_json::json!({
+    //                     "text": message.text,
+    //                     "metadata": message.metadata,
+    //                 }),
+    //                 priority,
+    //             ).await {
+    //                 Ok(task_id) => submitted_tasks.push(task_id),
+    //                 Err(_) => failed_tasks.push(format!("{}-{:?}", message.message_id, task_type)),
+    //             }
+    //         }
+    //     }
 
-        let total_messages = messages.len();
-        let success_rate = if total_messages > 0 {
-            submitted_tasks.len() as f32 / total_messages as f32
-        } else {
-            0.0
-        };
+    //     let total_messages = messages.len();
+    //     let success_rate = if total_messages > 0 {
+    //         submitted_tasks.len() as f32 / total_messages as f32
+    //     } else {
+    //         0.0
+    //     };
 
-        Ok(BatchProcessResponse {
-            submitted_tasks,
-            failed_tasks,
-            total_messages,
-            success_rate,
-        })
-    }
+    //     Ok(BatchProcessResponse {
+    //         submitted_tasks,
+    //         failed_tasks,
+    //         total_messages,
+    //         success_rate,
+    //     })
+    // }
 }
 
 /// 批量消息
@@ -242,52 +242,52 @@ pub struct BatchProcessResponse {
 }
 
 /// 处理消息的AI任务
-pub async fn process_message_with_ai(
-    ai_manager: Arc<AIManager>,
-    user_id: String,
-    message_id: String,
-    content: String,
-    content_type: &str,
-) -> Result<Vec<String>, SimpleProxyError> {
-    let task_types = determine_ai_tasks(content_type);
-    let mut task_ids = Vec::new();
+// pub async fn process_message_with_ai(
+//     ai_manager: Arc<AIManager>,
+//     user_id: String,
+//     message_id: String,
+//     content: String,
+//     content_type: &str,
+// ) -> Result<Vec<String>, SimpleProxyError> {
+//     let task_types = determine_ai_tasks(content_type);
+//     let mut task_ids = Vec::new();
 
-    for task_type in task_types {
-        let task_id = ai_manager.submit_task(
-            task_type,
-            user_id.clone(),
-            message_id.clone(),
-            serde_json::json!({ "content": content }),
-            None,
-        ).await?;
-        task_ids.push(task_id);
-    }
+//     for task_type in task_types {
+//         let task_id = ai_manager.submit_task(
+//             task_type,
+//             user_id.clone(),
+//             message_id.clone(),
+//             serde_json::json!({ "content": content }),
+//             None,
+//         ).await?;
+//         task_ids.push(task_id);
+//     }
 
-    Ok(task_ids)
-}
+//     Ok(task_ids)
+// }
 
 /// 根据内容类型确定AI任务
-fn determine_ai_tasks(content_type: &str) -> Vec<AITaskType> {
-    match content_type {
-        "text" => vec![
-            AITaskType::SentimentAnalysis,
-            AITaskType::IntentClassification,
-            AITaskType::SmartReply,
-        ],
-        "voice" => vec![
-            AITaskType::VoiceTranscription,
-            AITaskType::SentimentAnalysis,
-            AITaskType::IntentClassification,
-        ],
-        "image" => vec![
-            AITaskType::ContentGeneration,
-        ],
-        _ => vec![
-            AITaskType::SentimentAnalysis,
-            AITaskType::IntentClassification,
-        ],
-    }
-}
+// fn determine_ai_tasks(content_type: &str) -> Vec<AITaskType> {
+//     match content_type {
+//         "text" => vec![
+//             AITaskType::SentimentAnalysis,
+//             AITaskType::IntentClassification,
+//             AITaskType::SmartReply,
+//         ],
+//         "voice" => vec![
+//             AITaskType::VoiceTranscription,
+//             AITaskType::SentimentAnalysis,
+//             AITaskType::IntentClassification,
+//         ],
+//         "image" => vec![
+//             AITaskType::ContentGeneration,
+//         ],
+//         _ => vec![
+//             AITaskType::SentimentAnalysis,
+//             AITaskType::IntentClassification,
+//         ],
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

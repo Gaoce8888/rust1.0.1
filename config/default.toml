@@ -1,0 +1,187 @@
+# 企业级客服系统默认配置文件
+# 生成时间: 2025-07-21
+# 版本: v1.0
+
+[domains]
+primary_domain = "localhost"
+api_subdomain = "api"
+web_subdomain = "web"
+admin_subdomain = "admin"
+dev_domain = "dev.localhost"
+dev_api_domain = "api.dev.localhost"
+dev_web_domain = "web.dev.localhost"
+test_domain = "test.localhost"
+test_api_domain = "api.test.localhost"
+test_web_domain = "web.test.localhost"
+prod_domain = "kefu-system.com"
+prod_api_domain = "api.kefu-system.com"
+prod_web_domain = "web.kefu-system.com"
+
+[ports]
+server_port = 8080
+api_port = 8080
+websocket_port = 8081
+admin_port = 8082
+dev_port = 3000
+test_port = 3001
+frontend_port = 3000
+react_dev_port = 3002
+vue_dev_port = 3003
+redis_port = 6379
+postgres_port = 5432
+nginx_port = 80
+nginx_ssl_port = 443
+
+[protocols]
+http_protocol = "http"
+https_protocol = "https"
+ws_protocol = "ws"
+wss_protocol = "wss"
+dev_default_protocol = "http"
+test_default_protocol = "http"
+prod_default_protocol = "https"
+
+[urls]
+dev_api_url = "http://localhost:8080"
+dev_ws_url = "ws://localhost:8081"
+dev_web_url = "http://localhost:3000"
+dev_admin_url = "http://localhost:8082"
+test_api_url = "http://test.localhost:8080"
+test_ws_url = "ws://test.localhost:8081"
+test_web_url = "http://test.localhost:3000"
+test_admin_url = "http://test.localhost:8082"
+prod_api_url = "https://api.kefu-system.com"
+prod_ws_url = "wss://api.kefu-system.com"
+prod_web_url = "https://web.kefu-system.com"
+prod_admin_url = "https://admin.kefu-system.com"
+fallback_api_url = "http://localhost:8080"
+fallback_ws_url = "ws://localhost:8081"
+
+[paths]
+api_base_path = "/api"
+websocket_path = "/ws"
+admin_path = "/admin"
+static_path = "/static"
+upload_path = "/upload"
+download_path = "/download"
+user_path = "/user"
+message_path = "/message"
+session_path = "/session"
+kefu_path = "/kefu"
+file_path = "/file"
+voice_path = "/voice"
+docs_path = "/docs"
+swagger_path = "/swagger"
+redoc_path = "/redoc"
+rapidoc_path = "/rapidoc"
+
+[cors]
+enabled = true
+allow_credentials = true
+dev_origins = ["http://localhost:3000", "http://localhost:3002", "http://localhost:3003"]
+test_origins = ["http://test.localhost:3000", "http://test.localhost:3002"]
+prod_origins = ["https://web.kefu-system.com", "https://admin.kefu-system.com"]
+allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+allowed_headers = ["Content-Type", "Authorization", "X-Requested-With"]
+exposed_headers = ["X-Total-Count", "X-Page-Count"]
+max_age = 86400
+
+[ssl]
+enabled = false
+cert_path = "/etc/ssl/certs/kefu-system.crt"
+key_path = "/etc/ssl/private/kefu-system.key"
+ca_path = "/etc/ssl/certs/ca-bundle.crt"
+dev_ssl_enabled = false
+dev_cert_path = "/etc/ssl/certs/dev-kefu-system.crt"
+dev_key_path = "/etc/ssl/private/dev-kefu-system.key"
+ssl_protocols = ["TLSv1.2", "TLSv1.3"]
+ssl_ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
+ssl_prefer_server_ciphers = true
+
+[proxy]
+enabled = false
+proxy_host = "proxy.example.com"
+proxy_port = 8080
+proxy_username = ""
+proxy_password = ""
+reverse_proxy_enabled = false
+nginx_config_path = "/etc/nginx/conf.d/kefu-system.conf"
+nginx_ssl_config_path = "/etc/nginx/conf.d/kefu-system-ssl.conf"
+
+[cdn]
+enabled = false
+cdn_domain = "cdn.kefu-system.com"
+cdn_protocol = "https"
+cdn_path = "/static"
+static_cdn_url = "https://cdn.kefu-system.com/static"
+image_cdn_url = "https://cdn.kefu-system.com/images"
+js_cdn_url = "https://cdn.kefu-system.com/js"
+css_cdn_url = "https://cdn.kefu-system.com/css"
+
+[monitoring]
+health_check_url = "/health"
+metrics_url = "/metrics"
+status_url = "/status"
+ping_url = "/ping"
+uptime_robot_url = "https://uptimerobot.com"
+pingdom_url = "https://pingdom.com"
+newrelic_url = "https://newrelic.com"
+
+[external_apis]
+openai_api_url = "https://api.openai.com/v1"
+google_translate_url = "https://translation.googleapis.com"
+microsoft_speech_url = "https://speech.microsoft.com"
+huggingface_api_url = "https://api.huggingface.co"
+redis_url = "redis://localhost:6379"
+postgres_url = "postgresql://kefu_user:kefu_pass@localhost:5432/kefu_db"
+
+[websocket]
+heartbeat_interval = 30
+reconnect_interval = 5
+max_reconnect_attempts = 10
+message_timeout = 60
+max_message_size = 1048576
+ws_path = "/ws"
+ws_upgrade_path = "/ws/upgrade"
+ws_fallback_path = "/ws/fallback"
+subprotocols = ["kefu-v1", "kefu-v2"]
+
+[load_balancing]
+enabled = false
+algorithm = "round_robin"
+backend_servers = ["http://localhost:8080", "http://localhost:8081"]
+health_check_interval = 30
+health_check_timeout = 5
+health_check_path = "/health"
+
+[failover]
+enabled = false
+primary_endpoint = "http://localhost:8080"
+backup_endpoints = ["http://localhost:8081", "http://localhost:8082"]
+failover_check_interval = 60
+failover_timeout = 10
+max_failover_attempts = 3
+
+[security]
+rate_limiting_enabled = true
+rate_limit_window = 60
+rate_limit_max_requests = 1000
+allowed_ips = ["127.0.0.1", "::1"]
+blocked_ips = []
+required_headers = ["User-Agent", "X-Requested-With"]
+blocked_user_agents = ["bot", "crawler", "spider"]
+
+[logging]
+log_level = "info"
+log_format = "json"
+log_file_path = "logs/app.log"
+access_log_path = "logs/access.log"
+error_log_path = "logs/error.log"
+max_log_size = 104857600
+max_log_files = 10
+log_retention_days = 30
+
+[environment]
+current_environment = "development"
+env_vars = ["RUST_LOG", "DATABASE_URL", "REDIS_URL"]
+config_priority = ["environment", "file", "default"]

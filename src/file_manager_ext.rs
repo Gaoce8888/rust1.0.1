@@ -200,3 +200,8 @@ pub fn create_enhanced_file_manager(config: crate::config::StorageConfig) -> Res
     let manager = FileManager::new(config)?;
     Ok(Arc::new(manager))
 }
+
+// TODO: 以下方法需要实现类
+// - save_file: 保存文件
+// - get_file: 获取文件
+// - search_files: 搜索文件

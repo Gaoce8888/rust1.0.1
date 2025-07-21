@@ -241,3 +241,10 @@ pub async fn handle_mark_messages_read(
 
     Ok(warp::reply::json(&response))
 }
+
+// TODO: 以下函数需要路由注册
+// - handle_list_messages: 消息列表查询
+// - handle_get_message: 获取消息详情
+// - handle_search_messages: 搜索消息
+// - handle_export_messages: 导出消息
+// - handle_delete_message: 删除消息

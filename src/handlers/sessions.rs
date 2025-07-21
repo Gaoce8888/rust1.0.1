@@ -521,3 +521,11 @@ pub async fn handle_session_statistics(
 
     Ok(warp::reply::json(&response))
 }
+
+// TODO: 以下函数需要路由注册
+// - handle_list_sessions: 会话列表查询
+// - handle_get_session: 获取会话详情
+// - handle_get_session_messages: 获取会话消息
+// - handle_transfer_session: 转移会话
+// - handle_end_session: 结束会话
+// - handle_session_statistics: 会话统计
