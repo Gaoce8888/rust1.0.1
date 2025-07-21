@@ -24,3 +24,7 @@ pub mod message;
 pub mod voice_message;
 pub mod html_template_manager;
 // pub mod ai;  // 暂时禁用AI模块
+
+// 新增：API网关和代理模块
+pub mod api_gateway;
+pub mod proxy;
