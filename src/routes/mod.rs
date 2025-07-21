@@ -1,6 +1,6 @@
 // 原始模块暂时禁用
 // pub mod api;
-pub mod react_template;
+// pub mod react_template;  // 暂时禁用，有编译错误
 // pub mod auth;
 pub mod frontend;
 pub mod websocket;
@@ -11,8 +11,11 @@ pub mod api_simple;
 pub mod auth_simple;
 
 // 扩展API路由模块
-pub mod api_extended;
-pub mod api_real;
+// pub mod api_extended;  // 暂时禁用，有编译错误
+// pub mod api_real;  // 暂时禁用，有编译错误
+
+// AI React组件路由模块
+pub mod ai_react_routes;
 
 // 客服认证路由模块 - 暂时禁用，使用新版本
 // pub mod kefu_auth;
@@ -26,7 +29,7 @@ use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::storage::LocalStorage;
 use crate::ai::AIManager;
-use crate::handlers::ai::AIHandler;
+// use crate::handlers::ai::AIHandler;  // 暂时禁用
 use crate::auth::{KefuAuthManager, CustomerManager, KefuAuthApiRoutes, CustomerApiRoutes};
 use crate::redis_pool::RedisPoolManager;
 
@@ -61,18 +64,18 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
     let auth_routes = auth_simple::build_auth_routes(config.user_manager.clone());
     let simple_api_routes = api_simple::build_api_routes(config.ws_manager.clone(), config.file_manager.clone(), config.html_manager.clone(), config.voice_manager.clone(), config.storage.clone());
     
-    // 扩展的API路由
-    let extended_api_routes = api_extended::build_extended_api_routes(
-        config.ws_manager.clone(),
-        config.user_manager.clone(),
-        config.storage.clone(),
-        config.file_manager.clone(),
-    );
+    // 扩展的API路由 - 暂时禁用
+    // let extended_api_routes = api_extended::build_extended_api_routes(
+    //     config.ws_manager.clone(),
+    //     config.user_manager.clone(),
+    //     config.storage.clone(),
+    //     config.file_manager.clone(),
+    // );
     
-    // 真实的文件管理API路由
-    let real_file_api_routes = api_real::build_real_file_api_routes(
-        config.file_manager.clone(),
-    );
+    // 真实的文件管理API路由 - 暂时禁用
+    // let real_file_api_routes = api_real::build_real_file_api_routes(
+    //     config.file_manager.clone(),
+    // );
     
     let websocket_routes = websocket::build_websocket_routes(config.ws_manager.clone(), config.kefu_auth_manager.clone());
     let frontend_routes = frontend::build_frontend_routes();
@@ -80,9 +83,12 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
     // Swagger路由应该在最前面，避免被其他路由拦截
     let swagger_routes = swagger::build_swagger_routes();
     
-    // AI路由
-    let ai_handler = AIHandler::new(config.ai_manager.clone());
-    let ai_routes = ai_handler.routes();
+    // AI路由 - 暂时禁用
+    // let ai_handler = AIHandler::new(config.ai_manager.clone());
+    // let ai_routes = ai_handler.routes();
+    
+    // AI React组件路由
+    let ai_react_routes = ai_react_routes::create_ai_react_routes();
     
     // 客服认证API路由（新版本）
     let kefu_auth_api_routes = KefuAuthApiRoutes::with_manager(config.kefu_auth_manager.clone()).create_routes();
@@ -131,12 +137,14 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
         .or(customer_api_routes)
         // 6. 客服认证路由（旧版本，暂时禁用）
         // .or(kefu_auth_routes)
-        // 7. AI路由
-        .or(ai_routes)
-        // 8. API路由
+        // 7. AI路由 - 暂时禁用
+        // .or(ai_routes)
+        // 8. AI React组件路由
+        .or(ai_react_routes)
+        // 9. API路由
         .or(simple_api_routes)
-        .or(extended_api_routes)
-        .or(real_file_api_routes)
+        // .or(extended_api_routes)  // 暂时禁用
+        // .or(real_file_api_routes)  // 暂时禁用
         // 9. WebSocket路由
         .or(websocket_routes)
         // 10. 前端路由（静态文件）放在最后

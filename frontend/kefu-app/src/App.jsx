@@ -30,6 +30,7 @@ import { initializeMonitoring, monitorWebSocket } from "./utils/monitoring";
 import { validateMessageContent, validateCustomerData, escapeHtml } from "./utils/validation";
 import ReactCardRenderer from "./components/ReactCardRenderer";
 import AdaptiveConfigPanel from "./components/AdaptiveConfigPanel";
+import AIComponentGenerator from "./components/AIComponentGenerator";
 import adaptiveConfigManager from "./utils/adaptiveConfig";
 
 // 主应用组件 - 客服聊天界面
@@ -43,6 +44,7 @@ export default function Component() {
   const [isMobile, setIsMobile] = React.useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const [isAdaptiveConfigOpen, setIsAdaptiveConfigOpen] = React.useState(false);
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState(null);
   const [customers, setCustomers] = React.useState([]);
@@ -662,6 +664,54 @@ export default function Component() {
     // 可以在这里处理配置变更后的逻辑，比如重新渲染相关组件
   };
 
+  // 处理AI生成器打开
+  const handleAIGeneratorOpen = () => {
+    setIsAIGeneratorOpen(true);
+  };
+
+  // 处理AI生成器关闭
+  const handleAIGeneratorClose = () => {
+    setIsAIGeneratorOpen(false);
+  };
+
+  // 处理AI生成的组件
+  const handleComponentGenerated = (componentData) => {
+    console.log('AI生成的组件:', componentData);
+    
+    // 将生成的组件作为消息发送给当前客户
+    if (currentCustomer) {
+      const messageData = {
+        type: 'react_component',
+        content: 'AI生成的React组件',
+        reactComponentData: componentData.component_data,
+        adaptiveStyles: componentData.adaptive_styles,
+        customerId: currentCustomer.id,
+        senderId: currentUser?.id,
+        senderName: currentUser?.name || '客服',
+        senderAvatar: currentUser?.avatar || generateAvatarUrl(currentUser?.name || '客服'),
+        timestamp: new Date().toISOString(),
+        status: 'sent'
+      };
+
+      // 添加到消息列表
+      setCustomerMessages(prev => ({
+        ...prev,
+        [currentCustomer.id]: [
+          ...(prev[currentCustomer.id] || []),
+          messageData
+        ]
+      }));
+
+      // 通过WebSocket发送给后端
+      if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+        wsClient.send(JSON.stringify({
+          type: 'send_message',
+          data: messageData
+        }));
+      }
+    }
+  };
+
   // 处理登录成功
   const handleLoginSuccess = (userInfo) => {
     setCurrentUser(userInfo);
@@ -1226,6 +1276,20 @@ export default function Component() {
                       配置自适应设置
                     </Button>
                   </div>
+                  
+                  <div>
+                    <p className="text-small mb-2">AI组件生成器</p>
+                    <p className="text-tiny text-default-500 mb-2">使用AI智能生成React组件</p>
+                    <Button
+                      size="sm"
+                      variant="bordered"
+                      startContent={<Icon icon="solar:magic-stick-line-duotone" width={16} />}
+                      onClick={handleAIGeneratorOpen}
+                      className="w-full"
+                    >
+                      打开AI生成器
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1254,6 +1318,14 @@ export default function Component() {
         isOpen={isAdaptiveConfigOpen}
         onClose={() => setIsAdaptiveConfigOpen(false)}
         onConfigChange={handleAdaptiveConfigChange}
+      />
+
+      {/* AI组件生成器 */}
+      <AIComponentGenerator
+        isOpen={isAIGeneratorOpen}
+        onClose={handleAIGeneratorClose}
+        onComponentGenerated={handleComponentGenerated}
+        currentUserId={currentUser?.id}
       />
     </div>
   );

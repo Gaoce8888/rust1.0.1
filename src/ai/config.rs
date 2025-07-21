@@ -138,7 +138,7 @@ pub struct PreprocessingConfig {
 }
 
 /// React组件生成配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ReactComponentGenerationConfig {
     pub enabled: bool,
     pub model_type: String, // "gpt-4", "claude", "gemini", "custom"
@@ -193,7 +193,7 @@ pub struct ValidationRule {
 }
 
 /// 生成提示词
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct GenerationPrompts {
     pub component_generation: String,
     pub style_generation: String,
@@ -204,7 +204,7 @@ pub struct GenerationPrompts {
 }
 
 /// 质量控制配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct QualityControlConfig {
     pub enabled: bool,
     pub code_quality_check: bool,
@@ -216,7 +216,7 @@ pub struct QualityControlConfig {
 }
 
 /// AI服务集成配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AIServiceIntegrationConfig {
     pub enabled: bool,
     pub openai: OpenAIConfig,
@@ -231,7 +231,7 @@ pub struct AIServiceIntegrationConfig {
 }
 
 /// OpenAI配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct OpenAIConfig {
     pub enabled: bool,
     pub api_key: String,
@@ -245,7 +245,7 @@ pub struct OpenAIConfig {
 }
 
 /// Anthropic配置
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AnthropicConfig {
     pub enabled: bool,
     pub api_key: String,

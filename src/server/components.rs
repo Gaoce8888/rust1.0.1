@@ -1,10 +1,10 @@
 use std::sync::Arc;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use tracing::{info, error};
 use crate::config::{init_config, AppConfig};
 use crate::file_manager::FileManager;
 use crate::html_template_manager::HtmlTemplateManager;
-use crate::react_template_manager::ReactTemplateManager;
+// use crate::react_template_manager::ReactTemplateManager;  // 暂时禁用
 use crate::redis_client::RedisManager;
 use crate::redis_pool::{RedisPoolManager, RedisPoolConfig};
 use crate::storage::LocalStorage;
@@ -36,7 +36,7 @@ pub struct SystemComponents {
     pub storage: LocalStorage,
     pub file_manager: Arc<FileManager>,
     pub html_manager: Arc<HtmlTemplateManager>,
-    pub react_manager: Arc<ReactTemplateManager>,
+    // pub react_manager: Arc<ReactTemplateManager>,  // 暂时禁用
     pub user_manager: Arc<UserManager>,
     pub voice_manager: Arc<VoiceMessageManager>,
     pub ws_manager: Arc<WebSocketManager>,

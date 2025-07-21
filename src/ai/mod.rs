@@ -3,6 +3,7 @@ pub mod intent_recognition;
 pub mod translation;
 pub mod speech_recognition;
 pub mod queue;
+pub mod react_component_generator;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
