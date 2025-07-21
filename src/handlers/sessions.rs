@@ -84,9 +84,10 @@ pub async fn handle_list_sessions(
                         message_count: {
                             // 从Redis获取实际消息数
                             let redis = ws_manager.redis.read().await;
-                            redis.get_conversation_message_count(&format!("{}:{}", customer.user_id, kefu_id))
+                            let count = redis.get_conversation_message_count(&format!("{}:{}", customer.id, kefu_id))
                                 .await
-                                .unwrap_or(0)
+                                .unwrap_or(0);
+                            count as u32
                         },
                         last_message: Some(customer.last_message),
                     });

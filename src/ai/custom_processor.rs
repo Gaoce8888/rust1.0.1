@@ -730,28 +730,66 @@ impl AIProcessor for CustomAIProcessor {
             }
         }
 
-        // 预处理
-        let mut input = task.input_data.clone();
-        if let Some(preprocessing) = &processor_def.preprocessing {
-            input = self.preprocess(&input, preprocessing).await?;
-        }
-
         // 处理请求
         let result = match &processor_def.processor_type {
             CustomProcessorType::MCPTool { tool_name, tool_version, tool_config } => {
-                self.process_mcp_tool(task, tool_name, tool_version, tool_config, processor_def).await?
-            }
-            CustomProcessorType::KnowledgeBase { kb_id, search_type, max_results, min_score } => {
-                self.process_knowledge_base(task, kb_id, search_type, *max_results, *min_score, processor_def).await?
-            }
-            CustomProcessorType::RAG { retriever_endpoint, generator_endpoint, retriever_config, generator_config } => {
-                self.process_rag(task, retriever_endpoint, generator_endpoint, retriever_config, generator_config, processor_def).await?
-            }
-            CustomProcessorType::HttpAPI { method, request_template, response_mapping } => {
-                self.process_http_api(task, method, request_template, response_mapping, processor_def).await?
+                // MCP工具处理保持原样
+                self.process_mcp_tool(
+                    &task,
+                    tool_name,
+                    tool_version,
+                    tool_config,
+                    processor_def
+                ).await?
             }
             _ => {
-                return Err(anyhow::anyhow!("Processor type not implemented yet"));
+                // 其他处理器类型需要预处理
+                let processed_input: serde_json::Value;
+                
+                // 预处理
+                if let Some(preprocessing) = &processor_def.preprocessing {
+                    processed_input = self.preprocess(&task.input_data, preprocessing).await?;
+                } else {
+                    processed_input = task.input_data.clone();
+                }
+                
+                // 根据类型处理
+                match &processor_def.processor_type {
+                    CustomProcessorType::HttpAPI { method, request_template, response_mapping } => {
+                        // 处理HTTP API
+                        let result = self.process_http_api(
+                            &task,
+                            method,
+                            request_template,
+                            response_mapping,
+                            processor_def
+                        ).await?;
+                        result
+                    }
+                    CustomProcessorType::KnowledgeBase { kb_id, search_type, max_results, min_score } => {
+                        self.process_knowledge_base(
+                            &task,
+                            kb_id,
+                            search_type,
+                            *max_results,
+                            *min_score,
+                            processor_def
+                        ).await?
+                    }
+                    CustomProcessorType::RAG { retriever_endpoint, generator_endpoint, retriever_config, generator_config } => {
+                        self.process_rag(
+                            &task,
+                            retriever_endpoint,
+                            generator_endpoint,
+                            retriever_config,
+                            generator_config,
+                            processor_def
+                        ).await?
+                    }
+                    _ => {
+                        return Err(anyhow::anyhow!("不支持的处理器类型"));
+                    }
+                }
             }
         };
 

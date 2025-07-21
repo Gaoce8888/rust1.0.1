@@ -776,11 +776,11 @@ impl RedisManager {
     
     pub async fn get_total_session_count(&self) -> Result<usize> {
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg("stats:total_sessions")
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_average_response_time(&self) -> Result<f64> {
@@ -803,22 +803,22 @@ impl RedisManager {
     
     pub async fn get_peak_concurrent_users(&self) -> Result<usize> {
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg("stats:peak_concurrent_users")
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_resolved_sessions_today(&self) -> Result<usize> {
         let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
         let key = format!("stats:resolved_sessions:{}", today);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_pending_sessions(&self) -> Result<usize> {
@@ -833,11 +833,11 @@ impl RedisManager {
         let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
         let key = format!("stats:sessions:{}", today);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_avg_session_duration_today(&self) -> Result<f64> {
@@ -866,11 +866,11 @@ impl RedisManager {
         let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
         let key = format!("stats:new_customers:{}", today);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_messages_yesterday(&self) -> Result<usize> {
@@ -879,11 +879,11 @@ impl RedisManager {
             .to_string();
         let key = format!("stats:messages:{}", yesterday);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_sessions_yesterday(&self) -> Result<usize> {
@@ -892,11 +892,11 @@ impl RedisManager {
             .to_string();
         let key = format!("stats:sessions:{}", yesterday);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_avg_response_time_yesterday(&self) -> Result<f64> {
@@ -915,43 +915,44 @@ impl RedisManager {
     pub async fn get_conversation_message_count(&self, conversation_id: &str) -> Result<usize> {
         let key = format!("conversation:{}:message_count", conversation_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_last_message(&self, conversation_id: &str) -> Result<String> {
         let key = format!("conversation:{}:last_message", conversation_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<String> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or_else(|_| Ok("".to_string()))
+            .await?;
+        Ok(value.unwrap_or_else(|| String::new()))
     }
     
     pub async fn get_unread_count(&self, kefu_id: &str, customer_id: &str) -> Result<usize> {
         let key = format!("unread:{}:{}", kefu_id, customer_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_top_kefus(&self, limit: usize) -> Result<Vec<(String, usize)>> {
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("ZREVRANGE")
+        let result: Vec<(String, usize)> = redis::cmd("ZREVRANGE")
             .arg("stats:kefu_rankings")
             .arg(0)
             .arg(limit - 1)
             .arg("WITHSCORES")
             .query_async(&mut conn)
             .await
-            .unwrap_or_else(|_| Ok(Vec::new()))
+            .unwrap_or_else(|_| Vec::new());
+        Ok(result)
     }
     
     pub async fn get_response_time_distribution(&self) -> Result<Vec<(String, usize)>> {
@@ -966,21 +967,21 @@ impl RedisManager {
     pub async fn get_user_message_count(&self, user_id: &str) -> Result<usize> {
         let key = format!("user:{}:message_count", user_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_user_session_count(&self, user_id: &str) -> Result<usize> {
         let key = format!("user:{}:session_count", user_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_user_avg_session_duration(&self, user_id: &str) -> Result<f64> {
@@ -1033,21 +1034,21 @@ impl RedisManager {
     pub async fn get_kefu_resolved_sessions(&self, kefu_id: &str) -> Result<usize> {
         let key = format!("kefu:{}:resolved_sessions", kefu_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_customer_inquiries(&self, customer_id: &str) -> Result<usize> {
         let key = format!("customer:{}:inquiries", customer_id);
         let mut conn = self.pool_manager.as_ref().unwrap().get_connection().await?;
-        redis::cmd("GET")
+        let value: Option<usize> = redis::cmd("GET")
             .arg(&key)
             .query_async(&mut conn)
-            .await
-            .unwrap_or(Ok(0))
+            .await?;
+        Ok(value.unwrap_or(0))
     }
     
     pub async fn get_customer_avg_wait_time(&self, customer_id: &str) -> Result<f64> {

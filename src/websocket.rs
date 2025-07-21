@@ -1675,10 +1675,11 @@ impl WebSocketManager {
                             last_activity: customer_conn.last_heartbeat,
                             unread_count: {
                                 // 获取未读消息计数
-                                self.redis.read().await
+                                let count = self.redis.read().await
                                     .get_unread_count(kefu_id, &customer_id)
                                     .await
-                                    .unwrap_or(0)
+                                    .unwrap_or(0);
+                                count as u32
                             },
                         });
                     }

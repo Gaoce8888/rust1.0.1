@@ -255,10 +255,10 @@ pub async fn handle_get_users(
     // 过滤用户类型
     let filtered_users: Vec<_> = match user_type.as_deref() {
         Some("kefu") => all_users.into_iter()
-            .filter(|(_, user)| user.user_type == "kefu")
+            .filter(|(_, user)| user.role == "kefu")
             .collect(),
         Some("kehu") => all_users.into_iter()
-            .filter(|(_, user)| user.user_type == "kehu")
+            .filter(|(_, user)| user.role == "kehu")
             .collect(),
         _ => all_users.into_iter().collect(),
     };
@@ -273,12 +273,12 @@ pub async fn handle_get_users(
         .map(|(id, user)| {
             serde_json::json!({
                 "id": id,
-                "name": user.name,
-                "user_type": user.user_type,
-                "avatar": user.avatar,
-                "status": "active",
-                "created_at": chrono::Utc::now() - chrono::Duration::days(30),
-                "last_login": chrono::Utc::now() - chrono::Duration::hours(2),
+                "name": user.display_name,
+                "user_type": user.role,
+                "avatar": format!("/api/avatar/{}", id),
+                "status": user.status,
+                "created_at": user.created_at,
+                "last_login": user.last_login,
             })
         })
         .collect();

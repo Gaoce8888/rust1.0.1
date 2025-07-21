@@ -1,10 +1,11 @@
 use std::sync::Arc;
-use warp::{Reply, Rejection};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use warp::{Rejection, Reply};
+
 use crate::storage::LocalStorage;
 use crate::types::api::ApiResponse;
-use chrono::{DateTime, Utc};
-use uuid::Uuid;
+use crate::message::{ChatMessage, ContentType};
 
 // 请求和响应结构体
 #[derive(Debug, Serialize, Deserialize)]
@@ -21,7 +22,10 @@ pub struct MessageListQuery {
 pub struct MessageSearchRequest {
     pub keyword: String,
     pub user_id: Option<String>,
+    pub sender_id: Option<String>,
+    pub receiver_id: Option<String>,
     pub content_type: Option<String>,
+    pub message_type: Option<String>,
     pub start_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
     pub page: Option<u32>,
@@ -30,11 +34,11 @@ pub struct MessageSearchRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MessageExportRequest {
-    pub format: String, // json, csv, excel
+    pub format: Option<String>, // json, csv, excel
     pub user_id: Option<String>,
+    pub session_id: Option<String>,
     pub start_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
-    pub include_attachments: Option<bool>,
 }
 
 // 获取消息列表
@@ -94,13 +98,13 @@ pub async fn handle_get_message(
         Ok(Some(message)) => {
             let message_json = serde_json::json!({
                 "id": message.id,
-                "from": message.sender_id,
-                "to": message.receiver_id,
+                "from": message.from,
+                "to": message.to,
                 "content": message.content,
-                "content_type": message.message_type,
+                "content_type": message.content_type,
                 "timestamp": message.timestamp.to_rfc3339(),
-                "read": message.status == "read",
-                "status": message.status,
+                "filename": message.filename,
+                "url": message.url,
             });
             
             let response = ApiResponse {
@@ -151,8 +155,8 @@ pub async fn handle_search_messages(
         Some(&query.keyword),
         query.sender_id.as_deref(),
         query.receiver_id.as_deref(),
-        query.start_date.as_deref(),
-        query.end_date.as_deref(),
+        query.start_date.map(|dt| dt.to_rfc3339()).as_deref(),
+        query.end_date.map(|dt| dt.to_rfc3339()).as_deref(),
         query.message_type.as_deref(),
     ).await.unwrap_or_else(|e| {
         tracing::error!("搜索消息失败: {}", e);
@@ -176,13 +180,12 @@ pub async fn handle_search_messages(
             
             serde_json::json!({
                 "id": msg.id,
-                "from": msg.sender_id,
-                "to": msg.receiver_id,
+                "from": msg.from,
+                "to": msg.to,
                 "content": msg.content,
-                "content_type": msg.message_type,
+                "content_type": msg.content_type,
                 "timestamp": msg.timestamp.to_rfc3339(),
                 "highlight": highlighted_content,
-                "status": msg.status,
             })
         })
         .collect();
@@ -212,17 +215,17 @@ pub async fn handle_export_messages(
     // 实现导出逻辑
     let messages = storage.get_messages_for_export(
         request.user_id.as_deref(),
-        request.start_date.as_deref(),
-        request.end_date.as_deref(),
+        request.start_date.map(|dt| dt.to_rfc3339()).as_deref(),
+        request.end_date.map(|dt| dt.to_rfc3339()).as_deref(),
         request.session_id.as_deref(),
     ).await.unwrap_or_else(|e| {
         tracing::error!("获取导出消息失败: {}", e);
         Vec::new()
     });
     
-    let export_format = request.format.unwrap_or_else(|| "json".to_string());
+    let format = request.format.as_deref().unwrap_or("json");
     
-    match export_format.as_str() {
+    match format {
         "json" => {
             let export_data = serde_json::json!({
                 "export_time": chrono::Utc::now().to_rfc3339(),
@@ -236,17 +239,16 @@ pub async fn handle_export_messages(
                 "messages": messages.iter().map(|msg| {
                     serde_json::json!({
                         "id": msg.id,
-                        "sender_id": msg.sender_id,
-                        "receiver_id": msg.receiver_id,
+                        "sender_id": msg.from,
+                        "receiver_id": msg.to,
                         "content": msg.content,
-                        "message_type": msg.message_type,
+                        "message_type": msg.content_type,
                         "timestamp": msg.timestamp.to_rfc3339(),
-                        "status": msg.status,
                     })
                 }).collect::<Vec<_>>(),
             });
             
-            let response = ApiResponse {
+            let response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: true,
                 message: "消息导出成功".to_string(),
                 data: Some(export_data),
@@ -254,35 +256,30 @@ pub async fn handle_export_messages(
             Ok(warp::reply::json(&response))
         }
         "csv" => {
-            let mut csv_data = String::from("ID,发送者,接收者,内容,类型,时间,状态\n");
+            let mut csv_data = String::from("ID,发送者,接收者,内容,类型,时间\n");
             for msg in messages {
                 csv_data.push_str(&format!(
-                    "{},{},{},{},{},{},{}\n",
+                    "{},{},{},{},{},{}\n",
                     msg.id.as_deref().unwrap_or(""),
                     msg.from,
                     msg.to.as_deref().unwrap_or(""),
                     msg.content.replace(",", "，").replace("\n", " "),
-                    msg.message_type,
-                    msg.timestamp.to_rfc3339(),
-                    msg.status
+                    format!("{:?}", msg.content_type.as_ref().unwrap_or(&ContentType::Text)),
+                    msg.timestamp.to_rfc3339()
                 ));
             }
             
-            let response = ApiResponse {
-                success: true,
-                message: "消息导出成功".to_string(),
-                data: Some(serde_json::json!({
-                    "format": "csv",
-                    "content": csv_data,
-                    "filename": format!("messages_export_{}.csv", chrono::Utc::now().format("%Y%m%d_%H%M%S")),
-                })),
+            let response: ApiResponse<()> = ApiResponse {
+                success: false,
+                message: format!("不支持的导出格式: {}", format),
+                data: None,
             };
             Ok(warp::reply::json(&response))
         }
         _ => {
-            let response = ApiResponse {
+            let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("不支持的导出格式: {}", export_format),
+                message: format!("不支持的导出格式: {}", format),
                 data: None,
             };
             Ok(warp::reply::json(&response))
@@ -298,7 +295,7 @@ pub async fn handle_delete_message(
     // 实际删除消息（软删除）
     match storage.soft_delete_message(&message_id).await {
         Ok(()) => {
-            let response = ApiResponse {
+            let response: ApiResponse<serde_json::Value> = ApiResponse {
                 success: true,
                 message: "消息删除成功".to_string(),
                 data: Some(serde_json::json!({
@@ -309,7 +306,7 @@ pub async fn handle_delete_message(
         }
         Err(e) => {
             tracing::error!("删除消息失败: {}", e);
-            let response = ApiResponse {
+            let response: ApiResponse<()> = ApiResponse {
                 success: false,
                 message: "删除消息失败".to_string(),
                 data: None,

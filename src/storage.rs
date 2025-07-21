@@ -1,4 +1,4 @@
-use crate::message::{ChatMessage, Session};
+use crate::message::{ChatMessage, ContentType, Session};
 use anyhow::Result;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -381,7 +381,7 @@ impl LocalStorage {
         let total_messages = self.db
             .open_tree("messages")
             .ok()
-            .and_then(|tree| tree.len().ok())
+            .map(|tree| tree.len())
             .unwrap_or(0);
         stats.insert("total_messages".to_string(), serde_json::json!(total_messages));
         
@@ -450,7 +450,16 @@ impl LocalStorage {
             for item in tree.iter() {
                 if let Ok((_, value)) = item {
                     if let Ok(message) = serde_json::from_slice::<ChatMessage>(&value) {
-                        *distribution.entry(message.message_type.clone()).or_insert(0) += 1;
+                        let msg_type = match message.content_type.as_ref() {
+                            Some(ContentType::Text) => "text",
+                            Some(ContentType::Image) => "image",
+                            Some(ContentType::File) => "file",
+                            Some(ContentType::Voice) => "voice",
+                            Some(ContentType::Video) => "video",
+                            Some(ContentType::Html) => "html",
+                            None => "text",
+                        };
+                        *distribution.entry(msg_type.to_string()).or_insert(0) += 1;
                     }
                 }
             }
@@ -467,35 +476,81 @@ impl LocalStorage {
     ) -> Result<std::collections::HashMap<String, MessageStats>> {
         let mut stats = std::collections::HashMap::new();
         
-        // 简单实现，返回示例数据
-        let now = chrono::Utc::now();
-        match group_by {
-            "hour" => {
-                for hour in 0..24 {
-                    let key = format!("{:02}:00", hour);
-                    stats.insert(key, MessageStats {
-                        total: 100 + hour as u64 * 10,
-                        text_count: 80 + hour as u64 * 8,
-                        voice_count: 10 + hour as u64,
-                        file_count: 5 + hour as u64 / 2,
-                        image_count: 5 + hour as u64 / 2,
-                    });
+        // 实际统计消息
+        if let Ok(tree) = self.db.open_tree("messages") {
+            let now = chrono::Utc::now();
+            
+            match group_by {
+                "hour" => {
+                    // 按小时统计
+                    for hour in 0..24 {
+                        let hour_start = now.date_naive().and_hms_opt(hour, 0, 0)
+                            .unwrap()
+                            .and_local_timezone(chrono::Utc)
+                            .unwrap();
+                        let hour_end = hour_start + chrono::Duration::hours(1);
+                        let mut hour_stats = MessageStats::default();
+                        
+                        for item in tree.iter() {
+                            if let Ok((_, value)) = item {
+                                if let Ok(msg) = serde_json::from_slice::<ChatMessage>(&value) {
+                                    if msg.timestamp >= hour_start && msg.timestamp < hour_end {
+                                        hour_stats.total += 1;
+                                        match msg.content_type.as_ref() {
+                                            Some(ContentType::Text) | None => hour_stats.text_count += 1,
+                                            Some(ContentType::Image) => hour_stats.image_count += 1,
+                                            Some(ContentType::File) => hour_stats.file_count += 1,
+                                            Some(ContentType::Voice) => hour_stats.voice_count += 1,
+                                            Some(ContentType::Video) => hour_stats.file_count += 1, // 归类到文件
+                                            Some(ContentType::Html) => hour_stats.text_count += 1,  // 归类到文本
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        let key = format!("{:02}:00", hour);
+                        stats.insert(key, hour_stats);
+                    }
+                }
+                "day" => {
+                    // 按天统计
+                    for day in 0..7 {
+                        let day_start = (now - chrono::Duration::days(day))
+                            .date_naive()
+                            .and_hms_opt(0, 0, 0)
+                            .unwrap()
+                            .and_local_timezone(chrono::Utc)
+                            .unwrap();
+                        let day_end = day_start + chrono::Duration::days(1);
+                        let mut day_stats = MessageStats::default();
+                        
+                        for item in tree.iter() {
+                            if let Ok((_, value)) = item {
+                                if let Ok(msg) = serde_json::from_slice::<ChatMessage>(&value) {
+                                    if msg.timestamp >= day_start && msg.timestamp < day_end {
+                                        day_stats.total += 1;
+                                        match msg.content_type.as_ref() {
+                                            Some(ContentType::Text) | None => day_stats.text_count += 1,
+                                            Some(ContentType::Image) => day_stats.image_count += 1,
+                                            Some(ContentType::File) => day_stats.file_count += 1,
+                                            Some(ContentType::Voice) => day_stats.voice_count += 1,
+                                            Some(ContentType::Video) => day_stats.file_count += 1, // 归类到文件
+                                            Some(ContentType::Html) => day_stats.text_count += 1,  // 归类到文本
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        let key = day_start.format("%Y-%m-%d").to_string();
+                        stats.insert(key, day_stats);
+                    }
+                }
+                _ => {
+                    // 默认不执行任何操作，返回空的统计
                 }
             }
-            "day" => {
-                for day in 0..7 {
-                    let date = now - chrono::Duration::days(day);
-                    let key = date.format("%Y-%m-%d").to_string();
-                    stats.insert(key, MessageStats {
-                        total: 1000 + day as u64 * 100,
-                        text_count: 800 + day as u64 * 80,
-                        voice_count: 100 + day as u64 * 10,
-                        file_count: 50 + day as u64 * 5,
-                        image_count: 50 + day as u64 * 5,
-                    });
-                }
-            }
-            _ => {}
         }
         
         Ok(stats)
@@ -534,15 +589,41 @@ impl LocalStorage {
                         
                         // 接收者匹配
                         if let Some(rid) = receiver_id {
-                            if message.to != Some(rid.to_string()) {
+                            if message.to.as_deref() != Some(rid) {
                                 matches = false;
                             }
                         }
                         
                         // 类型匹配
                         if let Some(mt) = message_type {
-                            if message.message_type != mt {
+                            let msg_type = match message.content_type.as_ref() {
+                                Some(ContentType::Text) => "text",
+                                Some(ContentType::Image) => "image",
+                                Some(ContentType::File) => "file",
+                                Some(ContentType::Voice) => "voice",
+                                Some(ContentType::Video) => "video",
+                                Some(ContentType::Html) => "html",
+                                None => "text",
+                            };
+                            if msg_type != mt {
                                 matches = false;
+                            }
+                        }
+                        
+                        // 时间范围匹配
+                        if let Some(start) = start_date {
+                            if let Ok(start_dt) = chrono::DateTime::parse_from_rfc3339(start) {
+                                if message.timestamp < start_dt.with_timezone(&chrono::Utc) {
+                                    matches = false;
+                                }
+                            }
+                        }
+                        
+                        if let Some(end) = end_date {
+                            if let Ok(end_dt) = chrono::DateTime::parse_from_rfc3339(end) {
+                                if message.timestamp > end_dt.with_timezone(&chrono::Utc) {
+                                    matches = false;
+                                }
                             }
                         }
                         
@@ -603,9 +684,11 @@ impl LocalStorage {
         let key = format!("message:{}", message_id);
         
         if let Ok(tree) = self.db.open_tree("messages") {
+            // 标记消息为已删除而不是真正删除
             if let Ok(Some(value)) = tree.get(&key) {
                 if let Ok(mut message) = serde_json::from_slice::<ChatMessage>(&value) {
-                    message.status = "deleted".to_string();
+                    // 清空内容，保留消息结构
+                    message.content = "[已删除]".to_string();
                     let updated = serde_json::to_vec(&message)?;
                     tree.insert(&key, updated)?;
                 }
@@ -648,6 +731,44 @@ impl LocalStorage {
         
         Ok(count)
     }
+
+    pub async fn get_message(&self, message_id: &str) -> Result<Option<ChatMessage>> {
+        let key = format!("message:{}", message_id);
+        
+        if let Ok(tree) = self.db.open_tree("messages") {
+            if let Ok(Some(value)) = tree.get(&key) {
+                if let Ok(message) = serde_json::from_slice::<ChatMessage>(&value) {
+                    return Ok(Some(message));
+                }
+            }
+        }
+        
+        Ok(None)
+    }
+    
+    pub async fn store_message(&self, message: &ChatMessage) -> Result<()> {
+        let message_id = message.id.clone().unwrap_or_else(|| {
+            format!(
+                "msg_{}_{}",
+                Utc::now().timestamp_millis(),
+                &uuid::Uuid::new_v4().to_string()[0..8]
+            )
+        });
+
+        let mut message_with_id = message.clone();
+        message_with_id.id = Some(message_id.clone());
+
+        let message_data = serde_json::to_vec(&message_with_id)?;
+        self.messages_tree
+            .insert(message_id.as_bytes(), message_data)?;
+
+        if let Some(to_user) = &message.to {
+            self.update_user_message_index(&message.from, to_user, &message_id)?;
+            self.update_user_message_index(to_user, &message.from, &message_id)?;
+        }
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -667,7 +788,7 @@ pub struct OptimizationResult {
     pub final_size_bytes: u64,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct MessageStats {
     pub total: u64,
     pub text_count: u64,

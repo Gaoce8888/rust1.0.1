@@ -529,15 +529,19 @@ impl UserManager {
         // Redis会自动处理过期，这个方法保留接口兼容性
         info!("🧹 Redis自动处理过期会话，无需手动清理");
     }
+
+    pub fn get_user(&self, user_id: &str) -> Option<User> {
+        self.users.iter()
+            .find(|u| u.id == user_id)
+            .cloned()
+    }
+    
+    /// 获取所有用户
+    pub fn get_all_users(&self) -> Vec<(String, User)> {
+        self.users.iter()
+            .map(|user| (user.id.clone(), user.clone()))
+            .collect()
+    }
 }
 
 // Cargo.toml 依赖项：
-// [dependencies]
-// redis = { version = "0.23", features = ["tokio-comp"] }
-// serde = { version = "1.0", features = ["derive"] }
-// serde_json = "1.0"
-// chrono = { version = "0.4", features = ["serde"] }
-// uuid = { version = "1.0", features = ["v4", "serde"] }
-// tracing = "0.1"
-// anyhow = "1.0"
-// tokio = { version = "1", features = ["full"] }

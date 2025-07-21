@@ -1,6 +1,7 @@
+use warp::{Filter, Rejection, Reply};
 use std::sync::Arc;
-use warp::Filter;
 use crate::websocket::WebSocketManager;
+use crate::redis_client::RedisManager;
 use crate::user_manager::UserManager;
 use crate::storage::LocalStorage;
 use crate::file_manager::FileManager;
@@ -374,7 +375,12 @@ async fn handle_system_backup(request: serde_json::Value, storage: Arc<LocalStor
     let backup_dir = format!("backups/{}", chrono::Utc::now().format("%Y%m%d_%H%M%S"));
     tokio::fs::create_dir_all(&backup_dir).await.map_err(|e| {
         tracing::error!("创建备份目录失败: {}", e);
-        warp::reject::custom(crate::error::ApiError::InternalError)
+        warp::reject::custom(ApiError {
+            success: false,
+            message: "内部服务器错误".to_string(),
+            code: Some(500),
+            details: None,
+        })
     })?;
     
     let mut backup_files = Vec::new();
@@ -449,7 +455,12 @@ async fn handle_system_backup(request: serde_json::Value, storage: Arc<LocalStor
             "backed_up_files": backup_files
         })))
     } else {
-        Err(warp::reject::custom(crate::error::ApiError::InternalError))
+        Err(warp::reject::custom(ApiError {
+            success: false,
+            message: "内部服务器错误".to_string(),
+            code: Some(500),
+            details: None,
+        }))
     }
 }
 
@@ -474,7 +485,12 @@ async fn handle_system_maintenance(request: serde_json::Value) -> Result<impl wa
             .await
             .map_err(|e| {
                 tracing::error!("写入维护模式文件失败: {}", e);
-                warp::reject::custom(crate::error::ApiError::InternalError)
+                warp::reject::custom(ApiError {
+                    success: false,
+                    message: "内部服务器错误".to_string(),
+                    code: Some(500),
+                    details: None,
+                })
             })?;
             
         // 广播维护通知 - 注释掉或使用其他方式
