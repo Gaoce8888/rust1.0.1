@@ -11,6 +11,8 @@ pub struct AIConfig {
     pub speech_recognition: SpeechRecognitionConfig,
     pub sentiment_analysis: SentimentAnalysisConfig,
     pub auto_reply: AutoReplyConfig,
+    pub react_component_generation: ReactComponentGenerationConfig,
+    pub ai_service_integration: AIServiceIntegrationConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -135,6 +137,203 @@ pub struct PreprocessingConfig {
     pub custom_filters: Vec<String>,
 }
 
+/// React组件生成配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReactComponentGenerationConfig {
+    pub enabled: bool,
+    pub model_type: String, // "gpt-4", "claude", "gemini", "custom"
+    pub api_endpoint: String,
+    pub api_key: String,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub top_p: f32,
+    pub frequency_penalty: f32,
+    pub presence_penalty: f32,
+    pub supported_component_types: Vec<String>,
+    pub component_templates: Vec<ComponentTemplate>,
+    pub style_presets: Vec<StylePreset>,
+    pub validation_rules: Vec<ValidationRule>,
+    pub generation_prompts: GenerationPrompts,
+    pub quality_control: QualityControlConfig,
+}
+
+/// 组件模板
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComponentTemplate {
+    pub name: String,
+    pub description: String,
+    pub component_type: String,
+    pub base_template: String,
+    pub required_props: Vec<String>,
+    pub optional_props: Vec<String>,
+    pub default_styles: serde_json::Value,
+    pub example_usage: String,
+    pub tags: Vec<String>,
+}
+
+/// 样式预设
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StylePreset {
+    pub name: String,
+    pub description: String,
+    pub styles: serde_json::Value,
+    pub theme: String, // "light", "dark", "custom"
+    pub responsive: bool,
+    pub animations: Vec<String>,
+}
+
+/// 验证规则
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValidationRule {
+    pub name: String,
+    pub rule_type: String, // "prop_validation", "style_validation", "accessibility"
+    pub condition: String,
+    pub error_message: String,
+    pub severity: String, // "error", "warning", "info"
+}
+
+/// 生成提示词
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenerationPrompts {
+    pub component_generation: String,
+    pub style_generation: String,
+    pub accessibility_improvement: String,
+    pub responsive_design: String,
+    pub performance_optimization: String,
+    pub code_review: String,
+}
+
+/// 质量控制配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QualityControlConfig {
+    pub enabled: bool,
+    pub code_quality_check: bool,
+    pub accessibility_check: bool,
+    pub performance_check: bool,
+    pub security_check: bool,
+    pub auto_fix_issues: bool,
+    pub review_threshold: f32,
+}
+
+/// AI服务集成配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AIServiceIntegrationConfig {
+    pub enabled: bool,
+    pub openai: OpenAIConfig,
+    pub anthropic: AnthropicConfig,
+    pub google: GoogleAIConfig,
+    pub azure: AzureAIConfig,
+    pub custom_services: Vec<CustomAIService>,
+    pub service_selection: ServiceSelectionStrategy,
+    pub fallback_chain: Vec<String>,
+    pub rate_limiting: RateLimitingConfig,
+    pub caching: CachingConfig,
+}
+
+/// OpenAI配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OpenAIConfig {
+    pub enabled: bool,
+    pub api_key: String,
+    pub organization_id: Option<String>,
+    pub base_url: String,
+    pub models: Vec<String>,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub timeout_seconds: u64,
+    pub retry_attempts: u32,
+}
+
+/// Anthropic配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnthropicConfig {
+    pub enabled: bool,
+    pub api_key: String,
+    pub base_url: String,
+    pub models: Vec<String>,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub timeout_seconds: u64,
+    pub retry_attempts: u32,
+}
+
+/// Google AI配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GoogleAIConfig {
+    pub enabled: bool,
+    pub api_key: String,
+    pub base_url: String,
+    pub models: Vec<String>,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub timeout_seconds: u64,
+    pub retry_attempts: u32,
+}
+
+/// Azure AI配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AzureAIConfig {
+    pub enabled: bool,
+    pub api_key: String,
+    pub endpoint: String,
+    pub deployment_name: String,
+    pub api_version: String,
+    pub models: Vec<String>,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub timeout_seconds: u64,
+    pub retry_attempts: u32,
+}
+
+/// 自定义AI服务
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomAIService {
+    pub name: String,
+    pub enabled: bool,
+    pub api_endpoint: String,
+    pub api_key: Option<String>,
+    pub auth_type: String, // "api_key", "bearer", "oauth", "none"
+    pub request_format: String, // "json", "form", "xml"
+    pub response_format: String, // "json", "text", "xml"
+    pub models: Vec<String>,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub timeout_seconds: u64,
+    pub retry_attempts: u32,
+    pub custom_headers: std::collections::HashMap<String, String>,
+}
+
+/// 服务选择策略
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceSelectionStrategy {
+    pub strategy: String, // "round_robin", "load_balanced", "cost_optimized", "quality_optimized"
+    pub weights: std::collections::HashMap<String, f32>,
+    pub cost_limits: std::collections::HashMap<String, f32>,
+    pub quality_thresholds: std::collections::HashMap<String, f32>,
+}
+
+/// 速率限制配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RateLimitingConfig {
+    pub enabled: bool,
+    pub requests_per_minute: u32,
+    pub requests_per_hour: u32,
+    pub requests_per_day: u32,
+    pub burst_limit: u32,
+    pub retry_after_seconds: u64,
+}
+
+/// 缓存配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CachingConfig {
+    pub enabled: bool,
+    pub cache_type: String, // "memory", "redis", "file"
+    pub ttl_seconds: u64,
+    pub max_cache_size: usize,
+    pub cache_key_pattern: String,
+    pub invalidate_on_update: bool,
+}
+
 impl Default for AIConfig {
     fn default() -> Self {
         Self {
@@ -146,6 +345,8 @@ impl Default for AIConfig {
             speech_recognition: SpeechRecognitionConfig::default(),
             sentiment_analysis: SentimentAnalysisConfig::default(),
             auto_reply: AutoReplyConfig::default(),
+            react_component_generation: ReactComponentGenerationConfig::default(),
+            ai_service_integration: AIServiceIntegrationConfig::default(),
         }
     }
 }
