@@ -240,7 +240,7 @@ export default function Component() {
           existingCustomer.name = onlineCustomer.user_name;
         } else {
           // 如果是新客户，添加到列表
-          updatedCustomers.push({
+          updatedCustomers = [...updatedCustomers, {
             id: onlineCustomer.user_id,
             name: onlineCustomer.user_name,
             status: 'online',
@@ -249,7 +249,7 @@ export default function Component() {
             timestamp: new Date(onlineCustomer.last_seen),
             unreadCount: 0,
             messages: []
-          });
+          }];
         }
       });
       
@@ -388,7 +388,7 @@ export default function Component() {
       // 添加客户的历史消息
       if (customer.messages) {
         customer.messages.forEach((msg, index) => {
-          initialMessages.push({
+          initialMessages = [...initialMessages, {
             id: `history_${customer.id}_${index}_${Date.now()}`,
             type: MessageType.TEXT,
             content: msg,
@@ -397,7 +397,7 @@ export default function Component() {
             senderAvatar: customer.avatar,
             timestamp: new Date(Date.now() - (customer.messages.length - index) * 3 * 60 * 1000), // 每条消息间隔3分钟
             customerId: customer.id
-          });
+          }];
         });
       }
 
@@ -748,7 +748,7 @@ export default function Component() {
               <div className="flex flex-wrap gap-2">
                 {settings.quickReplies.slice(0, 3).map((reply, index) => (
                   <Button
-                    key={index}
+                    key={`quick-reply-${reply.substring(0, 10)}-${index}`}
                     size="sm"
                     variant="bordered"
                     className="text-tiny"
@@ -774,7 +774,7 @@ export default function Component() {
                     <DropdownMenu>
                       {settings.quickReplies.slice(3).map((reply, index) => (
                         <DropdownItem
-                          key={index + 3}
+                          key={`settings-reply-${reply.substring(0, 10)}-${index + 3}`}
                           onClick={() => {
                             if (reply.trim()) {
                               handleSendMessage({
@@ -901,7 +901,7 @@ export default function Component() {
                     <p className="text-tiny text-default-500 mb-2">设置常用的回复语句</p>
                     <div className="space-y-2">
                       {settings.quickReplies.map((reply, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                        <div key={`quick-reply-${reply.substring(0, 10)}-${index}`} className="flex items-center gap-2">
                           <input
                             type="text"
                             className="flex-1 p-2 text-small rounded-lg border border-divider bg-content2"
