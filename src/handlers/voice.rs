@@ -293,7 +293,7 @@ pub async fn handle_download_voice_file(
                     mime_type,
                 ),
                 "Content-Disposition",
-                format!("attachment; filename=\"voice_{}.mp3\"", file_id),
+                format!("attachment; filename=\"voice_{file_id}.mp3\""),
             );
             
             Ok(Box::new(response))

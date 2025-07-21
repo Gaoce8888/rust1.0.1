@@ -188,7 +188,7 @@ pub async fn handle_delete_user(
     
     let response = ApiResponse {
         success: true,
-        message: format!("用户 {} 已删除", user_id),
+        message: format!("用户 {user_id} 已删除"),
         data: Some(serde_json::json!({
             "user_id": user_id,
             "deleted_at": Utc::now()

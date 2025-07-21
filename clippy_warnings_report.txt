@@ -1,0 +1,75 @@
+     71 warning: temporary with significant `Drop` can be early dropped
+     58 warning: unnecessary structure name repetition
+     40 warning: item name ends with its containing module's name
+     22 warning: this could be a `const fn`
+     21 warning: item name starts with its containing module's name
+     17 warning: redundant clone
+     16 warning: casting `usize` to `f64` causes a loss of precision on targets with 64-bit wide pointers (`usize` is 64 bits wide, but `f64`'s mantissa is only 52 bits wide)
+     15 warning: this match arm has an identical body to the `_` wildcard arm
+     15 warning: this argument is passed by value, but not consumed in the function body
+     15 warning: binding's name is too similar to existing binding
+     11 warning: unused `self` argument
+     11 warning: docs for function returning `Result` missing `# Errors` section
+     11 warning: casting `u64` to `f64` causes a loss of precision (`u64` is 64 bits wide, but `f64`'s mantissa is only 52 bits wide)
+     10 warning: you are deriving `PartialEq` and can implement `Eq`
+      9 warning: use Option::map_or_else instead of an if let/else
+      8 warning: casting `i64` to `usize` may truncate the value on targets with 32-bit wide pointers
+      8 warning: casting `i64` to `usize` may lose the sign of the value
+      7 warning: casting `usize` to `u32` may truncate the value on targets with 64-bit wide pointers
+      7 warning: casting `u64` to `usize` may truncate the value on targets with 32-bit wide pointers
+      6 warning: this could be rewritten as `let...else`
+      6 warning: casting `i64` to `isize` may truncate the value on targets with 32-bit wide pointers
+      5 warning: this pattern matching can be expressed using `matches!`
+      4 warning: unnecessary boolean `not` operation
+      4 warning: redundant else block
+      4 warning: casting `u128` to `u64` may truncate the value
+      3 warning: use Option::map_or instead of an if let/else
+      3 warning: multiply and add expressions can be calculated more efficiently and accurately
+      3 warning: more than 3 bools in a struct
+      3 warning: long literal lacking separators
+      3 warning: casting `i64` to `u32` may truncate the value
+      3 warning: casting `i64` to `u32` may lose the sign of the value
+      3 warning: casting `f64` to `f32` may truncate the value
+      3 warning: all fields have the same postfix: `url`
+      2 warning: use of `unwrap_or` followed by a function call
+      2 warning: this function's return value is unnecessarily wrapped by `Result`
+      2 warning: temporary with significant `Drop` in `if let` scrutinee will live until the end of the `if let` expression
+      2 warning: field name starts with the struct's name
+      2 warning: casting `usize` to `f32` causes a loss of precision (`usize` is 32 or 64 bits wide, but `f32`'s mantissa is only 23 bits wide)
+      2 warning: casting `u64` to `f32` causes a loss of precision (`u64` is 64 bits wide, but `f32`'s mantissa is only 23 bits wide)
+      2 warning: casting `i64` to `u64` may lose the sign of the value
+      2 warning: casting `i32` to `u32` may lose the sign of the value
+      2 warning: casting `f64` to `usize` may truncate the value
+      2 warning: casting `f64` to `usize` may lose the sign of the value
+      2 warning: case-sensitive file extension comparison
+      1 warning: used binding `_ws_manager` which is prefixed with an underscore. A leading underscore signals that a binding will not be used
+      1 warning: this pattern matching can be expressed using equality
+      1 warning: this function has too many lines (440/100)
+      1 warning: this function has too many lines (386/100)
+      1 warning: this function has too many lines (259/100)
+      1 warning: this function has too many lines (253/100)
+      1 warning: this function has too many lines (223/100)
+      1 warning: this function has too many lines (205/100)
+      1 warning: this function has too many lines (188/100)
+      1 warning: this function has too many lines (124/100)
+      1 warning: this function has too many lines (117/100)
+      1 warning: this function has too many lines (108/100)
+      1 warning: this argument is a mutable reference, but not used mutably
+      1 warning: the function has a cognitive complexity of (43/25)
+      1 warning: the function has a cognitive complexity of (151/25)
+      1 warning: temporary with significant `Drop` in `match` scrutinee will live until the end of the `match` expression
+      1 warning: redundant pattern matching, consider using `is_ok()`
+      1 warning: manual `Debug` impl does not include all fields
+      1 warning: `kefu-system` (lib) generated 41 warnings (run `cargo clippy --fix --lib -p kefu-system` to apply 10 suggestions)
+      1 warning: `kefu-system` (bin "kefu-system") generated 463 warnings (28 duplicates) (run `cargo clippy --fix --bin "kefu-system"` to apply 106 suggestions)
+      1 warning: casting `usize` to `i64` may wrap around the value on targets with 64-bit wide pointers
+      1 warning: casting `u64` to `i64` may wrap around the value
+      1 warning: casting `f64` to `u64` may truncate the value
+      1 warning: casting `f64` to `u64` may lose the sign of the value
+      1 warning: casting `f64` to `u32` may truncate the value
+      1 warning: casting `f64` to `u32` may lose the sign of the value
+      1 warning: assigning the result of `Clone::clone()` may be inefficient
+      1 warning: all fields have the same postfix: `protocol`
+      1 warning: all fields have the same postfix: `port`
+      1 warning: all fields have the same postfix: `path`
+      1 warning: adding items after statements is confusing, since items exist from the start of the scope

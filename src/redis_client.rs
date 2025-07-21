@@ -94,7 +94,7 @@ impl RedisManager {
     pub async fn set_user_online(&self, user_id: &str, user_info: &UserInfo) -> Result<()> {
         let mut conn = self.get_async_connection().await?;
 
-        let user_key = format!("user:{}", user_id);
+        let user_key = format!("user:{user_id}");
         let user_json = serde_json::to_string(user_info)?;
 
         // 使用管道批量操作
@@ -102,7 +102,7 @@ impl RedisManager {
         conn.expire(&user_key, 300).await?; // 5分钟过期
         conn.sadd("users:online", user_id).await?;
         conn.set_ex(
-            format!("heartbeat:{}", user_id),
+            format!("heartbeat:{user_id}"),
             Utc::now().timestamp().to_string(),
             60,
         )
@@ -125,11 +125,11 @@ impl RedisManager {
     pub async fn set_user_offline(&self, user_id: &str) -> Result<()> {
         let mut conn = self.get_async_connection().await?;
 
-        let user_key = format!("user:{}", user_id);
+        let user_key = format!("user:{user_id}");
 
         // 使用批量操作
         conn.del(&user_key).await?;
-        conn.del(&format!("heartbeat:{}", user_id)).await?;
+        conn.del(&format!("heartbeat:{user_id}")).await?;
         conn.srem("users:online", user_id).await?;
 
         // 广播用户离线
@@ -157,7 +157,7 @@ impl RedisManager {
         // 批量获取用户信息
         let mut users = Vec::new();
         for user_id in &user_ids {
-            let user_key = format!("user:{}", user_id);
+            let user_key = format!("user:{user_id}");
             if let Ok(user_json) = conn.get(&user_key).await {
                 if let Ok(user_info) = serde_json::from_str::<UserInfo>(&user_json) {
                     users.push(user_info);
@@ -171,7 +171,7 @@ impl RedisManager {
     // 获取用户信息（优化版）
     pub async fn get_user_info(&self, user_id: &str) -> Result<UserInfo> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("user:{}", user_id);
+        let key = format!("user:{user_id}");
 
         let value: String = conn.get(&key).await?;
         let user_info = serde_json::from_str::<UserInfo>(&value)?;
@@ -183,7 +183,7 @@ impl RedisManager {
     pub async fn establish_session(&self, kehu_id: &str, kefu_id: &str) -> Result<()> {
         let mut conn = self.get_async_connection().await?;
 
-        let session_key = format!("session:{}:{}", kehu_id, kefu_id);
+        let session_key = format!("session:{kehu_id}:{kefu_id}");
         let session_info = serde_json::json!({
             "kehu_id": kehu_id,
             "kefu_id": kefu_id,
@@ -192,8 +192,8 @@ impl RedisManager {
         });
 
         // 使用批量操作
-        conn.set(&format!("partner:{}", kehu_id), kefu_id).await?;
-        conn.set(&format!("partner:{}", kefu_id), kehu_id).await?;
+        conn.set(&format!("partner:{kehu_id}"), kefu_id).await?;
+        conn.set(&format!("partner:{kefu_id}"), kehu_id).await?;
         conn.set_ex(session_key.clone(), session_info.to_string(), 86400)
             .await?; // 24小时
 
@@ -213,7 +213,7 @@ impl RedisManager {
     // 获取聊天伙伴（优化版）
     pub async fn get_partner(&self, user_id: &str) -> Result<Option<String>> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("partner:{}", user_id);
+        let key = format!("partner:{user_id}");
 
         match conn.get(&key).await {
             Ok(partner_id) => Ok(Some(partner_id)),
@@ -226,7 +226,7 @@ impl RedisManager {
         let mut conn = self.get_async_connection().await?;
 
         conn.set_ex(
-            format!("heartbeat:{}", user_id),
+            format!("heartbeat:{user_id}"),
             Utc::now().timestamp().to_string(),
             90, // 90秒过期
         )
@@ -251,7 +251,7 @@ impl RedisManager {
     #[allow(dead_code)] // 企业级功能保留
     pub async fn is_user_online(&self, user_id: &str) -> Result<bool> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("heartbeat:{}", user_id);
+        let key = format!("heartbeat:{user_id}");
 
         let exists: bool = conn.exists(&key).await?;
         Ok(exists)
@@ -261,7 +261,7 @@ impl RedisManager {
     #[allow(dead_code)] // 企业级功能保留
     pub async fn get_last_heartbeat(&self, user_id: &str) -> Result<Option<i64>> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("heartbeat:{}", user_id);
+        let key = format!("heartbeat:{user_id}");
 
         match conn.get(&key).await {
             Ok(timestamp_str) => match timestamp_str.parse::<i64>() {
@@ -278,7 +278,7 @@ impl RedisManager {
         let mut results = HashMap::new();
 
         for user_id in user_ids {
-            let key = format!("heartbeat:{}", user_id);
+            let key = format!("heartbeat:{user_id}");
             let exists: bool = conn.exists(&key).await?;
             results.insert(user_id.clone(), exists);
         }
@@ -392,14 +392,14 @@ impl RedisManager {
     // 获取客服的活跃会话列表
     pub async fn get_kefu_active_sessions(&self, kefu_id: &str) -> Result<Vec<String>> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("kefu_sessions:{}", kefu_id);
+        let key = format!("kefu_sessions:{kefu_id}");
 
         let sessions: Vec<String> = conn.smembers(&key).await.unwrap_or_default();
 
         // 过滤出仍然有效的会话
         let mut valid_sessions = Vec::new();
         for session_id in sessions {
-            let session_key = format!("session:{}", session_id);
+            let session_key = format!("session:{session_id}");
             if conn.exists(&session_key).await.unwrap_or(false) {
                 valid_sessions.push(session_id);
             } else {
@@ -415,7 +415,7 @@ impl RedisManager {
     #[allow(dead_code)] // 企业级API方法，预留给未来使用
     pub async fn get_waiting_customers_for_kefu(&self, kefu_id: &str) -> Result<Vec<String>> {
         let mut conn = self.get_async_connection().await?;
-        let key = format!("priority_queue:{}", kefu_id);
+        let key = format!("priority_queue:{kefu_id}");
 
         let customers: Vec<String> = conn.lrange(&key, 0, -1).await.unwrap_or_default();
         Ok(customers)
@@ -436,7 +436,7 @@ impl RedisManager {
         });
 
         conn.set_ex(
-            format!("waiting:{}", customer_id),
+            format!("waiting:{customer_id}"),
             waiting_info.to_string(),
             3600, // 1小时过期
         )
@@ -454,7 +454,7 @@ impl RedisManager {
         conn.lrem("waiting_queue", 0, customer_id).await?;
 
         // 清除等待状态
-        conn.del(&format!("waiting:{}", customer_id)).await?;
+        conn.del(&format!("waiting:{customer_id}")).await?;
 
         tracing::info!("✅ 客户{}已从等待队列移除", customer_id);
         Ok(())
@@ -475,19 +475,19 @@ impl RedisManager {
         let mut conn = self.get_async_connection().await?;
 
         // 清除配对关系
-        conn.del(&format!("partner:{}", user1_id)).await?;
-        conn.del(&format!("partner:{}", user2_id)).await?;
+        conn.del(&format!("partner:{user1_id}")).await?;
+        conn.del(&format!("partner:{user2_id}")).await?;
 
         // 清除会话记录
-        let session_key = format!("session:{}:{}", user1_id, user2_id);
-        let session_key_alt = format!("session:{}:{}", user2_id, user1_id);
+        let session_key = format!("session:{user1_id}:{user2_id}");
+        let session_key_alt = format!("session:{user2_id}:{user1_id}");
         conn.del(&session_key).await?;
         conn.del(&session_key_alt).await?;
 
         // 从客服会话列表中移除
-        conn.srem(&format!("kefu_sessions:{}", user1_id), user2_id)
+        conn.srem(&format!("kefu_sessions:{user1_id}"), user2_id)
             .await?;
-        conn.srem(&format!("kefu_sessions:{}", user2_id), user1_id)
+        conn.srem(&format!("kefu_sessions:{user2_id}"), user1_id)
             .await?;
 
         tracing::info!("🧹 已清除会话关系: {} <-> {}", user1_id, user2_id);
@@ -498,8 +498,8 @@ impl RedisManager {
     pub async fn establish_session_enhanced(&self, kehu_id: &str, kefu_id: &str) -> Result<()> {
         let mut conn = self.get_async_connection().await?;
 
-        let session_id = format!("{}:{}", kehu_id, kefu_id);
-        let session_key = format!("session:{}", session_id);
+        let session_id = format!("{kehu_id}:{kefu_id}");
+        let session_key = format!("session:{session_id}");
 
         let session_info = serde_json::json!({
             "kehu_id": kehu_id,
@@ -512,15 +512,15 @@ impl RedisManager {
         });
 
         // 建立双向配对关系
-        conn.set(&format!("partner:{}", kehu_id), kefu_id).await?;
-        conn.set(&format!("partner:{}", kefu_id), kehu_id).await?;
+        conn.set(&format!("partner:{kehu_id}"), kefu_id).await?;
+        conn.set(&format!("partner:{kefu_id}"), kehu_id).await?;
 
         // 设置会话信息
         conn.set_ex(session_key.clone(), session_info.to_string(), 86400)
             .await?; // 24小时
 
         // 添加到客服的会话列表
-        conn.sadd(&format!("kefu_sessions:{}", kefu_id), kehu_id)
+        conn.sadd(&format!("kefu_sessions:{kefu_id}"), kehu_id)
             .await?;
 
         // 从等待队列移除客户
@@ -561,7 +561,7 @@ impl RedisManager {
 
         // 缓存工作负载信息
         conn.set_ex(
-            format!("workload:{}", kefu_id),
+            format!("workload:{kefu_id}"),
             workload_info.to_string(),
             300, // 5分钟缓存
         )
@@ -582,7 +582,7 @@ impl RedisManager {
         let mut active_sessions_count = 0;
 
         for user_id in &online_users {
-            let user_key = format!("user:{}", user_id);
+            let user_key = format!("user:{user_id}");
             if let Ok(user_json) = conn.get(&user_key).await {
                 if let Ok(user_info) = serde_json::from_str::<UserInfo>(&user_json) {
                     if user_info.user_type == crate::message::UserType::Kefu {
@@ -603,7 +603,7 @@ impl RedisManager {
             "waiting_customers": waiting_count,
             "active_sessions": active_sessions_count,
             "system_load": if active_kefu_count > 0 {
-                (active_sessions_count as f64 / (active_kefu_count as f64 * 5.0)) * 100.0
+                (active_sessions_count as f64 / (f64::from(active_kefu_count) * 5.0)) * 100.0
             } else { 0.0 },
             "timestamp": Utc::now().timestamp()
         });

@@ -4,7 +4,7 @@ use crate::errors::log_websocket_param_error;
 use crate::auth::kefu_auth::KefuAuthManager;
 use std::sync::Arc;
 
-/// WebSocket连接信息
+/// `WebSocket连接信息`
 pub struct WebSocketConnectionInfo {
     pub user_id: String,
     pub user_name: String,
@@ -13,7 +13,7 @@ pub struct WebSocketConnectionInfo {
     pub session_token: Option<String>,
 }
 
-/// 验证WebSocket连接参数 - 修复版本
+/// `验证WebSocket连接参数` - 修复版本
 pub fn validate_websocket_params(query: &WebSocketParams) -> bool {
     // 简化验证：只要求必要的两个参数
     let has_user_id = query.contains_key("user_id");
@@ -32,7 +32,7 @@ pub fn validate_websocket_params(query: &WebSocketParams) -> bool {
     true
 }
 
-/// 解析WebSocket连接参数
+/// `解析WebSocket连接参数`
 pub fn parse_websocket_connection(query: &WebSocketParams) -> Result<WebSocketConnectionInfo, String> {
     if !validate_websocket_params(query) {
         log_websocket_param_error("query", "Missing required WebSocket parameters");
@@ -57,8 +57,8 @@ pub fn parse_websocket_connection(query: &WebSocketParams) -> Result<WebSocketCo
         "kefu" | "support" | "agent" => UserType::Kefu,
         "kehu" | "customer" | "client" => UserType::Kehu,
         _ => {
-            log_websocket_param_error("user_type", &format!("未知的用户类型: {}", user_type_str));
-            return Err(format!("未知的用户类型: {}", user_type_str));
+            log_websocket_param_error("user_type", &format!("未知的用户类型: {user_type_str}"));
+            return Err(format!("未知的用户类型: {user_type_str}"));
         }
     };
 
@@ -71,7 +71,7 @@ pub fn parse_websocket_connection(query: &WebSocketParams) -> Result<WebSocketCo
     })
 }
 
-/// 验证客服WebSocket连接的认证
+/// `验证客服WebSocket连接的认证`
 pub async fn validate_kefu_websocket_auth(
     connection_info: &WebSocketConnectionInfo,
     kefu_auth_manager: &Arc<KefuAuthManager>,
@@ -95,7 +95,7 @@ pub async fn validate_kefu_websocket_auth(
                     return Err("客服未登录或已下线".to_string());
                 }
                 Err(e) => {
-                    return Err(format!("验证客服状态失败: {}", e));
+                    return Err(format!("验证客服状态失败: {e}"));
                 }
             }
         } else {

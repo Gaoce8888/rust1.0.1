@@ -49,9 +49,9 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, std::convert
     Ok(warp::reply::with_status(json, code))
 }
 
-/// 记录WebSocket参数错误
+/// `记录WebSocket参数错误`
 /// 
-/// 用于记录WebSocket连接过程中的参数解析错误
+/// `用于记录WebSocket连接过程中的参数解析错误`
 pub fn log_websocket_param_error(param_name: &str, error: &str) {
     tracing::warn!("🔗 WebSocket参数错误 - {}: {}", param_name, error);
 }

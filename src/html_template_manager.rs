@@ -547,12 +547,12 @@ impl HtmlTemplateManager {
         // 添加CSS和JavaScript
         if let Some(ref css) = template.css {
             let rendered_css = self.render_content(css, &render_variables)?;
-            preview_html = format!("<style>{}</style>\n{}", rendered_css, preview_html);
+            preview_html = format!("<style>{rendered_css}</style>\n{preview_html}");
         }
 
         if let Some(ref js) = template.javascript {
             let rendered_js = self.render_content(js, &render_variables)?;
-            preview_html = format!("{}\n<script>{}</script>", preview_html, rendered_js);
+            preview_html = format!("{preview_html}\n<script>{rendered_js}</script>");
         }
 
         Ok(preview_html)
@@ -565,7 +565,7 @@ impl HtmlTemplateManager {
         let callback = HtmlCallback {
             id: Uuid::new_v4().to_string(),
             message_id: request.message_id.clone(),
-            template_id: "".to_string(), // 需要通过message_id查找
+            template_id: String::new(), // 需要通过message_id查找
             action: request.action,
             element_id: request.element_id,
             callback_data: request.callback_data.unwrap_or(serde_json::Value::Null),
@@ -677,7 +677,7 @@ impl HtmlTemplateManager {
     }
 
     fn get_template_path(&self, template_id: &str) -> PathBuf {
-        self.base_path.join(format!("{}.json", template_id))
+        self.base_path.join(format!("{template_id}.json"))
     }
 
     async fn save_callback(&self, callback: &HtmlCallback) -> Result<()> {
@@ -786,11 +786,11 @@ impl HtmlTemplateManager {
                     serde_json::Value::String(s) => s.clone(),
                     serde_json::Value::Number(n) => n.to_string(),
                     serde_json::Value::Bool(b) => b.to_string(),
-                    serde_json::Value::Null => "".to_string(),
+                    serde_json::Value::Null => String::new(),
                     _ => value.to_string(),
                 }
             } else {
-                format!("{{{{{}}}}}", var_name) // 保留未找到的变量
+                format!("{{{{{var_name}}}}}") // 保留未找到的变量
             }
         });
 

@@ -199,14 +199,14 @@ pub async fn handle_redis_flush(
 
     // TODO: 实际执行Redis刷新
     let flushed_keys = if let Some(pattern) = &request.pattern {
-        format!("匹配模式 '{}' 的键", pattern)
+        format!("匹配模式 '{pattern}' 的键")
     } else {
         "所有键".to_string()
     };
 
     let response = ApiResponse {
         success: true,
-        message: format!("已刷新{}", flushed_keys),
+        message: format!("已刷新{flushed_keys}"),
         data: Some(serde_json::json!({
             "flushed_pattern": request.pattern,
             "database": request.database.unwrap_or(0),

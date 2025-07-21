@@ -1,10 +1,10 @@
-/// WebSocket处理器模块
+/// `WebSocket处理器模块`
 /// 
 /// 提供WebSocket连接管理、消息路由、实时通信功能。
 /// 支持多用户并发连接、消息广播、状态同步等特性。
 /// 
 /// # 功能特性
-/// - WebSocket连接建立和管理
+/// - `WebSocket连接建立和管理`
 /// - 实时消息路由和转发
 /// - 用户在线状态检测
 /// - 连接统计和监控
@@ -24,9 +24,9 @@ use crate::{
     websocket::WebSocketManager,
 };
 
-/// 获取WebSocket连接统计处理函数
+/// `获取WebSocket连接统计处理函数`
 /// 
-/// 获取当前WebSocket连接的统计信息
+/// `获取当前WebSocket连接的统计信息`
 #[allow(dead_code)] // 将在WebSocket管理API路由中使用
 pub async fn handle_get_websocket_stats(
     ws_manager: Arc<WebSocketManager>,
@@ -88,13 +88,13 @@ pub async fn handle_disconnect_user(
     if disconnected {
         Ok(warp::reply::json(&ApiResponse {
             success: true,
-            message: format!("成功断开用户 {} 的连接", user_id),
+            message: format!("成功断开用户 {user_id} 的连接"),
             data: Some(json!({"user_id": user_id})),
         }))
     } else {
         Ok(warp::reply::json(&ApiResponse {
             success: false,
-            message: format!("用户 {} 未在线或断开失败", user_id),
+            message: format!("用户 {user_id} 未在线或断开失败"),
             data: None::<()>,
         }))
     }
@@ -116,7 +116,7 @@ pub async fn handle_broadcast_message(
 
     Ok(warp::reply::json(&ApiResponse {
         success: true,
-        message: format!("消息已广播给 {} 个用户", broadcast_count),
+        message: format!("消息已广播给 {broadcast_count} 个用户"),
         data: Some(json!({
             "message": message,
             "broadcast_count": broadcast_count,
@@ -151,9 +151,9 @@ pub async fn handle_check_user_status(
     }))
 }
 
-/// 获取WebSocket健康状态处理函数
+/// `获取WebSocket健康状态处理函数`
 /// 
-/// 获取WebSocket服务的健康状态信息
+/// `获取WebSocket服务的健康状态信息`
 #[allow(dead_code)] // 将在健康检查API路由中使用
 pub async fn handle_get_websocket_health(
     ws_manager: Arc<WebSocketManager>,

@@ -5,7 +5,7 @@ use crate::file_manager::FileCategory;
 /// 系统配置响应
 #[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct SystemConfig {
-    /// WebSocket配置
+    /// `WebSocket配置`
     pub websocket: WebSocketConfig,
     /// API配置
     pub api: ApiConfig,
@@ -15,10 +15,10 @@ pub struct SystemConfig {
     pub html_templates: HtmlTemplateConfig,
 }
 
-/// WebSocket连接配置
+/// `WebSocket连接配置`
 #[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct WebSocketConfig {
-    /// WebSocket连接URL
+    /// `WebSocket连接URL`
     pub url: String,
 }
 

@@ -133,7 +133,7 @@ async fn handle_real_file_list(
                     "page": response.page,
                     "limit": response.limit,
                     "has_more": response.has_more,
-                    "total_pages": (response.total as f32 / response.limit as f32).ceil() as u32
+                    "total_pages": ((f64::from(response.total) / f64::from(response.limit)).ceil()) as u32
                 })),
             };
             Ok(warp::reply::json(&api_response))
@@ -141,7 +141,7 @@ async fn handle_real_file_list(
         Err(e) => {
             let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("获取文件列表失败: {}", e),
+                message: format!("获取文件列表失败: {e}"),
                 data: None,
             };
             Ok(warp::reply::json(&response))
@@ -168,7 +168,7 @@ async fn handle_real_file_upload(
     for part in parts {
         match part.name() {
             "file" => {
-                file_name = part.filename().map(|s| s.to_string());
+                file_name = part.filename().map(std::string::ToString::to_string);
                 let data = part.stream().try_fold(Vec::new(), |mut vec, data| {
                     vec.put(data);
                     async move { Ok(vec) }
@@ -203,16 +203,13 @@ async fn handle_real_file_upload(
     }
 
     // 验证文件数据
-    let (data, name) = match (file_data, file_name) {
-        (Some(d), Some(n)) => (d, n),
-        _ => {
-            let response: ApiResponse<()> = ApiResponse {
-                success: false,
-                message: "未找到有效的文件数据".to_string(),
-                data: None,
-            };
-            return Ok(warp::reply::json(&response));
-        }
+    let (data, name) = if let (Some(d), Some(n)) = (file_data, file_name) { (d, n) } else {
+        let response: ApiResponse<()> = ApiResponse {
+            success: false,
+            message: "未找到有效的文件数据".to_string(),
+            data: None,
+        };
+        return Ok(warp::reply::json(&response));
     };
 
     // 保存文件
@@ -228,7 +225,7 @@ async fn handle_real_file_upload(
         Err(e) => {
             let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("文件上传失败: {}", e),
+                message: format!("文件上传失败: {e}"),
                 data: None,
             };
             Ok(warp::reply::json(&response))
@@ -266,7 +263,7 @@ async fn handle_real_file_delete(
         Ok(_) => {
             let response = ApiResponse {
                 success: true,
-                message: format!("文件 {} 删除成功", file_id),
+                message: format!("文件 {file_id} 删除成功"),
                 data: Some(serde_json::json!({
                     "file_id": file_id,
                     "deleted_at": chrono::Utc::now()
@@ -277,7 +274,7 @@ async fn handle_real_file_delete(
         Err(e) => {
             let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("文件删除失败: {}", e),
+                message: format!("文件删除失败: {e}"),
                 data: None,
             };
             Ok(warp::reply::json(&response))
@@ -302,7 +299,7 @@ async fn handle_file_info(
         Err(e) => {
             let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("获取文件信息失败: {}", e),
+                message: format!("获取文件信息失败: {e}"),
                 data: None,
             };
             Ok(warp::reply::json(&response))
@@ -360,7 +357,7 @@ async fn handle_file_search(
         Err(e) => {
             let response: ApiResponse<()> = ApiResponse {
                 success: false,
-                message: format!("文件搜索失败: {}", e),
+                message: format!("文件搜索失败: {e}"),
                 data: None,
             };
             Ok(warp::reply::json(&response))

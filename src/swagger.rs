@@ -72,7 +72,7 @@ impl Modify for SecurityAddon {
     }
 }
 
-/// 获取OpenAPI规范JSON
+/// `获取OpenAPI规范JSON`
 #[allow(dead_code)]
 pub fn get_openapi_spec() -> utoipa::openapi::OpenApi {
     // 使用更简单的方式创建OpenAPI文档

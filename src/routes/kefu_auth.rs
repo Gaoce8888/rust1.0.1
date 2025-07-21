@@ -189,7 +189,7 @@ async fn handle_kefu_logout(
     query: std::collections::HashMap<String, String>,
     kefu_auth_manager: Arc<KefuAuthManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let kefu_id = query.get("kefu_id").unwrap_or(&"".to_string()).clone();
+    let kefu_id = query.get("kefu_id").unwrap_or(&String::new()).clone();
     
     if kefu_id.is_empty() {
         return Ok(warp::reply::json(&serde_json::json!({
@@ -253,7 +253,7 @@ async fn handle_kefu_heartbeat(
     query: std::collections::HashMap<String, String>,
     kefu_auth_manager: Arc<KefuAuthManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let kefu_id = query.get("kefu_id").unwrap_or(&"".to_string()).clone();
+    let kefu_id = query.get("kefu_id").unwrap_or(&String::new()).clone();
     
     if kefu_id.is_empty() {
         return Ok(warp::reply::json(&serde_json::json!({

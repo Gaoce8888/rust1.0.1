@@ -123,7 +123,7 @@ impl LocalStorage {
 
     // 更新用户消息索引
     fn update_user_message_index(&self, user1: &str, user2: &str, message_id: &str) -> Result<()> {
-        let key = format!("{}:{}", user1, user2);
+        let key = format!("{user1}:{user2}");
 
         // 获取现有消息ID列表
         let mut message_ids: Vec<String> =
@@ -153,8 +153,8 @@ impl LocalStorage {
     // 获取两个用户之间的消息历史
     pub fn get_messages(&self, user1: &str, user2: &str) -> Result<Vec<ChatMessage>> {
         // 尝试两种键的组合
-        let key1 = format!("{}:{}", user1, user2);
-        let key2 = format!("{}:{}", user2, user1);
+        let key1 = format!("{user1}:{user2}");
+        let key2 = format!("{user2}:{user1}");
 
         let message_ids: Vec<String> =
             match self.user_messages_tree.get(key1.as_bytes())? { Some(data) => {
@@ -241,7 +241,7 @@ impl LocalStorage {
     pub fn get_user_sessions(&self, user_id: &str) -> Result<Vec<Session>> {
         let mut sessions = Vec::new();
 
-        for result in self.sessions_tree.iter() {
+        for result in &self.sessions_tree {
             let (_, value) = result?;
             if let Ok(session) = serde_json::from_slice::<Session>(&value) {
                 if session.kefu_id == user_id || session.kehu_id == user_id {
@@ -264,7 +264,7 @@ impl LocalStorage {
 
         let mut keys_to_delete = Vec::new();
 
-        for result in self.sessions_tree.iter() {
+        for result in &self.sessions_tree {
             let (key, value) = result?;
             if let Ok(session) = serde_json::from_slice::<Session>(&value) {
                 if session.last_activity < cutoff_time {
@@ -301,7 +301,7 @@ impl LocalStorage {
     // 企业级账号查找功能
     #[allow(dead_code)] // 企业级功能：用于客户账号关联和历史查询
     pub fn get_session_by_zhanghao(&self, zhanghao: &str) -> Result<Option<Session>> {
-        for result in self.sessions_tree.iter() {
+        for result in &self.sessions_tree {
             let (_, value) = result?;
             if let Ok(session) = serde_json::from_slice::<Session>(&value) {
                 if let Some(ref session_zhanghao) = session.kehu_zhanghao {
@@ -321,7 +321,7 @@ impl LocalStorage {
         let mut message_ids_in_use = std::collections::HashSet::new();
 
         // 收集所有在用的消息ID
-        for result in self.user_messages_tree.iter() {
+        for result in &self.user_messages_tree {
             let (_, value) = result?;
             if let Ok(message_ids) = serde_json::from_slice::<Vec<String>>(&value) {
                 for id in message_ids {
@@ -332,7 +332,7 @@ impl LocalStorage {
 
         // 删除不在索引中的消息
         let mut keys_to_delete = Vec::new();
-        for result in self.messages_tree.iter() {
+        for result in &self.messages_tree {
             let (key, _) = result?;
             let key_str = String::from_utf8_lossy(&key);
             if !message_ids_in_use.contains(key_str.as_ref()) {

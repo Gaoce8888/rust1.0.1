@@ -10,7 +10,7 @@
 /// - `file`: 文件管理处理器
 /// - `voice`: 语音消息处理器
 /// - `template`: HTML模板处理器
-/// - `websocket`: WebSocket连接处理器
+/// - `websocket`: `WebSocket连接处理器`
 /// - `ai`: AI处理器 - 包含意图识别、翻译、语音识别等AI功能
 /// - `users`: 用户管理处理器
 /// - `messages`: 消息管理处理器

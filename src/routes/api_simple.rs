@@ -6,8 +6,8 @@ use crate::html_template_manager::HtmlTemplateManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::storage::LocalStorage;
 use crate::types::api::{ApiResponse, IpLocationQuery, ClientRegisterInfo};
-use crate::handlers::system::*;
-use crate::handlers::client::*;
+use crate::handlers::system::{handle_get_config, handle_get_public_online_users, handle_get_realtime_users};
+use crate::handlers::client::{handle_client_register, handle_ip_location};
 
 /// 构建简化的API路由
 pub fn build_api_routes(
@@ -202,7 +202,7 @@ pub fn build_api_routes(
     let file_download_route = warp::path!("api" / "file" / "download" / String)
         .and(warp::get())
         .and_then(|file_id: String| async move {
-            let response = format!("Mock file content for {}", file_id);
+            let response = format!("Mock file content for {file_id}");
             Result::<_, warp::Rejection>::Ok(warp::reply::with_header(
                 response,
                 "Content-Type",
@@ -217,7 +217,7 @@ pub fn build_api_routes(
             tracing::info!("🗑️ 删除文件请求: {}", file_id);
             let response = ApiResponse {
                 success: true,
-                message: format!("文件 {} 删除成功", file_id),
+                message: format!("文件 {file_id} 删除成功"),
                 data: Some(serde_json::json!({
                     "file_id": file_id,
                     "deleted_at": chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string()
@@ -463,24 +463,21 @@ pub fn build_api_routes(
             async move {
                 tracing::info!("🔍 查询客户端信息: {}", client_id);
                 
-                let storage_key = format!("client:{}", client_id);
-                match storage.get(&storage_key).await {
-                    Ok(Some(data)) => {
-                        let response = ApiResponse {
-                            success: true,
-                            message: "客户端信息查询成功".to_string(),
-                            data: Some(serde_json::from_str::<serde_json::Value>(&data).unwrap_or_default()),
-                        };
-                        Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
-                    }
-                    _ => {
-                        let response = ApiResponse {
-                            success: false,
-                            message: "客户端信息不存在".to_string(),
-                            data: None::<()>,
-                        };
-                        Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
-                    }
+                let storage_key = format!("client:{client_id}");
+                if let Ok(Some(data)) = storage.get(&storage_key).await {
+                    let response = ApiResponse {
+                        success: true,
+                        message: "客户端信息查询成功".to_string(),
+                        data: Some(serde_json::from_str::<serde_json::Value>(&data).unwrap_or_default()),
+                    };
+                    Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
+                } else {
+                    let response = ApiResponse {
+                        success: false,
+                        message: "客户端信息不存在".to_string(),
+                        data: None::<()>,
+                    };
+                    Result::<_, warp::Rejection>::Ok(warp::reply::json(&response))
                 }
             }
         });

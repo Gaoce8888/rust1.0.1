@@ -528,11 +528,10 @@ pub async fn handle_preview_template(
                 <head><title>预览错误</title></head>
                 <body>
                     <h1>模板预览失败</h1>
-                    <p>{}</p>
+                    <p>{e}</p>
                 </body>
                 </html>
-                "#,
-                e
+                "#
             );
             let response = warp::reply::with_header(
                 error_html,

@@ -104,7 +104,7 @@ impl<T> CachedValue<T> {
         Self {
             value,
             cached_at: chrono::Utc::now().timestamp(),
-            ttl_seconds: ttl.map(|d| d.as_secs() as i64),
+            ttl_seconds: ttl.and_then(|d| i64::try_from(d.as_secs()).ok()),
         }
     }
     

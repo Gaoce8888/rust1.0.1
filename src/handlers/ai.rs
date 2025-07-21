@@ -163,7 +163,7 @@ async fn get_task_status(
         Ok(Some(status)) => {
             let response = TaskStatusResponse {
                 task_id,
-                status: format!("{:?}", status),
+                status: format!("{status:?}"),
                 result: None,
                 error: None,
             };
@@ -268,9 +268,9 @@ async fn update_config(
     ai_manager: Arc<AIManager>,
 ) -> Result<impl Reply, warp::Rejection> {
     match request.config.validate() {
-        Ok(_) => {
+        Ok(()) => {
             match ai_manager.update_config(request.config.clone()).await {
-                Ok(_) => {
+                Ok(()) => {
                     let response = ConfigResponse {
                         config: request.config.clone(),
                         enabled_features: request.config.get_enabled_features(),
