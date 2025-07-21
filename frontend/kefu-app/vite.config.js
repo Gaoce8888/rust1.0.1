@@ -36,7 +36,9 @@ export default defineConfig({
           // 将React相关库打包到一起
           'react-vendor': ['react', 'react-dom'],
           // 将UI库打包到一起
-          'ui-vendor': ['@heroui/react', '@iconify/react'],
+          'ui-vendor': ['@heroui/react', '@iconify/react', 'framer-motion'],
+          // 将工具库分离
+          'utils-vendor': ['clsx', 'tailwind-merge', 'usehooks-ts'],
         },
         // 自定义chunk文件名
         chunkFileNames: 'js/[name]-[hash].js',
@@ -51,11 +53,34 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
+        pure_funcs: ['console.log'],
+        reduce_vars: true,
+        dead_code: true,
+      },
+      mangle: {
+        safari10: true,
       },
     },
     
     // 生成source map用于调试
     sourcemap: false,
+    
+    // 设置打包警告的文件大小限制
+    chunkSizeWarningLimit: 1000,
+    
+    // 压缩选项
+    cssCodeSplit: true,
+    
+    // 优化依赖预构建
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+  
+  // 依赖优化
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@heroui/react', '@iconify/react'],
+    exclude: ['fs-extra'], // 避免在浏览器环境中打包Node.js模块
   },
   
   // 路径解析配置
@@ -67,5 +92,10 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, './src/utils'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
     },
+  },
+  
+  // 预览配置
+  preview: {
+    port: 6005,
   },
 })

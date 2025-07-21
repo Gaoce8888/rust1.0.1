@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
+
+// 生成唯一ID的工具函数
+const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
 function App() {
   const [messages, setMessages] = useState([
-    { text: '欢迎使用企业级客服系统！', type: 'received' }
+    { id: generateMessageId(), text: '欢迎使用企业级客服系统！', type: 'received' }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [connectionStatus, setConnectionStatus] = useState('未连接');
@@ -11,13 +14,13 @@ function App() {
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     connect();
@@ -28,7 +31,7 @@ function App() {
     };
   }, []);
 
-  const connect = () => {
+  const connect = useCallback(() => {
     const wsUrl = `ws://${window.location.hostname}:6006/ws?user_id=${userId}&user_type=kehu&user_name=客户${userId.substr(-4)}`;
     
     const ws = new WebSocket(wsUrl);
@@ -57,9 +60,9 @@ function App() {
       console.error('WebSocket错误:', error);
       setConnectionStatus('连接错误');
     };
-  };
+  }, [userId]);
 
-  const handleMessage = (data) => {
+  const handleMessage = useCallback((data) => {
     switch(data.type) {
       case 'Chat':
         if (data.from !== userId) {
@@ -75,13 +78,17 @@ function App() {
         }
         break;
     }
-  };
+  }, [userId]);
 
-  const addMessage = (text, type) => {
-    setMessages(prev => [...prev, { text, type }]);
-  };
+  const addMessage = useCallback((text, type) => {
+    setMessages(prev => [...prev, { 
+      id: generateMessageId(),
+      text, 
+      type 
+    }]);
+  }, []);
 
-  const sendMessage = () => {
+  const sendMessage = useCallback(() => {
     const message = inputValue.trim();
     
     if (message && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -96,13 +103,13 @@ function App() {
       addMessage(`我: ${message}`, 'sent');
       setInputValue('');
     }
-  };
+  }, [inputValue, userId, addMessage]);
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = useCallback((e) => {
     if (e.key === 'Enter') {
       sendMessage();
     }
-  };
+  }, [sendMessage]);
 
   return (
     <div className="container">
@@ -113,8 +120,8 @@ function App() {
       
       <div className="chat-container">
         <div className="messages">
-          {messages.map((msg, index) => (
-            <div key={index} className={`message ${msg.type}`}>
+          {messages.map((msg) => (
+            <div key={msg.id} className={`message ${msg.type}`}>
               {msg.text}
             </div>
           ))}
@@ -135,4 +142,4 @@ function App() {
   );
 }
 
-export default App;
+export default React.memo(App);
