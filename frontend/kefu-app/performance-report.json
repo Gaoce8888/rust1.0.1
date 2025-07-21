@@ -1,0 +1,593 @@
+{
+  "summary": {
+    "totalFiles": 42,
+    "totalLines": 14861,
+    "issuesFound": 69,
+    "optimizationOpportunities": 40
+  },
+  "issues": [
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 0,
+      "message": "检测到 8 个 map 操作，但只有 4 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 0,
+      "message": "检测到 14 个 map 操作，但只有 2 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/acme.jsx",
+      "line": 0,
+      "message": "组件 AcmeIcon 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/api-config.js",
+      "line": 0,
+      "message": "组件 API_CONFIG, API_ENDPOINTS, WS_MESSAGE_TYPE 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/ChatArea.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/CustomerList.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 0,
+      "message": "检测到 3 个 map 操作，但只有 1 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 0,
+      "message": "检测到 4 个 map 操作，但只有 2 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "refactor",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 0,
+      "message": "组件 OptimizedApp 过于复杂 (257 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 0,
+      "message": "组件 OptimizedMessage, OptimizedUserItem, VirtualizedMessageList, OptimizedInput, PerformanceMonitor, SmartCacheContainer 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 0,
+      "message": "组件 usePerformanceMonitor, PerformanceMonitorComponent, PerformancePanel, useNetworkMonitor, NetworkStatusIndicator 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "refactor",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 0,
+      "message": "组件 usePerformanceMonitor 过于复杂 (104 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 0,
+      "message": "组件 useOptimizedReducer, useDebouncedState, useThrottledState, useOptimizedList, useOptimizedForm, useOptimizedAsync, useOptimizedStorage, calculateUserDiffs, useOptimizedUserState, usePerformanceMonitor, useSmartCache, useDebounce, useThrottle, useVirtualScroll, useOptimizedAppState 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 0,
+      "message": "检测到 3 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "refactor",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 0,
+      "message": "组件 useOptimizedUserState 过于复杂 (108 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
+      "line": 0,
+      "message": "组件 useWebSocket 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/message-types.js",
+      "line": 0,
+      "message": "组件 MessageType, MessageStatus, FileType 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/messaging-chat-message.jsx",
+      "line": 0,
+      "message": "组件 MessageType 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
+      "line": 0,
+      "message": "组件 enterpriseWSManager 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
+      "line": 0,
+      "message": "组件 MessageStatus, MessagePriority, messageQueue, messageCache 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
+      "line": 0,
+      "message": "组件 apiService, useOptimizedApi, useBatchApi 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "warning",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/setupTests.js",
+      "line": 0,
+      "message": "检测到事件监听器但缺少清理逻辑",
+      "suggestion": "在 useEffect 的清理函数中移除事件监听器以避免内存泄漏"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/types/message.js",
+      "line": 0,
+      "message": "组件 MessageType, MessageStatus, FileType 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
+      "line": 0,
+      "message": "组件 batchDOMUpdate, updateElementStyles, appendElementsBatch, removeElementsBatch, observeElementVisibility, addScrollOptimizedListener 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
+      "line": 0,
+      "message": "检测到 2 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/MemoryManager.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/MemoryManager.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/PerformanceProfiler.js",
+      "line": 0,
+      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/PerformanceProfiler.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 0,
+      "message": "组件 loadWithProgress, preloadResources, recordUserInteraction 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "warning",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 0,
+      "message": "检测到 2 个 map 操作，但只有 0 个 key 属性",
+      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/performance.js",
+      "line": 0,
+      "message": "组件 useDebounce, useThrottle, lazyLoadImage, batchUpdate, performanceMonitor, measurePerformance, isInViewport, createIntersectionObserver 应该使用 React.memo 包装以提高性能",
+      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils/performance.js",
+      "line": 0,
+      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
+      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+    },
+    {
+      "type": "optimization",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
+      "line": 0,
+      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
+      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+    },
+    {
+      "type": "error",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
+      "line": 0,
+      "message": "检测到直接状态修改，这可能导致渲染问题",
+      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "性能优化",
+      "actions": [
+        "使用 React.memo 包装纯组件",
+        "对昂贵的计算使用 useMemo",
+        "对传递给子组件的函数使用 useCallback",
+        "实现虚拟滚动处理长列表",
+        "使用图片懒加载"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "代码质量",
+      "actions": [
+        "为所有列表项添加唯一的 key 属性",
+        "在 useEffect 中正确清理副作用",
+        "避免直接修改状态"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "代码重构",
+      "actions": [
+        "将大型组件拆分为更小的子组件",
+        "提取可复用的逻辑到自定义 Hook",
+        "优化组件层次结构"
+      ]
+    }
+  ]
+}
