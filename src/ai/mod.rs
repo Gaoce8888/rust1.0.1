@@ -3,6 +3,7 @@ pub mod intent_recognition;
 pub mod translation;
 pub mod speech_recognition;
 pub mod queue;
+pub mod custom_processor;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -19,6 +20,7 @@ pub enum AITaskType {
     SpeechRecognition,
     SentimentAnalysis,
     AutoReply,
+    CustomProcessor,  // 新增自定义处理器类型
 }
 
 // AI处理任务状态
@@ -137,6 +139,7 @@ pub struct AIManager {
     pub intent_processor: Arc<intent_recognition::IntentProcessor>,
     pub translation_processor: Arc<translation::TranslationProcessor>,
     pub speech_processor: Arc<speech_recognition::SpeechProcessor>,
+    pub custom_processor: Arc<custom_processor::CustomAIProcessor>,  // 新增自定义处理器
     pub config: Arc<RwLock<config::AIConfig>>,
 }
 
@@ -174,6 +177,7 @@ impl AIManager {
             intent_processor: Arc::new(intent_recognition::IntentProcessor::new(config.clone())),
             translation_processor: Arc::new(translation::TranslationProcessor::new(config.clone())),
             speech_processor: Arc::new(speech_recognition::SpeechProcessor::new(config.clone())),
+            custom_processor: Arc::new(custom_processor::CustomAIProcessor::new(config.clone())),
             config,
         }
     }
@@ -188,6 +192,7 @@ impl AIManager {
             intent_processor: Arc::new(intent_recognition::IntentProcessor::new(config.clone())),
             translation_processor: Arc::new(translation::TranslationProcessor::new(config.clone())),
             speech_processor: Arc::new(speech_recognition::SpeechProcessor::new(config.clone())),
+            custom_processor: Arc::new(custom_processor::CustomAIProcessor::new(config.clone())),
             config,
         })
     }
@@ -214,6 +219,7 @@ impl AIManager {
         let intent_processor = self.intent_processor.clone();
         let translation_processor = self.translation_processor.clone();
         let speech_processor = self.speech_processor.clone();
+        let custom_processor = self.custom_processor.clone();
 
         tokio::spawn(async move {
             loop {
@@ -237,6 +243,7 @@ impl AIManager {
                     AITaskType::IntentRecognition => intent_processor.clone(),
                     AITaskType::Translation => translation_processor.clone(),
                     AITaskType::SpeechRecognition => speech_processor.clone(),
+                    AITaskType::CustomProcessor => custom_processor.clone(),  // 添加自定义处理器
                     _ => {
                         tracing::warn!("未支持的AI任务类型: {:?}", task.task_type);
                         continue;

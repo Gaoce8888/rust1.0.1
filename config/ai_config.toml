@@ -190,3 +190,202 @@ audit_logging_enabled = true
 allowed_origins = ["http://localhost:*", "https://*.ylqkf.com"]
 require_auth_token = true
 token_header = "X-AI-Auth-Token"
+
+# ============================================
+# 自定义AI处理器配置
+# ============================================
+
+[custom_processor]
+enabled = true
+
+# MCP工具集成示例
+[[custom_processor.processors]]
+id = "mcp_search"
+name = "MCP搜索工具"
+description = "使用MCP工具进行搜索"
+endpoint = "http://localhost:8081/mcp/tools/execute"
+api_key = ""  # 从环境变量MCP_API_KEY读取
+timeout_seconds = 30
+max_retries = 3
+cache_enabled = true
+cache_ttl_seconds = 300
+
+[custom_processor.processors.processor_type]
+type = "mcp_tool"
+tool_name = "search"
+tool_version = "1.0"
+tool_config = { index = "default", fields = ["title", "content", "tags"] }
+
+# 知识库查询示例
+[[custom_processor.processors]]
+id = "kb_faq"
+name = "FAQ知识库"
+description = "查询常见问题知识库"
+endpoint = "http://localhost:8082/kb/search"
+api_key = ""  # 从环境变量KB_API_KEY读取
+timeout_seconds = 10
+max_retries = 2
+cache_enabled = true
+cache_ttl_seconds = 600
+
+[custom_processor.processors.processor_type]
+type = "knowledge_base"
+kb_id = "faq_v1"
+search_type = "hybrid"  # semantic, keyword, hybrid
+max_results = 5
+min_score = 0.7
+
+[[custom_processor.processors.preprocessing.steps]]
+type = "text_normalize"
+lowercase = true
+remove_punctuation = false
+remove_extra_spaces = true
+
+# RAG系统集成示例
+[[custom_processor.processors]]
+id = "rag_customer_service"
+name = "客服RAG系统"
+description = "基于检索增强生成的客服问答系统"
+endpoint = ""  # RAG系统不需要单一端点
+api_key = ""
+timeout_seconds = 60
+max_retries = 2
+cache_enabled = true
+cache_ttl_seconds = 300
+
+[custom_processor.processors.processor_type]
+type = "rag"
+retriever_endpoint = "http://localhost:8083/retrieve"
+generator_endpoint = "http://localhost:8084/generate"
+retriever_config = { top_k = 5, similarity_threshold = 0.75 }
+generator_config = { model = "gpt-3.5-turbo", temperature = 0.7, max_tokens = 500 }
+
+# 自定义HTTP API集成示例
+[[custom_processor.processors]]
+id = "custom_nlp_api"
+name = "自定义NLP接口"
+description = "调用自定义的NLP分析接口"
+endpoint = "https://api.example.com/nlp/analyze"
+api_key = ""  # 从环境变量CUSTOM_NLP_KEY读取
+timeout_seconds = 20
+max_retries = 3
+cache_enabled = false
+cache_ttl_seconds = 0
+
+[custom_processor.processors.processor_type]
+type = "http_api"
+method = "POST"
+
+# 请求模板，支持{{input}}占位符
+[custom_processor.processors.processor_type.request_template]
+text = "{{input}}"
+language = "zh"
+features = ["entities", "keywords", "sentiment"]
+
+# 响应映射规则
+[custom_processor.processors.processor_type.response_mapping]
+extract_path = "$.data.analysis"
+rename_fields = { sentiment_score = "score", entities_list = "entities" }
+
+# 向量数据库集成示例
+[[custom_processor.processors]]
+id = "vector_search"
+name = "向量相似度搜索"
+description = "在向量数据库中进行语义搜索"
+endpoint = ""
+api_key = ""
+timeout_seconds = 15
+max_retries = 2
+cache_enabled = true
+cache_ttl_seconds = 1800
+
+[custom_processor.processors.processor_type]
+type = "vector_db"
+db_type = "pinecone"  # pinecone, weaviate, qdrant, milvus
+connection_string = "https://xxx.pinecone.io"
+collection_name = "customer_service_embeddings"
+embedding_model = "text-embedding-ada-002"
+
+# Python脚本集成示例（用于复杂的自定义逻辑）
+[[custom_processor.processors]]
+id = "python_custom_logic"
+name = "Python自定义逻辑"
+description = "执行自定义Python脚本进行数据处理"
+endpoint = ""
+api_key = ""
+timeout_seconds = 30
+max_retries = 1
+cache_enabled = false
+cache_ttl_seconds = 0
+
+[custom_processor.processors.processor_type]
+type = "python_script"
+script_path = "./scripts/custom_processor.py"
+python_path = "/usr/bin/python3"
+virtualenv_path = "./venv"
+
+# WebAssembly模块示例（用于高性能计算）
+[[custom_processor.processors]]
+id = "wasm_text_analyzer"
+name = "WASM文本分析器"
+description = "使用WebAssembly模块进行高性能文本分析"
+endpoint = ""
+api_key = ""
+timeout_seconds = 5
+max_retries = 2
+cache_enabled = true
+cache_ttl_seconds = 3600
+
+[custom_processor.processors.processor_type]
+type = "wasm"
+module_path = "./wasm/text_analyzer.wasm"
+function_name = "analyze_text"
+memory_limit_mb = 128
+
+# 预处理和后处理示例
+[[custom_processor.processors]]
+id = "advanced_processor"
+name = "高级处理器"
+description = "带有复杂预处理和后处理的处理器"
+endpoint = "http://localhost:8085/process"
+api_key = ""
+timeout_seconds = 45
+max_retries = 2
+cache_enabled = true
+cache_ttl_seconds = 900
+
+[custom_processor.processors.processor_type]
+type = "http_api"
+method = "POST"
+request_template = {}
+response_mapping = {}
+
+# 预处理步骤
+[[custom_processor.processors.preprocessing.steps]]
+type = "text_normalize"
+lowercase = true
+remove_punctuation = true
+remove_extra_spaces = true
+
+[[custom_processor.processors.preprocessing.steps]]
+type = "text_split"
+method = "sentence"  # sentence, paragraph, token
+max_length = 1000
+overlap = 100
+
+[[custom_processor.processors.preprocessing.steps]]
+type = "template_render"
+template = "请分析以下文本：{{input}}"
+
+# 后处理步骤
+[[custom_processor.processors.postprocessing.steps]]
+type = "json_extract"
+path = "$.results[0]"
+
+[[custom_processor.processors.postprocessing.steps]]
+type = "text_format"
+format_template = "分析结果：{{result}}"
+
+[[custom_processor.processors.postprocessing.steps]]
+type = "result_filter"
+condition = "score > 0.5"

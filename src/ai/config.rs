@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use super::custom_processor::CustomProcessorConfig;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AIConfig {
@@ -11,6 +12,7 @@ pub struct AIConfig {
     pub speech_recognition: SpeechRecognitionConfig,
     pub sentiment_analysis: SentimentAnalysisConfig,
     pub auto_reply: AutoReplyConfig,
+    pub custom_processor: Option<CustomProcessorConfig>,  // 新增自定义处理器配置
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -146,6 +148,7 @@ impl Default for AIConfig {
             speech_recognition: SpeechRecognitionConfig::default(),
             sentiment_analysis: SentimentAnalysisConfig::default(),
             auto_reply: AutoReplyConfig::default(),
+            custom_processor: None,
         }
     }
 }
