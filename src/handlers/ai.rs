@@ -115,6 +115,14 @@ impl AIHandler {
                             .and(with_ai_manager(ai_manager.clone()))
                             .and_then(batch_process)
                     )
+                    .or(
+                        // 重新加载配置
+                        warp::path("config")
+                            .and(warp::path("reload"))
+                            .and(warp::post())
+                            .and(with_ai_manager(ai_manager.clone()))
+                            .and_then(reload_config)
+                    )
             )
     }
 }
@@ -379,6 +387,27 @@ async fn batch_process(
     };
 
     Ok(warp::reply::json(&response))
+}
+
+async fn reload_config(
+    ai_manager: Arc<AIManager>,
+) -> Result<impl Reply, warp::Rejection> {
+    match ai_manager.reload_config().await {
+        Ok(_) => {
+            let response = serde_json::json!({
+                "status": "success",
+                "message": "AI配置已重新加载"
+            });
+            Ok(warp::reply::json(&response))
+        }
+        Err(e) => {
+            let response = serde_json::json!({
+                "status": "error",
+                "message": format!("重新加载配置失败: {}", e)
+            });
+            Ok(warp::reply::json(&response))
+        }
+    }
 }
 
 // WebSocket集成的辅助函数

@@ -1,0 +1,192 @@
+# AI系统配置文件
+# 此文件支持运行时修改，无需重新编译后端
+
+[general]
+# 是否启用AI功能
+enabled = true
+# 最大并发任务数
+max_concurrent_tasks = 10
+# 任务超时时间（秒）
+task_timeout_seconds = 30
+
+# 意图识别配置
+[intent_recognition]
+enabled = true
+model_type = "openai"  # 可选: openai, azure, local
+api_endpoint = "https://api.openai.com/v1/chat/completions"
+api_key = ""  # 从环境变量OPENAI_API_KEY读取
+confidence_threshold = 0.7
+max_retries = 3
+timeout_seconds = 10
+supported_languages = ["zh", "en"]
+
+# 自定义意图配置
+[[intent_recognition.custom_intents]]
+name = "complaint"
+description = "客户投诉"
+keywords = ["投诉", "不满", "问题", "退款", "退货"]
+patterns = ["我要投诉", "这个有问题", "我不满意"]
+confidence_boost = 0.1
+
+[[intent_recognition.custom_intents]]
+name = "inquiry"
+description = "咨询问询"
+keywords = ["询问", "咨询", "了解", "请问", "怎么"]
+patterns = ["我想了解", "请问", "能告诉我"]
+confidence_boost = 0.05
+
+[[intent_recognition.custom_intents]]
+name = "order"
+description = "订单相关"
+keywords = ["订单", "购买", "下单", "买", "支付"]
+patterns = ["我要买", "下单", "怎么购买"]
+confidence_boost = 0.1
+
+[[intent_recognition.custom_intents]]
+name = "technical_support"
+description = "技术支持"
+keywords = ["故障", "不能用", "坏了", "错误", "bug"]
+patterns = ["出现故障", "不能使用", "有bug"]
+confidence_boost = 0.15
+
+# 意图预处理配置
+[intent_recognition.preprocessing]
+remove_punctuation = true
+convert_to_lowercase = true
+remove_extra_spaces = true
+expand_contractions = true
+
+# 翻译服务配置
+[translation]
+enabled = true
+service_provider = "google"  # 可选: google, azure, aws, baidu
+api_endpoint = "https://translation.googleapis.com/language/translate/v2"
+api_key = ""  # 从环境变量GOOGLE_TRANSLATE_API_KEY读取
+api_secret = ""
+default_source_language = "auto"
+default_target_language = "zh"
+auto_detect_language = true
+confidence_threshold = 0.8
+max_text_length = 5000
+cache_translations = true
+cache_ttl_seconds = 3600
+
+# 支持的语言映射
+[[translation.supported_languages]]
+code = "zh"
+name = "中文"
+supported_directions = ["en", "ja", "ko", "es", "fr"]
+
+[[translation.supported_languages]]
+code = "en"
+name = "English"
+supported_directions = ["zh", "ja", "ko", "es", "fr"]
+
+[[translation.supported_languages]]
+code = "ja"
+name = "日本語"
+supported_directions = ["zh", "en", "ko"]
+
+[[translation.supported_languages]]
+code = "ko"
+name = "한국어"
+supported_directions = ["zh", "en", "ja"]
+
+# 语音识别配置
+[speech_recognition]
+enabled = true
+service_provider = "azure"  # 可选: azure, google, aws, baidu
+api_endpoint = "https://eastasia.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1"
+api_key = ""  # 从环境变量AZURE_SPEECH_KEY读取
+api_secret = ""
+default_language = "zh-CN"
+supported_languages = ["zh-CN", "en-US", "ja-JP", "ko-KR"]
+supported_formats = ["wav", "mp3", "ogg", "flac", "m4a"]
+max_audio_duration_seconds = 300
+max_file_size_bytes = 10485760  # 10MB
+confidence_threshold = 0.7
+enable_punctuation = true
+enable_word_timestamps = false
+enable_speaker_diarization = false
+custom_vocabulary = ["客服", "订单", "产品"]
+
+# 情感分析配置
+[sentiment_analysis]
+enabled = true
+model_type = "azure"  # 可选: azure, google, aws, local
+api_endpoint = "https://eastasia.api.cognitive.microsoft.com/text/analytics/v3.0/sentiment"
+api_key = ""  # 从环境变量AZURE_TEXT_ANALYTICS_KEY读取
+supported_languages = ["zh", "en"]
+confidence_threshold = 0.6
+sentiment_categories = ["positive", "neutral", "negative", "mixed"]
+
+# 自定义情感关键词
+[sentiment_analysis.custom_keywords]
+"非常满意" = 0.9
+"很好" = 0.8
+"不错" = 0.6
+"一般" = 0.0
+"不满意" = -0.6
+"很差" = -0.8
+"垃圾" = -0.9
+
+# 自动回复配置
+[auto_reply]
+enabled = true
+model_type = "openai"  # 可选: openai, azure, local
+api_endpoint = "https://api.openai.com/v1/chat/completions"
+api_key = ""  # 从环境变量OPENAI_API_KEY读取
+max_response_length = 500
+temperature = 0.7
+top_p = 0.9
+frequency_penalty = 0.0
+presence_penalty = 0.0
+model_name = "gpt-3.5-turbo"
+system_prompt = "你是一个专业的客服助手，请用友好、专业的语言回复客户。"
+include_context = true
+context_window_size = 5
+use_knowledge_base = true
+knowledge_base_path = "./knowledge_base"
+
+# 回复模板
+[auto_reply.templates]
+greeting = "您好！很高兴为您服务。请问有什么可以帮助您的吗？"
+farewell = "感谢您的咨询，祝您生活愉快！如有其他问题，欢迎随时联系我们。"
+wait_moment = "请稍等，我正在为您查询相关信息..."
+transfer_human = "我将为您转接人工客服，请稍候。"
+
+# 缓存配置
+[cache]
+enabled = true
+provider = "redis"  # 可选: redis, memory
+redis_url = "redis://localhost:6379"
+ttl_seconds = 3600
+max_entries = 10000
+
+# 监控配置
+[monitoring]
+enabled = true
+metrics_enabled = true
+metrics_interval_seconds = 60
+log_level = "info"  # 可选: debug, info, warn, error
+log_failed_tasks = true
+alert_on_high_failure_rate = true
+failure_rate_threshold = 0.3
+alert_webhook_url = ""
+
+# API限流配置
+[rate_limiting]
+enabled = true
+max_requests_per_minute = 100
+max_requests_per_hour = 1000
+max_requests_per_day = 10000
+burst_size = 20
+
+# 安全配置
+[security]
+encrypt_api_keys = true
+mask_sensitive_data = true
+audit_logging_enabled = true
+allowed_origins = ["http://localhost:*", "https://*.ylqkf.com"]
+require_auth_token = true
+token_header = "X-AI-Auth-Token"
