@@ -1,236 +1,291 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createIntersectionObserver, lazyLoadImage } from '@utils/performance';
 
-/**
- * 图片懒加载组件
- * 支持渐进式加载、占位符、错误处理等功能
- */
-export const LazyImage = React.memo(({
-  src,
-  alt = '',
-  className = '',
+// 懒加载图片组件
+export const LazyImage = React.memo(({ 
+  src, 
+  alt = '', 
+  className = '', 
   style = {},
-  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OWE5YiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+',
-  fallback = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmVlMmUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2Q5NGE0YSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==',
-  threshold = 0.1,
-  rootMargin = '50px',
+  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YWFhYSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+',
+  fallback = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmVlMmUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2Q5NzM3MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==',
   onLoad,
   onError,
-  onIntersect,
-  progressive = true,
-  blur = true,
-  ...props
+  ...props 
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const imgRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const imageRef = useRef(null);
   const observerRef = useRef(null);
 
   // 加载图片
   const loadImage = useCallback(async () => {
-    if (!src || isLoading) return;
-    
+    if (!src) return;
+
     setIsLoading(true);
-    setIsError(false);
-    
+    setHasError(false);
+
     try {
-      await lazyLoadImage(src, placeholder);
-      setImageSrc(src);
-      setIsLoaded(true);
-      onLoad?.(src);
+      const loadedSrc = await lazyLoadImage(src, fallback);
+      setImageSrc(loadedSrc);
+      onLoad?.(loadedSrc);
     } catch (error) {
-      console.error('Failed to load image:', error);
+      console.error('Image load error:', error);
       setImageSrc(fallback);
-      setIsError(true);
+      setHasError(true);
       onError?.(error);
     } finally {
       setIsLoading(false);
     }
-  }, [src, placeholder, fallback, onLoad, onError, isLoading]);
+  }, [src, fallback, onLoad, onError]);
 
-  // 创建Intersection Observer
+  // 设置Intersection Observer
   useEffect(() => {
-    if (!imgRef.current) return;
+    if (!imageRef.current) return;
 
-    const observer = createIntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsIntersecting(true);
-            onIntersect?.(entry);
-            loadImage();
-            // 一旦加载开始，就不再需要观察
-            if (observerRef.current) {
-              observerRef.current.unobserve(entry.target);
-            }
-          }
-        });
-      },
-      {
-        threshold,
-        rootMargin,
-      }
-    );
+    observerRef.current = createIntersectionObserver((target) => {
+      loadImage();
+      observerRef.current?.unobserve(target);
+    }, { threshold: 0.1 });
 
-    observerRef.current = observer;
-    observer.observe(imgRef.current);
+    observerRef.current.observe(imageRef.current);
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observerRef.current?.disconnect();
     };
-  }, [threshold, rootMargin, onIntersect, loadImage]);
+  }, [loadImage]);
 
-  // 清理函数
+  // 清理
   useEffect(() => {
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observerRef.current?.disconnect();
     };
   }, []);
 
-  // 计算样式
-  const imageStyle = {
-    ...style,
-    transition: progressive ? 'filter 0.3s ease-in-out' : 'none',
-    filter: progressive && blur && !isLoaded ? 'blur(5px)' : 'none',
-  };
+  return (
+    <img
+      ref={imageRef}
+      src={imageSrc}
+      alt={alt}
+      className={`${className} ${isLoading ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300`}
+      style={style}
+      {...props}
+    />
+  );
+});
+
+// 响应式图片组件
+export const ResponsiveImage = React.memo(({ 
+  srcSet, 
+  sizes, 
+  src, 
+  alt = '', 
+  className = '', 
+  style = {},
+  onLoad,
+  onError,
+  ...props 
+}) => {
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 根据屏幕尺寸选择合适的图片
+  const selectBestImage = useCallback(() => {
+    if (!srcSet) return src;
+
+    const mediaQueries = [
+      { width: 1920, src: srcSet.large || srcSet.medium || src },
+      { width: 1024, src: srcSet.medium || srcSet.small || src },
+      { width: 768, src: srcSet.small || src },
+      { width: 0, src: src }
+    ];
+
+    const screenWidth = window.innerWidth;
+    const bestMatch = mediaQueries.find(mq => screenWidth >= mq.width);
+    
+    return bestMatch?.src || src;
+  }, [srcSet, src]);
+
+  // 加载最佳图片
+  useEffect(() => {
+    const bestSrc = selectBestImage();
+    if (bestSrc !== currentSrc) {
+      setIsLoading(true);
+      setCurrentSrc(bestSrc);
+    }
+  }, [selectBestImage, currentSrc]);
+
+  const handleLoad = useCallback(() => {
+    setIsLoading(false);
+    onLoad?.(currentSrc);
+  }, [currentSrc, onLoad]);
+
+  const handleError = useCallback((error) => {
+    setIsLoading(false);
+    onError?.(error);
+  }, [onError]);
 
   return (
     <img
-      ref={imgRef}
-      src={imageSrc}
-      alt={alt}
-      className={`lazy-image ${className} ${isLoaded ? 'loaded' : ''} ${isError ? 'error' : ''}`}
-      style={imageStyle}
-      onLoad={() => setIsLoaded(true)}
-      onError={() => {
-        setIsError(true);
-        setImageSrc(fallback);
-        onError?.(new Error('Image failed to load'));
-      }}
-      {...props}
-    />
-  );
-});
-
-LazyImage.displayName = 'LazyImage';
-
-/**
- * 响应式图片组件
- * 支持不同屏幕尺寸的图片源
- */
-export const ResponsiveImage = React.memo(({
-  srcSet,
-  sizes,
-  src,
-  alt = '',
-  className = '',
-  style = {},
-  placeholder,
-  fallback,
-  ...props
-}) => {
-  const [currentSrc, setCurrentSrc] = useState(src);
-
-  // 根据屏幕尺寸选择合适的图片源
-  useEffect(() => {
-    if (!srcSet) return;
-
-    const updateSrc = () => {
-      const width = window.innerWidth;
-      const sources = srcSet.split(',').map(s => s.trim());
-      
-      for (const source of sources) {
-        const [url, size] = source.split(' ');
-        const sizeNum = parseInt(size);
-        
-        if (width <= sizeNum) {
-          setCurrentSrc(url);
-          break;
-        }
-      }
-    };
-
-    updateSrc();
-    window.addEventListener('resize', updateSrc);
-    
-    return () => {
-      window.removeEventListener('resize', updateSrc);
-    };
-  }, [srcSet]);
-
-  return (
-    <LazyImage
       src={currentSrc}
+      srcSet={srcSet ? Object.entries(srcSet).map(([size, url]) => `${url} ${size}w`).join(', ') : undefined}
+      sizes={sizes}
       alt={alt}
-      className={`responsive-image ${className}`}
+      className={`${className} ${isLoading ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300`}
       style={style}
-      placeholder={placeholder}
-      fallback={fallback}
+      onLoad={handleLoad}
+      onError={handleError}
       {...props}
     />
   );
 });
 
-ResponsiveImage.displayName = 'ResponsiveImage';
-
-/**
- * 图片画廊组件
- * 支持多图片展示和懒加载
- */
-export const ImageGallery = React.memo(({
-  images = [],
-  className = '',
+// 图片画廊组件
+export const ImageGallery = React.memo(({ 
+  images = [], 
+  className = '', 
   style = {},
   itemClassName = '',
-  itemStyle = {},
-  placeholder,
-  fallback,
-  columns = 3,
-  gap = 8,
-  ...props
+  onImageClick,
+  showThumbnails = true,
+  thumbnailSize = 80,
+  ...props 
 }) => {
-  const galleryStyle = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${columns}, 1fr)`,
-    gap: `${gap}px`,
-    ...style,
-  };
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const handleImageClick = useCallback((index) => {
+    setSelectedIndex(index);
+    onImageClick?.(images[index], index);
+  }, [images, onImageClick]);
+
+  const handlePrevious = useCallback(() => {
+    setSelectedIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
+  }, [images.length]);
+
+  const handleNext = useCallback(() => {
+    setSelectedIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
+  }, [images.length]);
+
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'ArrowLeft') {
+      handlePrevious();
+    } else if (event.key === 'ArrowRight') {
+      handleNext();
+    } else if (event.key === 'Escape') {
+      setIsFullscreen(false);
+    }
+  }, [handlePrevious, handleNext]);
+
+  useEffect(() => {
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isFullscreen, handleKeyDown]);
+
+  if (images.length === 0) {
+    return (
+      <div className={`flex items-center justify-center p-8 ${className}`} style={style}>
+        <p className="text-gray-500">暂无图片</p>
+      </div>
+    );
+  }
 
   return (
-    <div className={`image-gallery ${className}`} style={galleryStyle} {...props}>
-      {images.map((image, index) => (
-        <div
-          key={`${image.src}-${index}`}
-          className={`gallery-item ${itemClassName}`}
-          style={itemStyle}
-        >
-          <LazyImage
-            src={image.src}
-            alt={image.alt || ''}
-            placeholder={placeholder}
-            fallback={fallback}
-            className="w-full h-full object-cover"
-          />
+    <div className={`image-gallery ${className}`} style={style} {...props}>
+      {/* 主图片 */}
+      <div className="relative">
+        <LazyImage
+          src={images[selectedIndex]?.src}
+          alt={images[selectedIndex]?.alt || ''}
+          className={`w-full h-64 object-cover rounded-lg ${itemClassName}`}
+          onClick={() => setIsFullscreen(true)}
+        />
+        
+        {/* 导航按钮 */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={handlePrevious}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"
+            >
+              ←
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"
+            >
+              →
+            </button>
+          </>
+        )}
+        
+        {/* 图片计数器 */}
+        <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+          {selectedIndex + 1} / {images.length}
         </div>
-      ))}
+      </div>
+
+      {/* 缩略图 */}
+      {showThumbnails && images.length > 1 && (
+        <div className="flex gap-2 mt-4 overflow-x-auto">
+          {images.map((image, index) => (
+            <LazyImage
+              key={index}
+              src={image.src}
+              alt={image.alt || ''}
+              className={`w-20 h-20 object-cover rounded cursor-pointer transition-opacity ${
+                index === selectedIndex ? 'opacity-100 ring-2 ring-blue-500' : 'opacity-60 hover:opacity-80'
+              }`}
+              onClick={() => handleImageClick(index)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 全屏模式 */}
+      {isFullscreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+          <div className="relative max-w-4xl max-h-full">
+            <LazyImage
+              src={images[selectedIndex]?.src}
+              alt={images[selectedIndex]?.alt || ''}
+              className="max-w-full max-h-full object-contain"
+            />
+            
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"
+            >
+              ✕
+            </button>
+            
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevious}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-4 rounded-full hover:bg-opacity-75 transition-opacity"
+                >
+                  ←
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-4 rounded-full hover:bg-opacity-75 transition-opacity"
+                >
+                  →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 });
 
-ImageGallery.displayName = 'ImageGallery';
-
-/**
- * 图片预加载Hook
- * 用于预加载关键图片
- */
+// 图片预加载Hook
 export const useImagePreload = (imageUrls = []) => {
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [loadingImages, setLoadingImages] = useState(new Set());
@@ -280,6 +335,6 @@ export const useImagePreload = (imageUrls = []) => {
     preloadAll,
     isLoaded,
     isLoading,
-    hasFailed,
+    hasFailed
   };
 };

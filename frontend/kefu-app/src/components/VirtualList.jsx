@@ -3,74 +3,48 @@ import { FixedSizeList as List } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { performanceMonitor } from '@utils/performance';
 
-/**
- * 虚拟滚动列表组件
- * 用于高效渲染大量数据，避免DOM节点过多导致的性能问题
- */
-export const VirtualList = React.memo(({
-  items = [],
-  itemHeight = 50,
-  itemRenderer,
+// 虚拟列表组件
+export const VirtualList = React.memo(({ 
+  items = [], 
+  itemHeight = 50, 
+  itemRenderer, 
   className = '',
   style = {},
   overscanCount = 5,
   onScroll,
-  onItemsRendered,
-  estimatedItemSize,
-  useDynamicSize = false,
-  ...props
+  onItemsRendered
 }) => {
   const listRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const containerRef = useRef(null);
+  const [scrollDirection, setScrollDirection] = useState('forward');
+  const [scrollOffset, setScrollOffset] = useState(0);
 
-  // 性能监控
-  useEffect(() => {
-    performanceMonitor.startTimer('VirtualList-render');
-    return () => {
-      performanceMonitor.endTimer('VirtualList-render');
-    };
-  }, [items.length]);
-
-  // 动态计算item高度
-  const getItemSize = useCallback((index) => {
-    if (typeof itemHeight === 'function') {
-      return itemHeight(index);
-    }
-    return itemHeight;
-  }, [itemHeight]);
-
-  // 优化的item渲染函数
-  const renderItem = useCallback(({ index, style }) => {
+  // 优化的渲染函数
+  const renderItem = useCallback(({ index, style: itemStyle }) => {
     const item = items[index];
     if (!item) return null;
 
     return (
-      <div style={style} key={`item-${index}`}>
-        {itemRenderer({ item, index, style })}
+      <div style={itemStyle}>
+        {itemRenderer(item, index)}
       </div>
     );
   }, [items, itemRenderer]);
 
-  // 滚动事件处理
-  const handleScroll = useCallback(({ scrollOffset, scrollUpdateWasRequested }) => {
-    if (onScroll) {
-      onScroll({ scrollOffset, scrollUpdateWasRequested });
-    }
+  // 滚动处理
+  const handleScroll = useCallback(({ scrollDirection: direction, scrollOffset: offset }) => {
+    setScrollDirection(direction);
+    setScrollOffset(offset);
+    onScroll?.({ scrollDirection: direction, scrollOffset: offset });
   }, [onScroll]);
 
-  // 渲染完成事件处理
+  // 渲染完成处理
   const handleItemsRendered = useCallback(({ visibleStartIndex, visibleStopIndex, overscanStartIndex, overscanStopIndex }) => {
-    if (onItemsRendered) {
-      onItemsRendered({ visibleStartIndex, visibleStopIndex, overscanStartIndex, overscanStopIndex });
-    }
+    onItemsRendered?.({ visibleStartIndex, visibleStopIndex, overscanStartIndex, overscanStopIndex });
   }, [onItemsRendered]);
 
-  // 滚动到指定索引
+  // 滚动到指定项
   const scrollToItem = useCallback((index, align = 'auto') => {
-    if (listRef.current) {
-      listRef.current.scrollToItem(index, align);
-    }
+    listRef.current?.scrollToItem(index, align);
   }, []);
 
   // 滚动到顶部
@@ -83,77 +57,35 @@ export const VirtualList = React.memo(({
     scrollToItem(items.length - 1, 'end');
   }, [scrollToItem, items.length]);
 
-  // 获取可见范围
-  const getVisibleRange = useCallback(() => {
-    if (!listRef.current) return { start: 0, end: 0 };
-    
-    const { scrollOffset, clientHeight } = listRef.current.state;
-    const start = Math.floor(scrollOffset / itemHeight);
-    const end = Math.min(start + Math.ceil(clientHeight / itemHeight), items.length - 1);
-    
-    return { start, end };
-  }, [itemHeight, items.length]);
-
-  // 容器尺寸变化处理
+  // 性能监控
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setDimensions({ width, height });
-      }
-    });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
+    performanceMonitor.startTimer('VirtualList-render');
     return () => {
-      resizeObserver.disconnect();
+      performanceMonitor.endTimer('VirtualList-render');
     };
-  }, []);
+  }, [items.length]);
 
-  // 如果没有数据，显示空状态
   if (items.length === 0) {
     return (
-      <div 
-        ref={containerRef}
-        className={`virtual-list-empty ${className}`}
-        style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          height: '200px',
-          ...style 
-        }}
-      >
-        <div className="text-center text-gray-500">
-          <div className="text-2xl mb-2">📋</div>
-          <p>暂无数据</p>
-        </div>
+      <div className={`flex items-center justify-center p-8 ${className}`} style={style}>
+        <p className="text-gray-500">暂无数据</p>
       </div>
     );
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className={`virtual-list-container ${className}`}
-      style={{ height: '100%', ...style }}
-      {...props}
-    >
+    <div className={className} style={style}>
       <AutoSizer>
-        {({ width, height }) => (
+        {({ height, width }) => (
           <List
             ref={listRef}
             height={height}
             width={width}
             itemCount={items.length}
-            itemSize={getItemSize}
+            itemSize={itemHeight}
             overscanCount={overscanCount}
             onScroll={handleScroll}
             onItemsRendered={handleItemsRendered}
-            estimatedItemSize={estimatedItemSize}
-            useDynamicSize={useDynamicSize}
           >
             {renderItem}
           </List>
@@ -163,20 +95,15 @@ export const VirtualList = React.memo(({
   );
 });
 
-VirtualList.displayName = 'VirtualList';
-
-/**
- * 虚拟滚动列表的Hook
- * 提供虚拟列表的常用功能
- */
+// 虚拟列表Hook
 export const useVirtualList = (items = [], options = {}) => {
   const {
     itemHeight = 50,
     overscanCount = 5,
-    estimatedItemSize,
+    initialScrollOffset = 0
   } = options;
 
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(initialScrollOffset);
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
   const handleScroll = useCallback(({ scrollOffset: offset }) => {
@@ -187,168 +114,166 @@ export const useVirtualList = (items = [], options = {}) => {
     setVisibleRange({ start: visibleStartIndex, end: visibleStopIndex });
   }, []);
 
-  const listProps = useMemo(() => ({
-    itemHeight,
-    overscanCount,
-    estimatedItemSize,
-    onScroll: handleScroll,
-    onItemsRendered: handleItemsRendered,
-  }), [itemHeight, overscanCount, estimatedItemSize, handleScroll, handleItemsRendered]);
+  const visibleItems = useMemo(() => {
+    return items.slice(visibleRange.start, visibleRange.end + 1);
+  }, [items, visibleRange]);
 
   return {
     scrollOffset,
     visibleRange,
-    listProps,
+    visibleItems,
+    handleScroll,
+    handleItemsRendered,
+    itemHeight,
+    overscanCount
   };
 };
 
-/**
- * 虚拟滚动列表的增强版本
- * 包含搜索、过滤、排序等功能
- */
-export const EnhancedVirtualList = React.memo(({
-  items = [],
-  searchTerm = '',
+// 增强的虚拟列表组件（支持搜索和过滤）
+export const EnhancedVirtualList = React.memo(({ 
+  items = [], 
+  searchTerm = '', 
   searchFields = [],
-  sortBy = null,
-  sortDirection = 'asc',
-  filterFunction = null,
   itemHeight = 50,
   itemRenderer,
   className = '',
   style = {},
-  ...props
+  onFilteredItemsChange
 }) => {
-  // 过滤和排序数据
-  const processedItems = useMemo(() => {
-    let result = [...items];
+  // 过滤和搜索逻辑
+  const filteredItems = useMemo(() => {
+    if (!searchTerm.trim()) return items;
 
-    // 搜索过滤
-    if (searchTerm && searchFields.length > 0) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(item => 
-        searchFields.some(field => {
-          const value = item[field];
-          return value && value.toString().toLowerCase().includes(term);
-        })
-      );
-    }
-
-    // 自定义过滤
-    if (filterFunction) {
-      result = result.filter(filterFunction);
-    }
-
-    // 排序
-    if (sortBy) {
-      result.sort((a, b) => {
-        const aValue = a[sortBy];
-        const bValue = b[sortBy];
-        
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
+    const term = searchTerm.toLowerCase();
+    return items.filter(item => {
+      return searchFields.some(field => {
+        const value = item[field];
+        return value && value.toString().toLowerCase().includes(term);
       });
-    }
+    });
+  }, [items, searchTerm, searchFields]);
 
-    return result;
-  }, [items, searchTerm, searchFields, sortBy, sortDirection, filterFunction]);
-
-  // 使用虚拟列表Hook
-  const { scrollOffset, visibleRange, listProps } = useVirtualList(processedItems, {
-    itemHeight,
-    ...props,
-  });
+  // 通知过滤结果变化
+  useEffect(() => {
+    onFilteredItemsChange?.(filteredItems);
+  }, [filteredItems, onFilteredItemsChange]);
 
   return (
-    <div className={`enhanced-virtual-list ${className}`} style={style}>
-      {/* 统计信息 */}
-      <div className="virtual-list-stats text-xs text-gray-500 mb-2">
-        显示 {processedItems.length} 项，可见范围: {visibleRange.start}-{visibleRange.end}
-      </div>
-      
-      {/* 虚拟列表 */}
-      <VirtualList
-        items={processedItems}
-        itemHeight={itemHeight}
-        itemRenderer={itemRenderer}
-        {...listProps}
-        {...props}
-      />
-    </div>
+    <VirtualList
+      items={filteredItems}
+      itemHeight={itemHeight}
+      itemRenderer={itemRenderer}
+      className={className}
+      style={style}
+    />
   );
 });
 
-EnhancedVirtualList.displayName = 'EnhancedVirtualList';
-
-/**
- * 虚拟滚动列表的懒加载版本
- * 支持分页加载数据
- */
-export const LazyVirtualList = React.memo(({
-  items = [],
-  hasMore = false,
-  isLoading = false,
+// 懒加载虚拟列表组件
+export const LazyVirtualList = React.memo(({ 
+  items = [], 
+  hasMore = false, 
+  isLoading = false, 
   onLoadMore,
   itemHeight = 50,
   itemRenderer,
   className = '',
   style = {},
-  threshold = 5, // 距离底部多少项时开始加载
-  ...props
+  threshold = 5
 }) => {
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [internalItems, setInternalItems] = useState(items);
+  const [internalHasMore, setInternalHasMore] = useState(hasMore);
+  const [internalLoading, setInternalLoading] = useState(isLoading);
 
-  // 处理加载更多
+  // 同步外部状态
+  useEffect(() => {
+    setInternalItems(items);
+  }, [items]);
+
+  useEffect(() => {
+    setInternalHasMore(hasMore);
+  }, [hasMore]);
+
+  useEffect(() => {
+    setInternalLoading(isLoading);
+  }, [isLoading]);
+
+  // 懒加载处理
   const handleItemsRendered = useCallback(({ visibleStopIndex }) => {
-    if (hasMore && !isLoading && !isLoadingMore && visibleStopIndex >= items.length - threshold) {
-      setIsLoadingMore(true);
+    if (internalHasMore && !internalLoading && visibleStopIndex >= internalItems.length - threshold) {
+      setInternalLoading(true);
       onLoadMore?.().finally(() => {
-        setIsLoadingMore(false);
+        setInternalLoading(false);
       });
     }
-  }, [hasMore, isLoading, isLoadingMore, items.length, threshold, onLoadMore]);
+  }, [internalHasMore, internalLoading, internalItems.length, threshold, onLoadMore]);
 
-  // 渲染加载状态
-  const renderItem = useCallback(({ index, style }) => {
-    const item = items[index];
-    
-    // 如果是最后一个item且正在加载更多，显示加载状态
-    if (index === items.length - 1 && isLoadingMore) {
+  // 渲染加载指示器
+  const renderItem = useCallback((item, index) => {
+    if (index === internalItems.length && internalHasMore) {
       return (
-        <div style={style} className="flex items-center justify-center p-4">
-          <div className="text-gray-500">加载中...</div>
+        <div className="flex items-center justify-center p-4">
+          {internalLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+              <span className="text-sm text-gray-500">加载中...</span>
+            </div>
+          ) : (
+            <button 
+              onClick={() => onLoadMore?.()}
+              className="text-sm text-blue-500 hover:text-blue-700"
+            >
+              加载更多
+            </button>
+          )}
         </div>
       );
     }
 
-    if (!item) return null;
+    return itemRenderer(item, index);
+  }, [internalItems.length, internalHasMore, internalLoading, itemRenderer, onLoadMore]);
 
-    return (
-      <div style={style} key={`item-${index}`}>
-        {itemRenderer({ item, index, style })}
-      </div>
-    );
-  }, [items, itemRenderer, isLoadingMore]);
+  const allItems = useMemo(() => {
+    const items = [...internalItems];
+    if (internalHasMore) {
+      items.push({ id: 'loading-placeholder', type: 'loading' });
+    }
+    return items;
+  }, [internalItems, internalHasMore]);
 
   return (
-    <div className={`lazy-virtual-list ${className}`} style={style}>
-      <VirtualList
-        items={items}
-        itemHeight={itemHeight}
-        itemRenderer={renderItem}
-        onItemsRendered={handleItemsRendered}
-        {...props}
-      />
-      
-      {/* 底部加载状态 */}
-      {isLoading && (
-        <div className="flex items-center justify-center p-4 border-t">
-          <div className="text-gray-500">加载中...</div>
-        </div>
-      )}
-    </div>
+    <VirtualList
+      items={allItems}
+      itemHeight={itemHeight}
+      itemRenderer={renderItem}
+      className={className}
+      style={style}
+      onItemsRendered={handleItemsRendered}
+    />
   );
 });
 
-LazyVirtualList.displayName = 'LazyVirtualList';
+// 虚拟列表工具函数
+export const virtualListUtils = {
+  // 计算可见项范围
+  calculateVisibleRange: (scrollTop, containerHeight, itemHeight, itemCount) => {
+    const startIndex = Math.floor(scrollTop / itemHeight);
+    const endIndex = Math.min(
+      Math.ceil((scrollTop + containerHeight) / itemHeight),
+      itemCount - 1
+    );
+    return { start: Math.max(0, startIndex), end: endIndex };
+  },
+
+  // 计算滚动位置
+  calculateScrollPosition: (index, itemHeight, containerHeight) => {
+    return index * itemHeight;
+  },
+
+  // 检查项是否可见
+  isItemVisible: (index, scrollTop, containerHeight, itemHeight) => {
+    const itemTop = index * itemHeight;
+    const itemBottom = itemTop + itemHeight;
+    return itemBottom > scrollTop && itemTop < scrollTop + containerHeight;
+  }
+};

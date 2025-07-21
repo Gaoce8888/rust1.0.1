@@ -1,593 +1,2500 @@
 {
   "summary": {
-    "totalFiles": 42,
-    "totalLines": 14861,
-    "issuesFound": 69,
-    "optimizationOpportunities": 40
+    "totalFiles": 43,
+    "totalLines": 15240,
+    "issuesFound": 310,
+    "scanTime": "2025-07-21T12:31:21.514Z"
   },
   "issues": [
     {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/App.jsx",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 31,
+      "message": "组件 Component 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(Component) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 203,
+      "message": "事件处理函数 handleReceiveMessage 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleReceiveMessage 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 365,
+      "message": "事件处理函数 handleTyping 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleTyping 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 372,
+      "message": "事件处理函数 handleCustomerSelect 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleCustomerSelect 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 448,
+      "message": "事件处理函数 handleSettingsOpen 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSettingsOpen 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 453,
+      "message": "事件处理函数 handleSettingsClose 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSettingsClose 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 458,
+      "message": "事件处理函数 handleSettingsChange 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSettingsChange 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 466,
+      "message": "事件处理函数 handleLoginSuccess 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleLoginSuccess 函数"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/App.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 272,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "warning",
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/App.jsx",
-      "line": 0,
-      "message": "检测到 8 个 map 操作，但只有 4 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "line": 292,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 343,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 352,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 715,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 749,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 775,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 903,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 147,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 922,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 257,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 72,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 59,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 86,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 98,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "maintainability",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 31,
+      "message": "组件 Component 过于复杂 (966 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 24,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 25,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 26,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 27,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 28,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 528,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 560,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 639,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 755,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 778,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 921,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 935,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 266,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 290,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 341,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 347,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 715,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 746,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 775,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/App.jsx",
+      "line": 903,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 55,
+      "message": "组件 EnhancedApp 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(EnhancedApp) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 471,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 116,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 128,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "maintainability",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 55,
+      "message": "组件 EnhancedApp 过于复杂 (615 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 28,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 29,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 30,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 32,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 33,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 662,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/EnhancedApp.jsx",
+      "line": 471,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 58,
+      "message": "组件 OptimizedApp 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(OptimizedApp) 包装组件"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
-    },
-    {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
-      "line": 0,
-      "message": "检测到 14 个 map 操作，但只有 2 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
-      "file": "/workspace/frontend/kefu-app/src/acme.jsx",
-      "line": 0,
-      "message": "组件 AcmeIcon 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 175,
+      "message": "事件处理函数 handleReceiveMessage 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleReceiveMessage 函数"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 216,
+      "message": "事件处理函数 handleOnlineUsers 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleOnlineUsers 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 236,
+      "message": "事件处理函数 handleCustomerJoined 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleCustomerJoined 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 257,
+      "message": "事件处理函数 handleCustomerLeft 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleCustomerLeft 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 266,
+      "message": "事件处理函数 handleTypingStatus 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleTypingStatus 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 334,
+      "message": "事件处理函数 handleTyping 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleTyping 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 341,
+      "message": "事件处理函数 handleSelectCustomer 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSelectCustomer 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 197,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 219,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 250,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 258,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 267,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 310,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 315,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 327,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 345,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 350,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 521,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 522,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 523,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 600,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 219,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 366,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 371,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 376,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 91,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "maintainability",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 58,
+      "message": "组件 OptimizedApp 过于复杂 (675 行)",
+      "suggestion": "考虑将组件拆分为更小的子组件"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 34,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 36,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 37,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 38,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 39,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 389,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 216,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 247,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 257,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 266,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 325,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 341,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 521,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 522,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 523,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/OptimizedApp.jsx",
+      "line": 600,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/api-config.js",
-      "line": 0,
-      "message": "组件 API_CONFIG, API_ENDPOINTS, WS_MESSAGE_TYPE 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 75,
+      "message": "组件 request 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(request) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/api-config.js",
+      "line": 95,
+      "message": "组件 uploadFile 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(uploadFile) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 77,
+      "message": "组件 ParentComponent 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(ParentComponent) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 144,
+      "message": "组件 AppWithLazyRoutes 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(AppWithLazyRoutes) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 239,
+      "message": "组件 OptimizedImage 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(OptimizedImage) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 313,
+      "message": "组件 ProgressiveImage 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(ProgressiveImage) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 373,
+      "message": "组件 MyPage 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(MyPage) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 441,
+      "message": "组件 ProfiledApp 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(ProfiledApp) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 547,
+      "message": "组件 MemoryLeakPrevention 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(MemoryLeakPrevention) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 81,
+      "message": "事件处理函数 handleUpdate 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleUpdate 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 359,
+      "message": "事件处理函数 handleMouseEnter 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleMouseEnter 函数"
+    },
+    {
+      "type": "performance",
       "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 52,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 64,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 536,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 581,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 51,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 57,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 433,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 277,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 317,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 393,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 407,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 522,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 551,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "bundle-size",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 614,
+      "message": "导入了整个 lodash 库",
+      "suggestion": "使用具体路径导入，如 import debounce from \"lodash/debounce\""
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 31,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 378,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 7,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 23,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 47,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 64,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 536,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 581,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "bundle-size",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/AdvancedPerformance.jsx",
+      "line": 614,
+      "message": "导入了大型库 lodash",
+      "suggestion": "考虑使用更轻量的替代方案或按需导入"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/ChatArea.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 19,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
     },
     {
-      "type": "optimization",
-      "severity": "high",
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/ChatArea.jsx",
+      "line": 3,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/ChatArea.jsx",
+      "line": 4,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/ChatArea.jsx",
+      "line": 61,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/CustomerList.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 16,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
     },
     {
-      "type": "warning",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/CustomerList.jsx",
+      "line": 5,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 68,
+      "message": "组件 useDebounce 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(useDebounce) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 92,
+      "message": "组件 usePerformanceMonitor 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(usePerformanceMonitor) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 255,
+      "message": "组件 getStatusColor 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(getStatusColor) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 347,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "error",
+      "type": "performance",
       "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 535,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 414,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 431,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 439,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 72,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 122,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 488,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 501,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 166,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 298,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 307,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 316,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 325,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseCustomerList.jsx",
+      "line": 535,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 84,
+      "message": "事件处理函数 handleVisibilityChange 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleVisibilityChange 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 59,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 81,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 244,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 509,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 530,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 555,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 38,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 39,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 40,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 41,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 42,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 43,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 290,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 299,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 308,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 317,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 618,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/EnterpriseSidebar.jsx",
+      "line": 509,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/ErrorBoundary.jsx",
+      "line": 17,
+      "message": "状态更新应该使用函数式更新",
+      "suggestion": "使用 setState(prevState => newState) 的形式"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 26,
+      "message": "组件 KefuLogin 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(KefuLogin) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 248,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
       "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 55,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "warning",
+      "type": "performance",
       "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
-      "line": 0,
-      "message": "检测到 3 个 map 操作，但只有 1 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 75,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 109,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 127,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 249,
+      "message": "不应该使用数组索引作为 key",
+      "suggestion": "使用稳定的唯一标识符作为 key"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 178,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 281,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/KefuLogin.jsx",
+      "line": 248,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 236,
+      "message": "不应该使用数组索引作为 key",
+      "suggestion": "使用稳定的唯一标识符作为 key"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 44,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 60,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 111,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 181,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 204,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 242,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 259,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 132,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 232,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LazyImage.jsx",
+      "line": 313,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 18,
+      "message": "组件 LoginPage 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(LoginPage) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 93,
+      "message": "事件处理函数 handleQuickFill 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleQuickFill 函数"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 223,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "warning",
+      "type": "performance",
       "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
-      "line": 0,
-      "message": "检测到 4 个 map 操作，但只有 2 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 106,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "refactor",
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 42,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 63,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 67,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 225,
+      "message": "不应该使用数组索引作为 key",
+      "suggestion": "使用稳定的唯一标识符作为 key"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 100,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 235,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/LoginPage.jsx",
+      "line": 223,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
-      "line": 0,
-      "message": "组件 OptimizedApp 过于复杂 (257 行)",
-      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+      "line": 346,
+      "message": "事件处理函数 handleError 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleError 函数"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 63,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 71,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 315,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 345,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 150,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 183,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 210,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 295,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 298,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 374,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedApp.jsx",
+      "line": 330,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
-      "line": 0,
-      "message": "组件 OptimizedMessage, OptimizedUserItem, VirtualizedMessageList, OptimizedInput, PerformanceMonitor, SmartCacheContainer 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 9,
+      "message": "组件 useDebounceValue 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(useDebounceValue) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "high",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 180,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 339,
+      "message": "状态更新应该使用函数式更新",
+      "suggestion": "使用 setState(prevState => newState) 的形式"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 349,
+      "message": "状态更新应该使用函数式更新",
+      "suggestion": "使用 setState(prevState => newState) 的形式"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 12,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 293,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 297,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 6,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/OptimizedComponents.jsx",
+      "line": 180,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
-      "line": 0,
-      "message": "组件 usePerformanceMonitor, PerformanceMonitorComponent, PerformancePanel, useNetworkMonitor, NetworkStatusIndicator 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 407,
+      "message": "不应该使用数组索引作为 key",
+      "suggestion": "使用稳定的唯一标识符作为 key"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "refactor",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
-      "line": 0,
-      "message": "组件 usePerformanceMonitor 过于复杂 (104 行)",
-      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+      "line": 431,
+      "message": "不应该使用数组索引作为 key",
+      "suggestion": "使用稳定的唯一标识符作为 key"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 181,
+      "message": "状态更新应该使用函数式更新",
+      "suggestion": "使用 setState(prevState => newState) 的形式"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 213,
+      "message": "状态更新应该使用函数式更新",
+      "suggestion": "使用 setState(prevState => newState) 的形式"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 119,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 127,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 485,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 290,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 402,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/PerformanceMonitor.jsx",
+      "line": 426,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 61,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 157,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 189,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 193,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 197,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/components/VirtualList.jsx",
+      "line": 223,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/components/__tests__/CustomerList.test.jsx",
+      "line": 3,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 26,
+      "message": "组件 EnhancedPromptInput 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(EnhancedPromptInput) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 49,
+      "message": "事件处理函数 handleSendText 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSendText 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 61,
+      "message": "事件处理函数 handleFileSelect 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleFileSelect 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 87,
+      "message": "事件处理函数 handleImageSelect 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleImageSelect 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 122,
+      "message": "事件处理函数 handleSendImage 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleSendImage 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 186,
+      "message": "事件处理函数 handleInputChange 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleInputChange 函数"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 22,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 318,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/enhanced-prompt-input.jsx",
+      "line": 328,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 269,
+      "message": "组件 useEnterpriseWebSocket 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(useEnterpriseWebSocket) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 404,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "warning",
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "line": 445,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "error",
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+      "line": 527,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 545,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useEnterpriseWebSocket.js",
+      "line": 559,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
-      "line": 0,
-      "message": "组件 useOptimizedReducer, useDebouncedState, useThrottledState, useOptimizedList, useOptimizedForm, useOptimizedAsync, useOptimizedStorage, calculateUserDiffs, useOptimizedUserState, usePerformanceMonitor, useSmartCache, useDebounce, useThrottle, useVirtualScroll, useOptimizedAppState 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 22,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
     },
     {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
-      "line": 0,
-      "message": "检测到 3 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "refactor",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
-      "line": 0,
-      "message": "组件 useOptimizedUserState 过于复杂 (108 行)",
-      "suggestion": "考虑将组件拆分为更小的子组件以提高可维护性"
+      "line": 55,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 266,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 563,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 581,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 630,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 106,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/hooks/useOptimizedState.js",
+      "line": 323,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
-      "line": 0,
-      "message": "组件 useWebSocket 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 75,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
     },
     {
-      "type": "optimization",
-      "severity": "high",
+      "type": "performance",
+      "severity": "low",
       "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 2,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
     },
     {
-      "type": "warning",
-      "severity": "high",
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/hooks/useWebSocket.js",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
+      "line": 53,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/index.jsx",
+      "line": 6,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/index.jsx",
+      "line": 7,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/main.jsx",
+      "line": 3,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/message-types.js",
-      "line": 0,
-      "message": "组件 MessageType, MessageStatus, FileType 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 53,
+      "message": "组件 formatFileSize 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(formatFileSize) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/message-types.js",
+      "line": 62,
+      "message": "组件 getFileExtension 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(getFileExtension) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/message-types.js",
+      "line": 67,
+      "message": "组件 isImageFile 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(isImageFile) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/messaging-chat-message.jsx",
-      "line": 0,
-      "message": "组件 MessageType 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 102,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
     },
     {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
-      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
-      "line": 0,
-      "message": "组件 enterpriseWSManager 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "file": "/workspace/frontend/kefu-app/src/messaging-chat-message.jsx",
+      "line": 119,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/messaging-chat-message.jsx",
+      "line": 141,
+      "message": "事件处理器内联创建函数",
+      "suggestion": "将事件处理器提取为组件方法或使用 useCallback"
     },
     {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/enterprise-websocket.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
-      "line": 0,
-      "message": "组件 MessageStatus, MessagePriority, messageQueue, messageCache 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 165,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
-    },
-    {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/message-queue.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
-      "line": 0,
-      "message": "组件 apiService, useOptimizedApi, useBatchApi 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 314,
+      "message": "useEffect 缺少依赖数组或依赖数组为空",
+      "suggestion": "添加正确的依赖数组或使用 useCallback/useMemo 优化依赖"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
-    },
-    {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "warning",
+      "type": "performance",
       "severity": "medium",
-      "file": "/workspace/frontend/kefu-app/src/setupTests.js",
-      "line": 0,
-      "message": "检测到事件监听器但缺少清理逻辑",
-      "suggestion": "在 useEffect 的清理函数中移除事件监听器以避免内存泄漏"
+      "file": "/workspace/frontend/kefu-app/src/services/optimizedApi.js",
+      "line": 228,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 110,
+      "message": "组件 getStatusColor 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(getStatusColor) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 125,
+      "message": "组件 AvatarDropdownIcon 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(AvatarDropdownIcon) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 161,
+      "message": "组件 CustomerActionDropdown 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(CustomerActionDropdown) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 251,
+      "message": "组件 Component 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(Component) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "high",
       "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 356,
+      "message": "检测到昂贵的操作，应该使用 useMemo 优化",
+      "suggestion": "使用 useMemo 缓存计算结果"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 24,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 25,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/sidebar-with-chat-history.jsx",
+      "line": 356,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/types/message.js",
-      "line": 0,
-      "message": "组件 MessageType, MessageStatus, FileType 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 53,
+      "message": "组件 formatFileSize 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(formatFileSize) 包装组件"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/types/message.js",
+      "line": 62,
+      "message": "组件 getFileExtension 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(getFileExtension) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/types/message.js",
+      "line": 67,
+      "message": "组件 isImageFile 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(isImageFile) 包装组件"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
-      "line": 0,
-      "message": "组件 batchDOMUpdate, updateElementStyles, appendElementsBatch, removeElementsBatch, observeElementVisibility, addScrollOptimizedListener 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 467,
+      "message": "事件处理函数 handleScroll 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleScroll 函数"
     },
     {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 320,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "optimization",
-      "severity": "high",
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 634,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
-      "line": 0,
-      "message": "检测到 2 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/DOMOptimizer.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/MemoryManager.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/MemoryManager.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/PerformanceProfiler.js",
-      "line": 0,
-      "message": "检测到 1 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/PerformanceProfiler.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "optimization",
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
-      "line": 0,
-      "message": "组件 loadWithProgress, preloadResources, recordUserInteraction 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 453,
+      "message": "事件处理函数 handleScroll 应该使用 useCallback 优化",
+      "suggestion": "使用 useCallback 包装 handleScroll 函数"
     },
     {
-      "type": "optimization",
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
+      "line": 14,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
+    },
+    {
+      "type": "performance",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 546,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "optimization",
-      "severity": "high",
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "line": 608,
+      "message": "大型列表应该使用虚拟滚动",
+      "suggestion": "考虑使用 react-window 或 react-virtualized 进行虚拟化"
     },
     {
-      "type": "warning",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
-      "line": 0,
-      "message": "检测到 2 个 map 操作，但只有 0 个 key 属性",
-      "suggestion": "为所有列表项添加唯一的 key 属性以提高渲染性能"
-    },
-    {
-      "type": "error",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/utils/ProgressiveLoader.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
-    },
-    {
-      "type": "optimization",
+      "type": "bundle-size",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/performance.js",
-      "line": 0,
-      "message": "组件 useDebounce, useThrottle, lazyLoadImage, batchUpdate, performanceMonitor, measurePerformance, isInViewport, createIntersectionObserver 应该使用 React.memo 包装以提高性能",
-      "suggestion": "使用 React.memo 包装纯组件以避免不必要的重渲染"
+      "line": 1,
+      "message": "导入了整个 lodash 库",
+      "suggestion": "使用具体路径导入，如 import debounce from \"lodash/debounce\""
     },
     {
-      "type": "optimization",
+      "type": "bundle-size",
       "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/utils/performance.js",
-      "line": 0,
-      "message": "文件包含多个函数定义，考虑使用 useCallback 优化",
-      "suggestion": "对传递给子组件的函数使用 useCallback 以避免不必要的重渲染"
+      "line": 1,
+      "message": "导入了大型库 lodash",
+      "suggestion": "考虑使用更轻量的替代方案或按需导入"
     },
     {
-      "type": "optimization",
-      "severity": "high",
-      "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
-      "line": 0,
-      "message": "文件包含昂贵的计算操作，考虑使用 useMemo 优化",
-      "suggestion": "对昂贵的计算使用 useMemo 以避免每次渲染都重新计算"
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/utils.js",
+      "line": 4,
+      "message": "组件 cn 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(cn) 包装组件"
     },
     {
-      "type": "error",
-      "severity": "high",
+      "type": "performance",
+      "severity": "medium",
       "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
-      "line": 0,
-      "message": "检测到直接状态修改，这可能导致渲染问题",
-      "suggestion": "使用不可变更新模式，如展开运算符或数组方法"
+      "line": 437,
+      "message": "组件 getWebSocketClient 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(getWebSocketClient) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "medium",
+      "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
+      "line": 444,
+      "message": "组件 disconnectWebSocket 应该使用 React.memo 进行优化",
+      "suggestion": "使用 React.memo(disconnectWebSocket) 包装组件"
+    },
+    {
+      "type": "performance",
+      "severity": "low",
+      "file": "/workspace/frontend/kefu-app/src/websocket-client.js",
+      "line": 5,
+      "message": "考虑使用动态导入优化加载",
+      "suggestion": "使用 React.lazy() 进行代码分割"
     }
   ],
-  "recommendations": [
-    {
-      "priority": "high",
-      "category": "性能优化",
-      "actions": [
-        "使用 React.memo 包装纯组件",
-        "对昂贵的计算使用 useMemo",
-        "对传递给子组件的函数使用 useCallback",
-        "实现虚拟滚动处理长列表",
-        "使用图片懒加载"
-      ]
-    },
-    {
-      "priority": "medium",
-      "category": "代码质量",
-      "actions": [
-        "为所有列表项添加唯一的 key 属性",
-        "在 useEffect 中正确清理副作用",
-        "避免直接修改状态"
-      ]
-    },
-    {
-      "priority": "medium",
-      "category": "代码重构",
-      "actions": [
-        "将大型组件拆分为更小的子组件",
-        "提取可复用的逻辑到自定义 Hook",
-        "优化组件层次结构"
-      ]
-    }
-  ]
+  "recommendations": {
+    "high": [
+      "大量性能问题，建议优先使用 React.memo、useCallback、useMemo 进行优化"
+    ],
+    "medium": [
+      "包大小问题较多，建议进行代码分割和按需导入优化",
+      "代码量较大，建议进行组件拆分和模块化"
+    ],
+    "low": []
+  }
 }

@@ -1,38 +1,22 @@
 import { debounce, throttle } from 'lodash.debounce';
 
-/**
- * 防抖函数 - 用于搜索、输入等场景
- * @param {Function} func 要防抖的函数
- * @param {number} wait 等待时间（毫秒）
- * @param {Object} options 配置选项
- * @returns {Function} 防抖后的函数
- */
+// 防抖Hook
 export const useDebounce = (func, wait = 300, options = {}) => {
-  return debounce(func, wait, {
-    leading: false,
-    trailing: true,
-    ...options,
-  });
+  return useCallback(
+    debounce(func, wait, options),
+    [func, wait]
+  );
 };
 
-/**
- * 节流函数 - 用于滚动、拖拽等场景
- * @param {Function} func 要节流的函数
- * @param {number} wait 等待时间（毫秒）
- * @param {Object} options 配置选项
- * @returns {Function} 节流后的函数
- */
+// 节流Hook
 export const useThrottle = (func, wait = 100, options = {}) => {
-  return throttle(func, wait, {
-    leading: true,
-    trailing: true,
-    ...options,
-  });
+  return useCallback(
+    throttle(func, wait, options),
+    [func, wait]
+  );
 };
 
-/**
- * 内存缓存类
- */
+// 内存缓存类
 export class MemoryCache {
   constructor(maxSize = 100) {
     this.cache = new Map();
@@ -44,23 +28,23 @@ export class MemoryCache {
       const firstKey = this.cache.keys().next().value;
       this.cache.delete(firstKey);
     }
-
+    
     this.cache.set(key, {
       value,
       timestamp: Date.now(),
-      ttl,
+      ttl
     });
   }
 
   get(key) {
     const item = this.cache.get(key);
     if (!item) return null;
-
+    
     if (Date.now() - item.timestamp > item.ttl) {
       this.cache.delete(key);
       return null;
     }
-
+    
     return item.value;
   }
 
@@ -73,154 +57,98 @@ export class MemoryCache {
   }
 }
 
-/**
- * 图片懒加载工具
- * @param {string} src 图片源地址
- * @param {string} placeholder 占位图片
- * @returns {Promise<string>} 加载完成的图片地址
- */
-export const lazyLoadImage = (src, placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OWE5YiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+') => {
-  return new Promise((resolve, reject) => {
+// 图片懒加载
+export const lazyLoadImage = (src, placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YWFhYSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+') => {
+  return new Promise((resolve) => {
     const img = new Image();
-    
     img.onload = () => resolve(src);
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-    
+    img.onerror = () => resolve(placeholder);
     img.src = src;
   });
 };
 
-/**
- * 批量更新优化
- * @param {Function} updater 更新函数
- * @param {number} delay 延迟时间（毫秒）
- */
+// 批量更新
 export const batchUpdate = (updater, delay = 16) => {
   let timeoutId = null;
+  let pendingUpdates = [];
   
   return (...args) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
+    pendingUpdates.push(args);
+    
+    if (timeoutId) return;
     
     timeoutId = setTimeout(() => {
-      updater(...args);
+      updater(pendingUpdates);
+      pendingUpdates = [];
       timeoutId = null;
     }, delay);
   };
 };
 
-/**
- * 性能监控工具
- */
+// 性能监控类
 export class PerformanceMonitor {
   constructor() {
+    this.marks = new Map();
+    this.measures = new Map();
     this.metrics = new Map();
-    this.observers = new Map();
   }
 
-  /**
-   * 开始计时
-   * @param {string} name 指标名称
-   */
   startTimer(name) {
-    this.metrics.set(name, {
-      startTime: performance.now(),
-      endTime: null,
-      duration: null,
-    });
+    this.marks.set(name, performance.now());
   }
 
-  /**
-   * 结束计时
-   * @param {string} name 指标名称
-   * @returns {number} 持续时间（毫秒）
-   */
   endTimer(name) {
-    const metric = this.metrics.get(name);
-    if (!metric) {
-      console.warn(`Timer "${name}" not found`);
+    const startTime = this.marks.get(name);
+    if (startTime) {
+      const duration = performance.now() - startTime;
+      this.measures.set(name, duration);
+      this.marks.delete(name);
+      return duration;
+    }
+    return 0;
+  }
+
+  measure(name, startMark, endMark) {
+    try {
+      const measure = performance.measure(name, startMark, endMark);
+      this.measures.set(name, measure.duration);
+      return measure.duration;
+    } catch (error) {
+      console.warn('Performance measure failed:', error);
       return 0;
     }
-
-    metric.endTime = performance.now();
-    metric.duration = metric.endTime - metric.startTime;
-    
-    return metric.duration;
   }
 
-  /**
-   * 获取指标
-   * @param {string} name 指标名称
-   * @returns {Object} 指标数据
-   */
-  getMetric(name) {
-    return this.metrics.get(name);
+  getMetrics() {
+    return Object.fromEntries(this.measures);
   }
 
-  /**
-   * 获取所有指标
-   * @returns {Object} 所有指标数据
-   */
-  getAllMetrics() {
-    const result = {};
-    for (const [name, metric] of this.metrics) {
-      result[name] = metric;
-    }
-    return result;
-  }
-
-  /**
-   * 清除指标
-   * @param {string} name 指标名称
-   */
-  clearMetric(name) {
-    this.metrics.delete(name);
-  }
-
-  /**
-   * 清除所有指标
-   */
-  clearAllMetrics() {
+  clear() {
+    this.marks.clear();
+    this.measures.clear();
     this.metrics.clear();
   }
 }
 
-// 创建全局性能监控实例
 export const performanceMonitor = new PerformanceMonitor();
 
-/**
- * 性能装饰器 - 用于测量函数执行时间
- * @param {string} name 性能指标名称
- * @returns {Function} 装饰器函数
- */
+// 性能测量装饰器
 export const measurePerformance = (name) => {
   return (target, propertyKey, descriptor) => {
     const originalMethod = descriptor.value;
-
+    
     descriptor.value = function (...args) {
       performanceMonitor.startTimer(name);
       const result = originalMethod.apply(this, args);
-      
-      if (result instanceof Promise) {
-        return result.finally(() => {
-          performanceMonitor.endTimer(name);
-        });
-      } else {
-        performanceMonitor.endTimer(name);
-        return result;
-      }
+      performanceMonitor.endTimer(name);
+      return result;
     };
-
+    
     return descriptor;
   };
 };
 
-/**
- * 检查是否在视口内
- * @param {Element} element DOM元素
- * @returns {boolean} 是否在视口内
- */
+// 视口检测
 export const isInViewport = (element) => {
   if (!element) return false;
   
@@ -233,19 +161,20 @@ export const isInViewport = (element) => {
   );
 };
 
-/**
- * 创建Intersection Observer
- * @param {Function} callback 回调函数
- * @param {Object} options 配置选项
- * @returns {IntersectionObserver} Intersection Observer实例
- */
+// 创建Intersection Observer
 export const createIntersectionObserver = (callback, options = {}) => {
-  const defaultOptions = {
-    root: null,
-    rootMargin: '0px',
+  return new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        callback(entry.target, entry);
+      }
+    });
+  }, {
     threshold: 0.1,
-    ...options,
-  };
-
-  return new IntersectionObserver(callback, defaultOptions);
+    rootMargin: '50px',
+    ...options
+  });
 };
+
+// 导入React hooks
+import { useCallback } from 'react';

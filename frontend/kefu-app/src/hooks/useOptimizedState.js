@@ -4,359 +4,319 @@
  */
 import { useReducer, useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
-/**
- * 优化的状态管理Hook - 使用useReducer管理复杂状态
- * @param {Function} reducer 状态更新函数
- * @param {any} initialState 初始状态
- * @param {Function} init 初始化函数
- * @returns {Array} [state, dispatch, actions]
- */
+// 优化的useReducer Hook
 export const useOptimizedReducer = (reducer, initialState, init) => {
   const [state, dispatch] = useReducer(reducer, initialState, init);
   
-  // 缓存actions以避免重复创建
-  const actionsRef = useRef(new Map());
+  const optimizedDispatch = useCallback(dispatch, []);
   
-  const createAction = useCallback((type, payloadCreator) => {
-    if (!actionsRef.current.has(type)) {
-      actionsRef.current.set(type, (payload) => {
-        const action = { type };
-        if (payloadCreator) {
-          action.payload = payloadCreator(payload);
-        } else if (payload !== undefined) {
-          action.payload = payload;
-        }
-        dispatch(action);
-      });
-    }
-    return actionsRef.current.get(type);
-  }, []);
-  
-  return [state, dispatch, createAction];
+  return [state, optimizedDispatch];
 };
 
-/**
- * 防抖状态Hook
- * @param {any} initialValue 初始值
- * @param {number} delay 延迟时间（毫秒）
- * @returns {Array} [value, setValue, debouncedValue]
- */
+// 防抖状态Hook
 export const useDebouncedState = (initialValue, delay = 300) => {
   const [value, setValue] = useState(initialValue);
   const [debouncedValue, setDebouncedValue] = useState(initialValue);
   const timeoutRef = useRef(null);
-  
+
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
-    
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
   }, [value, delay]);
-  
+
   return [value, setValue, debouncedValue];
 };
 
-/**
- * 节流状态Hook
- * @param {any} initialValue 初始值
- * @param {number} delay 延迟时间（毫秒）
- * @returns {Array} [value, setValue, throttledValue]
- */
+// 节流状态Hook
 export const useThrottledState = (initialValue, delay = 100) => {
   const [value, setValue] = useState(initialValue);
   const [throttledValue, setThrottledValue] = useState(initialValue);
   const lastUpdateRef = useRef(0);
-  
-  useEffect(() => {
+
+  const setThrottledValueCallback = useCallback((newValue) => {
     const now = Date.now();
     if (now - lastUpdateRef.current >= delay) {
-      setThrottledValue(value);
+      setThrottledValue(newValue);
       lastUpdateRef.current = now;
     }
-  }, [value, delay]);
-  
+  }, [delay]);
+
+  useEffect(() => {
+    setThrottledValueCallback(value);
+  }, [value, setThrottledValueCallback]);
+
   return [value, setValue, throttledValue];
 };
 
-/**
- * 优化的列表状态Hook
- * @param {Array} initialItems 初始列表
- * @returns {Object} 列表操作方法
- */
+// 优化的列表状态Hook
 export const useOptimizedList = (initialItems = []) => {
   const [items, setItems] = useState(initialItems);
-  
+  const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  // 过滤和排序的缓存结果
+  const processedItems = useMemo(() => {
+    let result = [...items];
+
+    // 应用过滤器
+    if (Object.keys(filters).length > 0) {
+      result = result.filter(item => {
+        return Object.entries(filters).every(([key, value]) => {
+          if (!value) return true;
+          return item[key]?.toString().toLowerCase().includes(value.toLowerCase());
+        });
+      });
+    }
+
+    // 应用排序
+    if (sortBy) {
+      result.sort((a, b) => {
+        const aVal = a[sortBy];
+        const bVal = b[sortBy];
+        
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [items, filters, sortBy, sortDirection]);
+
   const addItem = useCallback((item) => {
     setItems(prev => [...prev, item]);
   }, []);
-  
-  const removeItem = useCallback((index) => {
-    setItems(prev => prev.filter((_, i) => i !== index));
+
+  const removeItem = useCallback((id) => {
+    setItems(prev => prev.filter(item => item.id !== id));
   }, []);
-  
-  const updateItem = useCallback((index, updater) => {
-    setItems(prev => prev.map((item, i) => 
-      i === index ? (typeof updater === 'function' ? updater(item) : updater) : item
+
+  const updateItem = useCallback((id, updates) => {
+    setItems(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updates } : item
     ));
   }, []);
-  
+
   const clearItems = useCallback(() => {
     setItems([]);
   }, []);
-  
-  const sortItems = useCallback((comparator) => {
-    setItems(prev => [...prev].sort(comparator));
-  }, []);
-  
-  const filterItems = useCallback((predicate) => {
-    setItems(prev => prev.filter(predicate));
-  }, []);
-  
+
   return {
-    items,
+    items: processedItems,
+    originalItems: items,
+    filters,
+    sortBy,
+    sortDirection,
+    setFilters,
+    setSortBy,
+    setSortDirection,
     addItem,
     removeItem,
     updateItem,
     clearItems,
-    sortItems,
-    filterItems,
-    setItems,
+    setItems
   };
 };
 
-/**
- * 优化的表单状态Hook
- * @param {Object} initialValues 初始表单值
- * @param {Object} validationSchema 验证规则
- * @returns {Object} 表单状态和方法
- */
+// 优化的表单状态Hook
 export const useOptimizedForm = (initialValues = {}, validationSchema = {}) => {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const setValue = useCallback((name, value) => {
-    setValues(prev => ({ ...prev, [name]: value }));
-    // 清除对应字段的错误
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  }, [errors]);
-  
-  const setFieldError = useCallback((name, error) => {
-    setErrors(prev => ({ ...prev, [name]: error }));
-  }, []);
-  
-  const setFieldTouched = useCallback((name, isTouched = true) => {
-    setTouched(prev => ({ ...prev, [name]: isTouched }));
-  }, []);
-  
-  const validateField = useCallback((name, value) => {
-    const validator = validationSchema[name];
-    if (validator) {
-      const error = validator(value, values);
-      setFieldError(name, error);
-      return error;
-    }
-    return null;
-  }, [validationSchema, values, setFieldError]);
-  
-  const validateForm = useCallback(() => {
+
+  // 验证函数
+  const validate = useCallback((fieldValues = values) => {
     const newErrors = {};
-    let isValid = true;
     
     Object.keys(validationSchema).forEach(field => {
-      const error = validateField(field, values[field]);
-      if (error) {
-        newErrors[field] = error;
-        isValid = false;
+      const value = fieldValues[field];
+      const rules = validationSchema[field];
+      
+      if (rules.required && !value) {
+        newErrors[field] = rules.required;
+      } else if (rules.pattern && !rules.pattern.test(value)) {
+        newErrors[field] = rules.pattern.message;
+      } else if (rules.minLength && value.length < rules.minLength) {
+        newErrors[field] = `最少需要 ${rules.minLength} 个字符`;
+      } else if (rules.maxLength && value.length > rules.maxLength) {
+        newErrors[field] = `最多允许 ${rules.maxLength} 个字符`;
       }
     });
     
-    setErrors(newErrors);
-    return isValid;
-  }, [validationSchema, values, validateField]);
-  
-  const resetForm = useCallback(() => {
-    setValues(initialValues);
+    return newErrors;
+  }, [values, validationSchema]);
+
+  // 设置字段值
+  const setFieldValue = useCallback((field, value) => {
+    setValues(prev => ({ ...prev, [field]: value }));
+    
+    // 如果字段已被触摸，立即验证
+    if (touched[field]) {
+      const fieldErrors = validate({ [field]: value });
+      setErrors(prev => ({ ...prev, [field]: fieldErrors[field] }));
+    }
+  }, [touched, validate]);
+
+  // 设置字段触摸状态
+  const setFieldTouched = useCallback((field, isTouched = true) => {
+    setTouched(prev => ({ ...prev, [field]: isTouched }));
+    
+    if (isTouched) {
+      const fieldErrors = validate({ [field]: values[field] });
+      setErrors(prev => ({ ...prev, [field]: fieldErrors[field] }));
+    }
+  }, [values, validate]);
+
+  // 提交表单
+  const handleSubmit = useCallback(async (onSubmit) => {
+    const formErrors = validate();
+    setErrors(formErrors);
+    
+    if (Object.keys(formErrors).length === 0) {
+      setIsSubmitting(true);
+      try {
+        await onSubmit(values);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  }, [values, validate]);
+
+  // 重置表单
+  const resetForm = useCallback((newValues = initialValues) => {
+    setValues(newValues);
     setErrors({});
     setTouched({});
     setIsSubmitting(false);
   }, [initialValues]);
-  
-  const handleSubmit = useCallback(async (onSubmit) => {
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    try {
-      await onSubmit(values);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [values, validateForm]);
-  
+
   return {
     values,
     errors,
     touched,
     isSubmitting,
-    setValue,
-    setFieldError,
+    setFieldValue,
     setFieldTouched,
-    validateField,
-    validateForm,
-    resetForm,
     handleSubmit,
+    resetForm,
+    setValues,
+    setErrors,
+    setTouched
   };
 };
 
-/**
- * 优化的异步数据Hook
- * @param {Function} fetcher 数据获取函数
- * @param {Array} deps 依赖数组
- * @param {Object} options 配置选项
- * @returns {Object} 异步数据状态
- */
+// 优化的异步数据Hook
 export const useOptimizedAsync = (fetcher, deps = [], options = {}) => {
-  const {
-    initialData = null,
-    cacheKey = null,
-    cacheTime = 5 * 60 * 1000, // 5分钟
-    retryCount = 3,
-    retryDelay = 1000,
-  } = options;
-  
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   
-  const cacheRef = useRef(new Map());
-  
-  const fetchData = useCallback(async (force = false) => {
-    if (loading && !force) return;
-    
+  const {
+    immediate = true,
+    cacheTime = 60000, // 1分钟缓存
+    retryCount = 3,
+    retryDelay = 1000
+  } = options;
+
+  const execute = useCallback(async (...args) => {
     // 检查缓存
-    if (cacheKey && !force) {
-      const cached = cacheRef.current.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < cacheTime) {
-        setData(cached.data);
-        return;
-      }
+    const now = Date.now();
+    if (cacheTime > 0 && lastFetchTime > 0 && (now - lastFetchTime) < cacheTime) {
+      return data;
     }
-    
+
     setLoading(true);
     setError(null);
-    
-    try {
-      const result = await fetcher();
-      setData(result);
-      
-      // 缓存结果
-      if (cacheKey) {
-        cacheRef.current.set(cacheKey, {
-          data: result,
-          timestamp: Date.now(),
-        });
+
+    let lastError;
+    for (let i = 0; i < retryCount; i++) {
+      try {
+        const result = await fetcher(...args);
+        setData(result);
+        setLastFetchTime(now);
+        setLoading(false);
+        return result;
+      } catch (err) {
+        lastError = err;
+        if (i < retryCount - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
+        }
       }
-      
-      setRetryCount(0);
-    } catch (err) {
-      setError(err);
-      
-      // 重试逻辑
-      if (retryCount < retryCount) {
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          fetchData(true);
-        }, retryDelay);
-      }
-    } finally {
-      setLoading(false);
     }
-  }, [fetcher, cacheKey, cacheTime, retryCount, retryDelay, loading]);
-  
-  const refetch = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
-  
-  const clearCache = useCallback(() => {
-    if (cacheKey) {
-      cacheRef.current.delete(cacheKey);
-    }
-  }, [cacheKey]);
-  
+
+    setError(lastError);
+    setLoading(false);
+    throw lastError;
+  }, [fetcher, cacheTime, lastFetchTime, data, retryCount, retryDelay]);
+
   useEffect(() => {
-    fetchData();
-  }, deps);
-  
+    if (immediate) {
+      execute();
+    }
+  }, [execute, immediate, ...deps]);
+
   return {
     data,
     loading,
     error,
-    retryCount,
-    refetch,
-    clearCache,
+    execute,
+    refetch: execute
   };
 };
 
-/**
- * 优化的本地存储Hook
- * @param {string} key 存储键
- * @param {any} initialValue 初始值
- * @param {Object} options 配置选项
- * @returns {Array} [value, setValue, removeValue]
- */
+// 优化的本地存储Hook
 export const useOptimizedStorage = (key, initialValue, options = {}) => {
   const {
     storage = localStorage,
-    serializer = JSON,
-    deserializer = JSON,
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+    onError = console.error
   } = options;
-  
-  const [value, setValue] = useState(() => {
+
+  const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = storage.getItem(key);
-      return item ? deserializer.parse(item) : initialValue;
+      return item ? deserialize(item) : initialValue;
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      onError(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
-  
-  const setStoredValue = useCallback((newValue) => {
+
+  const setValue = useCallback((value) => {
     try {
-      setValue(newValue);
-      storage.setItem(key, serializer.stringify(newValue));
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      storage.setItem(key, serialize(valueToStore));
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
+      onError(`Error setting localStorage key "${key}":`, error);
     }
-  }, [key, storage, serializer]);
-  
-  const removeStoredValue = useCallback(() => {
+  }, [key, storedValue, storage, serialize, onError]);
+
+  const removeValue = useCallback(() => {
     try {
-      setValue(initialValue);
+      setStoredValue(initialValue);
       storage.removeItem(key);
     } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error);
+      onError(`Error removing localStorage key "${key}":`, error);
     }
-  }, [key, storage, initialValue]);
-  
-  return [value, setStoredValue, removeStoredValue];
+  }, [key, initialValue, storage, onError]);
+
+  return [storedValue, setValue, removeValue];
 };
 
 // 计算用户差异

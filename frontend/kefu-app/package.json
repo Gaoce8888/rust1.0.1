@@ -44,6 +44,7 @@
     "react-virtualized-auto-sizer": "^1.0.26",
     "react-window": "^1.8.11",
     "tailwindcss": "^3.4.3",
+    "terser": "^5.43.1",
     "vite": "^7.0.5",
     "webpack-bundle-analyzer": "^4.10.2"
   }

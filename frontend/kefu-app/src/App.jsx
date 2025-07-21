@@ -240,7 +240,7 @@ export default function Component() {
           existingCustomer.name = onlineCustomer.user_name;
         } else {
           // 如果是新客户，添加到列表
-          updatedCustomers = [...updatedCustomers, {
+          updatedCustomers.push({
             id: onlineCustomer.user_id,
             name: onlineCustomer.user_name,
             status: 'online',
@@ -249,7 +249,7 @@ export default function Component() {
             timestamp: new Date(onlineCustomer.last_seen),
             unreadCount: 0,
             messages: []
-          }];
+          });
         }
       });
       
@@ -388,7 +388,7 @@ export default function Component() {
       // 添加客户的历史消息
       if (customer.messages) {
         customer.messages.forEach((msg, index) => {
-          initialMessages = [...initialMessages, {
+          initialMessages.push({
             id: `history_${customer.id}_${index}_${Date.now()}`,
             type: MessageType.TEXT,
             content: msg,
@@ -397,7 +397,7 @@ export default function Component() {
             senderAvatar: customer.avatar,
             timestamp: new Date(Date.now() - (customer.messages.length - index) * 3 * 60 * 1000), // 每条消息间隔3分钟
             customerId: customer.id
-          }];
+          });
         });
       }
 

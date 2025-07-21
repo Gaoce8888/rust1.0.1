@@ -1,540 +1,363 @@
 import { MemoryCache, useDebounce, useThrottle } from '@utils/performance';
 
-/**
- * 优化的API请求服务
- * 包含缓存、去重、优先级管理、重试等功能
- */
+// 优化的API服务类
 class OptimizedApiService {
   constructor(options = {}) {
     this.baseURL = options.baseURL || '';
-    this.timeout = options.timeout || 10000;
-    this.retryCount = options.retryCount || 3;
-    this.retryDelay = options.retryDelay || 1000;
+    this.defaultHeaders = options.defaultHeaders || {};
     this.cache = new MemoryCache(options.cacheSize || 100);
     this.pendingRequests = new Map();
     this.requestQueue = [];
-    this.maxConcurrent = options.maxConcurrent || 5;
-    this.currentConcurrent = 0;
+    this.maxConcurrent = options.maxConcurrent || 6;
+    this.activeRequests = 0;
+    this.retryConfig = {
+      maxRetries: options.maxRetries || 3,
+      retryDelay: options.retryDelay || 1000,
+      retryBackoff: options.retryBackoff || 2,
+      ...options.retryConfig
+    };
   }
 
-  /**
-   * 生成请求键
-   * @param {string} url 请求URL
-   * @param {Object} params 请求参数
-   * @returns {string} 请求键
-   */
-  generateRequestKey(url, params = {}) {
-    return `${url}:${JSON.stringify(params)}`;
+  // 创建请求键
+  createRequestKey(method, url, params, data) {
+    const key = `${method}:${url}`;
+    const paramsStr = params ? JSON.stringify(params) : '';
+    const dataStr = data ? JSON.stringify(data) : '';
+    return `${key}:${paramsStr}:${dataStr}`;
   }
 
-  /**
-   * 延迟函数
-   * @param {number} ms 延迟时间
-   * @returns {Promise} Promise对象
-   */
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  // 检查缓存
+  getCachedResponse(key) {
+    return this.cache.get(key);
   }
 
-  /**
-   * 带重试的请求
-   * @param {Function} requestFn 请求函数
-   * @param {number} retries 重试次数
-   * @returns {Promise} 请求结果
-   */
-  async withRetry(requestFn, retries = this.retryCount) {
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await requestFn();
-      } catch (error) {
-        if (i === retries) {
-          throw error;
-        }
-        
-        // 指数退避
-        const delay = this.retryDelay * Math.pow(2, i);
-        await this.delay(delay);
-      }
-    }
+  // 设置缓存
+  setCachedResponse(key, response, ttl = 60000) {
+    this.cache.set(key, response, ttl);
   }
 
-  /**
-   * 处理请求队列
-   */
+  // 请求去重
+  getPendingRequest(key) {
+    return this.pendingRequests.get(key);
+  }
+
+  // 设置待处理请求
+  setPendingRequest(key, promise) {
+    this.pendingRequests.set(key, promise);
+    promise.finally(() => {
+      this.pendingRequests.delete(key);
+    });
+  }
+
+  // 队列管理
+  addToQueue(request) {
+    this.requestQueue.push(request);
+    this.processQueue();
+  }
+
+  // 处理队列
   async processQueue() {
-    if (this.currentConcurrent >= this.maxConcurrent || this.requestQueue.length === 0) {
+    if (this.activeRequests >= this.maxConcurrent || this.requestQueue.length === 0) {
       return;
     }
 
     const request = this.requestQueue.shift();
-    this.currentConcurrent++;
+    this.activeRequests++;
 
     try {
-      const result = await request.execute();
-      request.resolve(result);
-    } catch (error) {
-      request.reject(error);
+      await request();
     } finally {
-      this.currentConcurrent--;
+      this.activeRequests--;
       this.processQueue();
     }
   }
 
-  /**
-   * 添加请求到队列
-   * @param {Function} execute 执行函数
-   * @param {number} priority 优先级
-   * @returns {Promise} Promise对象
-   */
-  async queueRequest(execute, priority = 0) {
-    return new Promise((resolve, reject) => {
-      const request = { execute, resolve, reject, priority };
-      
-      // 按优先级插入队列
-      const insertIndex = this.requestQueue.findIndex(r => r.priority < priority);
-      if (insertIndex === -1) {
-        this.requestQueue.push(request);
-      } else {
-        this.requestQueue.splice(insertIndex, 0, request);
+  // 重试机制
+  async retryRequest(requestFn, retryCount = 0) {
+    try {
+      return await requestFn();
+    } catch (error) {
+      if (retryCount < this.retryConfig.maxRetries && this.shouldRetry(error)) {
+        const delay = this.retryConfig.retryDelay * Math.pow(this.retryConfig.retryBackoff, retryCount);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.retryRequest(requestFn, retryCount + 1);
       }
-      
-      this.processQueue();
-    });
+      throw error;
+    }
   }
 
-  /**
-   * 发送GET请求
-   * @param {string} url 请求URL
-   * @param {Object} options 请求选项
-   * @returns {Promise} 请求结果
-   */
-  async get(url, options = {}) {
-    const {
-      params = {},
-      cache = true,
-      cacheTime = 5 * 60 * 1000, // 5分钟
-      priority = 0,
-      retry = true,
-      timeout = this.timeout,
-    } = options;
+  // 判断是否应该重试
+  shouldRetry(error) {
+    const retryableStatuses = [408, 429, 500, 502, 503, 504];
+    return retryableStatuses.includes(error.status) || error.code === 'NETWORK_ERROR';
+  }
 
-    const requestKey = this.generateRequestKey(url, params);
-    
+  // 构建请求URL
+  buildURL(url, params) {
+    if (!params || Object.keys(params).length === 0) {
+      return this.baseURL + url;
+    }
+
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, value);
+      }
+    });
+
+    const queryString = searchParams.toString();
+    return `${this.baseURL}${url}${queryString ? '?' + queryString : ''}`;
+  }
+
+  // 构建请求配置
+  buildRequestConfig(method, data, headers = {}) {
+    const config = {
+      method: method.toUpperCase(),
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.defaultHeaders,
+        ...headers
+      }
+    };
+
+    if (data && method !== 'GET') {
+      config.body = JSON.stringify(data);
+    }
+
+    return config;
+  }
+
+  // 执行请求
+  async executeRequest(method, url, data = null, params = null, options = {}) {
+    const requestKey = this.createRequestKey(method, url, params, data);
+    const { cache = true, ttl = 60000, priority = 'normal', ...requestOptions } = options;
+
     // 检查缓存
-    if (cache) {
-      const cached = this.cache.get(requestKey);
+    if (cache && method === 'GET') {
+      const cached = this.getCachedResponse(requestKey);
       if (cached) {
         return cached;
       }
     }
 
     // 检查重复请求
-    if (this.pendingRequests.has(requestKey)) {
-      return this.pendingRequests.get(requestKey);
+    const pending = this.getPendingRequest(requestKey);
+    if (pending) {
+      return pending;
     }
 
-    const requestPromise = this.queueRequest(async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
+    // 创建请求函数
+    const requestFn = async () => {
+      const fullURL = this.buildURL(url, params);
+      const config = this.buildRequestConfig(method, data, requestOptions.headers);
 
-      try {
-        const queryString = new URLSearchParams(params).toString();
-        const fullUrl = `${this.baseURL}${url}${queryString ? `?${queryString}` : ''}`;
-
-        const response = await fetch(fullUrl, {
-          method: 'GET',
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        // 缓存结果
-        if (cache) {
-          this.cache.set(requestKey, data, cacheTime);
-        }
-
-        return data;
-      } catch (error) {
-        clearTimeout(timeoutId);
+      const response = await fetch(fullURL, config);
+      
+      if (!response.ok) {
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        error.status = response.status;
+        error.response = response;
         throw error;
       }
-    }, priority);
 
-    this.pendingRequests.set(requestKey, requestPromise);
-    
-    requestPromise.finally(() => {
-      this.pendingRequests.delete(requestKey);
-    });
+      const result = await response.json();
 
-    return requestPromise;
-  }
-
-  /**
-   * 发送POST请求
-   * @param {string} url 请求URL
-   * @param {Object} data 请求数据
-   * @param {Object} options 请求选项
-   * @returns {Promise} 请求结果
-   */
-  async post(url, data = {}, options = {}) {
-    const {
-      priority = 0,
-      retry = true,
-      timeout = this.timeout,
-    } = options;
-
-    return this.queueRequest(async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-      try {
-        const response = await fetch(`${this.baseURL}${url}`, {
-          method: 'POST',
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-          body: JSON.stringify(data),
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
+      // 缓存响应
+      if (cache && method === 'GET') {
+        this.setCachedResponse(requestKey, result, ttl);
       }
-    }, priority);
-  }
 
-  /**
-   * 发送PUT请求
-   * @param {string} url 请求URL
-   * @param {Object} data 请求数据
-   * @param {Object} options 请求选项
-   * @returns {Promise} 请求结果
-   */
-  async put(url, data = {}, options = {}) {
-    const {
-      priority = 0,
-      retry = true,
-      timeout = this.timeout,
-    } = options;
+      return result;
+    };
 
-    return this.queueRequest(async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
+    // 创建请求Promise
+    const requestPromise = this.retryRequest(requestFn);
 
-      try {
-        const response = await fetch(`${this.baseURL}${url}`, {
-          method: 'PUT',
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-          body: JSON.stringify(data),
-        });
+    // 设置待处理请求
+    this.setPendingRequest(requestKey, requestPromise);
 
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-      }
-    }, priority);
-  }
-
-  /**
-   * 发送DELETE请求
-   * @param {string} url 请求URL
-   * @param {Object} options 请求选项
-   * @returns {Promise} 请求结果
-   */
-  async delete(url, options = {}) {
-    const {
-      priority = 0,
-      retry = true,
-      timeout = this.timeout,
-    } = options;
-
-    return this.queueRequest(async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-      try {
-        const response = await fetch(`${this.baseURL}${url}`, {
-          method: 'DELETE',
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-      }
-    }, priority);
-  }
-
-  /**
-   * 清除缓存
-   * @param {string} pattern 缓存键模式
-   */
-  clearCache(pattern = null) {
-    if (pattern) {
-      // 清除匹配模式的缓存
-      const keys = Array.from(this.cache.cache.keys());
-      keys.forEach(key => {
-        if (key.includes(pattern)) {
-          this.cache.cache.delete(key);
-        }
-      });
+    // 根据优先级处理请求
+    if (priority === 'high') {
+      return requestPromise;
     } else {
-      // 清除所有缓存
-      this.cache.clear();
+      return new Promise((resolve, reject) => {
+        this.addToQueue(async () => {
+          try {
+            const result = await requestPromise;
+            resolve(result);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
     }
   }
 
-  /**
-   * 获取缓存统计信息
-   * @returns {Object} 缓存统计
-   */
+  // GET请求
+  async get(url, params = null, options = {}) {
+    return this.executeRequest('GET', url, null, params, options);
+  }
+
+  // POST请求
+  async post(url, data = null, options = {}) {
+    return this.executeRequest('POST', url, data, null, options);
+  }
+
+  // PUT请求
+  async put(url, data = null, options = {}) {
+    return this.executeRequest('PUT', url, data, null, options);
+  }
+
+  // DELETE请求
+  async delete(url, options = {}) {
+    return this.executeRequest('DELETE', url, null, null, options);
+  }
+
+  // PATCH请求
+  async patch(url, data = null, options = {}) {
+    return this.executeRequest('PATCH', url, data, null, options);
+  }
+
+  // 批量请求
+  async batch(requests, options = {}) {
+    const { concurrency = 3, ...batchOptions } = options;
+    
+    const results = [];
+    const errors = [];
+    
+    for (let i = 0; i < requests.length; i += concurrency) {
+      const batch = requests.slice(i, i + concurrency);
+      const batchPromises = batch.map(request => 
+        this.executeRequest(request.method, request.url, request.data, request.params, {
+          ...batchOptions,
+          ...request.options
+        }).catch(error => {
+          errors.push({ index: i, error, request });
+          return null;
+        })
+      );
+      
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
+    }
+    
+    return { results, errors };
+  }
+
+  // 清除缓存
+  clearCache() {
+    this.cache.clear();
+  }
+
+  // 获取缓存统计
   getCacheStats() {
     return {
       size: this.cache.size(),
-      maxSize: this.cache.maxSize,
-      hitRate: this.cache.hitCount / (this.cache.hitCount + this.cache.missCount) || 0,
+      pendingRequests: this.pendingRequests.size,
+      activeRequests: this.activeRequests,
+      queueLength: this.requestQueue.length
     };
-  }
-
-  /**
-   * 取消所有待处理的请求
-   */
-  cancelAllRequests() {
-    this.pendingRequests.clear();
-    this.requestQueue.length = 0;
-    this.currentConcurrent = 0;
   }
 }
 
-// 创建全局API服务实例
+// 创建API服务实例
 export const apiService = new OptimizedApiService({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:6006',
-  timeout: 10000,
-  retryCount: 3,
-  retryDelay: 1000,
+  baseURL: process.env.REACT_APP_API_BASE_URL || '',
+  maxConcurrent: 6,
   cacheSize: 100,
-  maxConcurrent: 5,
+  retryConfig: {
+    maxRetries: 3,
+    retryDelay: 1000,
+    retryBackoff: 2
+  }
 });
 
-/**
- * 优化的API Hook
- * 提供缓存、去重、自动重试等功能
- */
+// 优化的API Hook
 export const useOptimizedApi = (fetcher, deps = [], options = {}) => {
-  const {
-    cache = true,
-    cacheTime = 5 * 60 * 1000,
-    retry = true,
-    retryCount = 3,
-    retryDelay = 1000,
-    priority = 0,
-    debounce = 0,
-    throttle = 0,
-  } = options;
-
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
+  
+  const {
+    immediate = true,
+    cacheTime = 60000,
+    retryCount = 3,
+    retryDelay = 1000,
+    cache = true,
+    priority = 'normal'
+  } = options;
 
-  const cacheRef = useRef(new Map());
-  const abortControllerRef = useRef(null);
-
-  const executeRequest = useCallback(async (force = false) => {
-    if (loading && !force) return;
-
+  const execute = useCallback(async (...args) => {
     // 检查缓存
-    if (cache && !force) {
-      const cacheKey = JSON.stringify(deps);
-      const cached = cacheRef.current.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < cacheTime) {
-        setData(cached.data);
-        return;
-      }
+    const now = Date.now();
+    if (cache && cacheTime > 0 && lastFetchTime > 0 && (now - lastFetchTime) < cacheTime) {
+      return data;
     }
 
-    // 取消之前的请求
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    abortControllerRef.current = new AbortController();
     setLoading(true);
     setError(null);
 
     try {
-      const result = await fetcher(abortControllerRef.current.signal);
+      const result = await fetcher(...args);
       setData(result);
-
-      // 缓存结果
-      if (cache) {
-        const cacheKey = JSON.stringify(deps);
-        cacheRef.current.set(cacheKey, {
-          data: result,
-          timestamp: Date.now(),
-        });
-      }
-
-      setRetryCount(0);
+      setLastFetchTime(now);
+      return result;
     } catch (err) {
-      if (err.name === 'AbortError') {
-        return; // 请求被取消
-      }
-
       setError(err);
-
-      // 重试逻辑
-      if (retry && retryCount < retryCount) {
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          executeRequest(true);
-        }, retryDelay);
-      }
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [fetcher, deps, cache, cacheTime, retry, retryCount, retryDelay, loading]);
-
-  // 防抖处理
-  const debouncedExecute = useDebounce(executeRequest, debounce);
-  
-  // 节流处理
-  const throttledExecute = useThrottle(executeRequest, throttle);
-
-  const refetch = useCallback(() => {
-    executeRequest(true);
-  }, [executeRequest]);
-
-  const cancel = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-  }, []);
+  }, [fetcher, cache, cacheTime, lastFetchTime, data]);
 
   useEffect(() => {
-    if (debounce > 0) {
-      debouncedExecute();
-    } else if (throttle > 0) {
-      throttledExecute();
-    } else {
-      executeRequest();
+    if (immediate) {
+      execute();
     }
-
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, deps);
+  }, [execute, immediate, ...deps]);
 
   return {
     data,
     loading,
     error,
-    retryCount,
-    refetch,
-    cancel,
+    execute,
+    refetch: execute
   };
 };
 
-/**
- * 批量请求Hook
- * 用于同时发送多个请求
- */
+// 批量API Hook
 export const useBatchApi = (requests = [], options = {}) => {
-  const {
-    parallel = true,
-    maxConcurrent = 5,
-    retry = true,
-    retryCount = 3,
-  } = options;
-
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState([]);
 
-  const executeBatch = useCallback(async () => {
+  const execute = useCallback(async () => {
+    if (requests.length === 0) return;
+
     setLoading(true);
-    setError(null);
+    setErrors([]);
 
     try {
-      let results;
-      
-      if (parallel) {
-        // 并行执行
-        results = await Promise.allSettled(requests.map(req => req()));
-      } else {
-        // 串行执行
-        results = [];
-        for (const req of requests) {
-          try {
-            const result = await req();
-            results.push({ status: 'fulfilled', value: result });
-          } catch (err) {
-            results.push({ status: 'rejected', reason: err });
-          }
-        }
-      }
-
-      setResults(results);
-    } catch (err) {
-      setError(err);
+      const { results: batchResults, errors: batchErrors } = await apiService.batch(requests, options);
+      setResults(batchResults);
+      setErrors(batchErrors);
+      return { results: batchResults, errors: batchErrors };
+    } catch (error) {
+      setErrors([{ error }]);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, [requests, parallel]);
-
-  useEffect(() => {
-    if (requests.length > 0) {
-      executeBatch();
-    }
-  }, [executeBatch]);
+  }, [requests, options]);
 
   return {
     results,
     loading,
-    error,
-    refetch: executeBatch,
+    errors,
+    execute
   };
 };
+
+// 导入React hooks
+import { useState, useCallback, useEffect } from 'react';
