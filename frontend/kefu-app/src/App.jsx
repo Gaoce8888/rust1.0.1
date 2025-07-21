@@ -28,6 +28,9 @@ import { getWebSocketClient } from "./websocket-client";
 import LoginPage from "./components/LoginPage";
 import { initializeMonitoring, monitorWebSocket } from "./utils/monitoring";
 import { validateMessageContent, validateCustomerData, escapeHtml } from "./utils/validation";
+import ReactCardRenderer from "./components/ReactCardRenderer";
+import AdaptiveConfigPanel from "./components/AdaptiveConfigPanel";
+import adaptiveConfigManager from "./utils/adaptiveConfig";
 
 // 主应用组件 - 客服聊天界面
 export default function Component() {
@@ -39,6 +42,7 @@ export default function Component() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isAdaptiveConfigOpen, setIsAdaptiveConfigOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState(null);
   const [customers, setCustomers] = React.useState([]);
@@ -278,7 +282,15 @@ export default function Component() {
         voiceDuration: data?.voiceDuration || null,
         voiceUrl: data?.voiceUrl || null,
         status: 'delivered',
+        // 新增：React组件数据
+        reactComponentData: data?.reactComponentData || null,
+        adaptiveStyles: data?.adaptiveStyles || null
       };
+
+      // 处理特殊消息类型
+      if (data?.messageType === 'html_template' && data?.reactComponentData) {
+        newMessage.type = 'react_component';
+      }
 
       setMessages(prev => [...prev, newMessage]);
     } catch (error) {
@@ -580,6 +592,76 @@ export default function Component() {
     }));
   };
 
+  // 处理React组件事件
+  const handleReactComponentEvent = (eventData) => {
+    console.log('React组件事件:', eventData);
+    
+    try {
+      // 根据事件类型处理
+      switch (eventData.type) {
+        case 'click':
+          // 处理点击事件
+          if (eventData.data?.action) {
+            handleComponentAction(eventData.data.action, eventData.data);
+          }
+          break;
+        case 'change':
+          // 处理值变化事件
+          if (eventData.data?.value !== undefined) {
+            handleComponentValueChange(eventData.componentName, eventData.data.value);
+          }
+          break;
+        case 'submit':
+          // 处理表单提交事件
+          handleComponentSubmit(eventData.data);
+          break;
+        default:
+          console.log('未处理的事件类型:', eventData.type);
+      }
+    } catch (error) {
+      console.error('处理React组件事件失败:', error);
+    }
+  };
+
+  // 处理组件动作
+  const handleComponentAction = (action, data) => {
+    switch (action) {
+      case 'open_url':
+        if (data.url) {
+          window.open(data.url, '_blank');
+        }
+        break;
+      case 'send_message':
+        if (data.message) {
+          handleSendMessage({ content: data.message, type: 'text' });
+        }
+        break;
+      case 'show_modal':
+        // 可以在这里处理显示模态框的逻辑
+        break;
+      default:
+        console.log('未处理的组件动作:', action);
+    }
+  };
+
+  // 处理组件值变化
+  const handleComponentValueChange = (componentName, value) => {
+    console.log(`组件 ${componentName} 值变化:`, value);
+    // 可以在这里处理组件值变化的逻辑
+  };
+
+  // 处理组件表单提交
+  const handleComponentSubmit = (formData) => {
+    console.log('组件表单提交:', formData);
+    // 可以在这里处理表单提交的逻辑
+  };
+
+  // 处理自适应配置变更
+  const handleAdaptiveConfigChange = (newConfig) => {
+    console.log('自适应配置已更新:', newConfig);
+    // 可以在这里处理配置变更后的逻辑，比如重新渲染相关组件
+  };
+
   // 处理登录成功
   const handleLoginSuccess = (userInfo) => {
     setCurrentUser(userInfo);
@@ -830,30 +912,66 @@ export default function Component() {
               )}
               
               {/* 渲染当前客户的消息 */}
-              {(customerMessages[currentCustomer.id] || []).map((message) => (
-                <MessagingChatMessage
-                  key={message.id}
-                  avatar={message.senderAvatar}
-                  name={message.senderName}
-                  time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                  message={message.content}
-                  messageType={message.type}
-                  isRTL={message.senderId === currentUser?.id}
-                  imageUrl={message.imageUrl}
-                  fileName={message.fileName}
-                  fileSize={message.fileSize}
-                  fileUrl={message.fileUrl}
-                  voiceDuration={message.voiceDuration}
-                  voiceUrl={message.voiceUrl}
-                  status={message.status}
-                  classNames={{
-                    base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
-                  }}
-                />
-              ))}
+              {(customerMessages[currentCustomer.id] || []).map((message) => {
+                // 处理React组件消息
+                if (message.type === 'react_component' && message.reactComponentData) {
+                  return (
+                    <div key={message.id} className="mb-4">
+                      <MessagingChatMessage
+                        avatar={message.senderAvatar}
+                        name={message.senderName}
+                        time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                        message=""
+                        messageType={MessageType.TEXT}
+                        isRTL={message.senderId === currentUser?.id}
+                        status={message.status}
+                        classNames={{
+                          base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
+                        }}
+                      />
+                      {/* React组件渲染器 */}
+                      <div className="mt-2 ml-12">
+                        <ReactCardRenderer
+                          componentData={message.reactComponentData}
+                          adaptiveStyles={message.adaptiveStyles}
+                          containerId={`react-${message.id}`}
+                          onEvent={handleReactComponentEvent}
+                          className="react-message-card"
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+
+                // 处理普通消息
+                return (
+                  <MessagingChatMessage
+                    key={message.id}
+                    avatar={message.senderAvatar}
+                    name={message.senderName}
+                    time={new Date(message.timestamp).toLocaleTimeString('zh-CN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                    message={message.content}
+                    messageType={message.type}
+                    isRTL={message.senderId === currentUser?.id}
+                    imageUrl={message.imageUrl}
+                    fileName={message.fileName}
+                    fileSize={message.fileSize}
+                    fileUrl={message.fileUrl}
+                    voiceDuration={message.voiceDuration}
+                    voiceUrl={message.voiceUrl}
+                    status={message.status}
+                    classNames={{
+                      base: message.senderId === currentUser?.id ? "bg-primary-50" : "bg-default-50",
+                    }}
+                  />
+                );
+              })}
             </>
           )}
         </ScrollShadow>
@@ -1089,6 +1207,27 @@ export default function Component() {
                   </div>
                 </div>
               </div>
+
+              <Divider />
+
+              <div>
+                <h4 className="text-small font-medium mb-3">React卡片设置</h4>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-small mb-2">自适应配置</p>
+                    <p className="text-tiny text-default-500 mb-2">配置React卡片的自适应行为和显示效果</p>
+                    <Button
+                      size="sm"
+                      variant="bordered"
+                      startContent={<Icon icon="solar:settings-line-duotone" width={16} />}
+                      onClick={() => setIsAdaptiveConfigOpen(true)}
+                      className="w-full"
+                    >
+                      配置自适应设置
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </ModalBody>
           <ModalFooter>
@@ -1109,6 +1248,13 @@ export default function Component() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* 自适应配置面板 */}
+      <AdaptiveConfigPanel
+        isOpen={isAdaptiveConfigOpen}
+        onClose={() => setIsAdaptiveConfigOpen(false)}
+        onConfigChange={handleAdaptiveConfigChange}
+      />
     </div>
   );
 }
