@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "id": "admin-001",
+      "username": "admin",
+      "password": "admin123",
+      "display_name": "系统管理员",
+      "role": "admin",
+      "status": "active",
+      "created_at": "2024-01-01T00:00:00Z",
+      "last_login": null,
+      "permissions": ["all"]
+    },
+    {
+      "id": "kefu-001",
+      "username": "kefu1",
+      "password": "kefu123",
+      "display_name": "客服小王",
+      "role": "kefu",
+      "status": "active",
+      "created_at": "2024-01-01T00:00:00Z",
+      "last_login": null,
+      "permissions": ["chat", "customer_management"]
+    },
+    {
+      "id": "kefu-002",
+      "username": "kefu2",
+      "password": "kefu123",
+      "display_name": "客服小李",
+      "role": "kefu",
+      "status": "active",
+      "created_at": "2024-01-01T00:00:00Z",
+      "last_login": null,
+      "permissions": ["chat", "customer_management"]
+    }
+  ]
+}

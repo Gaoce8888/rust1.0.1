@@ -16,7 +16,7 @@ pub struct HeartbeatService {
 impl HeartbeatService {
     /// 创建新的心跳检测服务
     pub fn new(
-        redis_pool: Arc<RedisPoolManager>,
+        _redis_pool: Arc<RedisPoolManager>,
         customer_manager: Arc<CustomerManager>,
     ) -> Self {
         Self {

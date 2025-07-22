@@ -142,6 +142,15 @@ pub enum UserType {
     Kehu, // 客户
 }
 
+impl std::fmt::Display for UserType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UserType::Kefu => write!(f, "kefu"),
+            UserType::Kehu => write!(f, "kehu"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
 pub enum ContentType {
     Text,

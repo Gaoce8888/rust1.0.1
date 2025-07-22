@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use warp::{Filter, Reply, Rejection};
 use serde_json::json;
-use crate::auth::jwt_auth::{JwtAuthManager, LoginRequest, LoginResponse};
+use crate::auth::jwt_auth::{JwtAuthManager, LoginRequest};
 use crate::types::api::{ApiResponse, ApiError};
 
 /// 构建JWT认证路由
@@ -72,7 +72,7 @@ async fn handle_login(
             Ok(warp::reply::json(&api_response))
         }
         Err(e) => {
-            let api_response = ApiResponse {
+            let api_response: ApiResponse<()> = ApiResponse {
                 success: false,
                 message: e.message,
                 data: None,
@@ -94,7 +94,7 @@ async fn handle_logout(
     // 执行登出
     match auth_manager.logout(&claims.sub).await {
         Ok(_) => {
-            let api_response = ApiResponse {
+            let api_response: ApiResponse<()> = ApiResponse {
                 success: true,
                 message: "登出成功".to_string(),
                 data: None,
@@ -102,7 +102,7 @@ async fn handle_logout(
             Ok(warp::reply::json(&api_response))
         }
         Err(e) => {
-            let api_response = ApiResponse {
+            let api_response: ApiResponse<()> = ApiResponse {
                 success: false,
                 message: e.message,
                 data: None,
@@ -132,7 +132,7 @@ async fn handle_validate_token(
             Ok(warp::reply::json(&api_response))
         }
         Err(e) => {
-            let api_response = ApiResponse {
+            let api_response: ApiResponse<()> = ApiResponse {
                 success: false,
                 message: e.message,
                 data: None,
@@ -180,7 +180,7 @@ async fn handle_heartbeat(
             Ok(warp::reply::json(&api_response))
         }
         Err(e) => {
-            let api_response = ApiResponse {
+            let api_response: ApiResponse<()> = ApiResponse {
                 success: false,
                 message: e.message,
                 data: None,

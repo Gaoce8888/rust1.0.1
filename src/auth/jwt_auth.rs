@@ -6,8 +6,8 @@ use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, D
 use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Utc, Duration};
 use uuid::Uuid;
-use crate::redis::RedisPoolManager;
-use crate::types::api::{ApiResponse, ApiError};
+use crate::redis_pool::RedisPoolManager;
+use crate::types::api::ApiError;
 
 /// JWT Claims 结构
 #[derive(Debug, Serialize, Deserialize)]
@@ -240,13 +240,13 @@ impl JwtAuthManager {
         online_users.remove(user_id);
         
         // 从Redis中清除用户会话
-        let redis = self.redis_pool.get_connection().await;
-        if let Ok(mut conn) = redis {
+        let _ = self.redis_pool.execute_async(|mut conn| async move {
             let _: Result<(), redis::RedisError> = redis::cmd("DEL")
                 .arg(format!("user_session:{}", user_id))
-                .execute_async(&mut *conn)
+                .query_async(&mut conn)
                 .await;
-        }
+            Ok((conn, ()))
+        }).await;
     }
 
     /// 更新在线状态
@@ -296,27 +296,31 @@ impl JwtAuthManager {
 
     /// 保存用户到Redis
     async fn save_user(&self, user: &User) -> Result<(), Box<dyn std::error::Error>> {
-        let redis = self.redis_pool.get_connection().await?;
         let user_json = serde_json::to_string(user)?;
         
-        redis::cmd("HSET")
-            .arg("users")
-            .arg(&user.username)
-            .arg(&user_json)
-            .execute_async(&mut *redis)
-            .await?;
+        self.redis_pool.execute_async(|mut conn| async move {
+            let _: Result<(), redis::RedisError> = redis::cmd("HSET")
+                .arg("users")
+                .arg(&user.username)
+                .arg(&user_json)
+                .query_async(&mut conn)
+                .await;
+            Ok((conn, ()))
+        }).await?;
 
         Ok(())
     }
 
     /// 从Redis获取用户
     async fn get_user_by_username(&self, username: &str) -> Result<User, Box<dyn std::error::Error>> {
-        let redis = self.redis_pool.get_connection().await?;
-        let user_json: String = redis::cmd("HGET")
-            .arg("users")
-            .arg(username)
-            .query_async(&mut *redis)
-            .await?;
+        let user_json: String = self.redis_pool.execute_async(|mut conn| async move {
+            let result: Result<String, redis::RedisError> = redis::cmd("HGET")
+                .arg("users")
+                .arg(username)
+                .query_async(&mut conn)
+                .await;
+            Ok((conn, result))
+        }).await??;
 
         let user: User = serde_json::from_str(&user_json)?;
         Ok(user)
@@ -324,14 +328,14 @@ impl JwtAuthManager {
 
     /// 更新最后登录时间
     async fn update_last_login(&self, user_id: &str) {
-        let redis = self.redis_pool.get_connection().await;
-        if let Ok(mut conn) = redis {
+        let _ = self.redis_pool.execute_async(|mut conn| async move {
             let _: Result<(), redis::RedisError> = redis::cmd("HSET")
                 .arg("users")
                 .arg(format!("{}:last_login", user_id))
                 .arg(Utc::now().timestamp())
-                .execute_async(&mut *conn)
+                .query_async(&mut conn)
                 .await;
-        }
+            Ok((conn, ()))
+        }).await;
     }
 }

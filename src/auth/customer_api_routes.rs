@@ -7,7 +7,7 @@ use tracing::{info, warn, error};
 
 use crate::auth::{CustomerManager, CustomerConnectRequest, CustomerDisconnectRequest, CustomerHeartbeatRequest};
 use crate::redis_pool::RedisPoolManager;
-use crate::auth::api_routes::ApiResponse;
+use crate::types::api::ApiResponse;
 
 /// 客户状态信息
 #[derive(Debug, Serialize)]
@@ -130,13 +130,13 @@ async fn handle_customer_connect(
             if response.success {
                 info!("✅ 客户连接成功: {}", response.assigned_kefu_id.as_ref().unwrap_or(&"等待分配".to_string()));
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::success(response)),
+                    warp::reply::json(&ApiResponse::success("客户连接成功".to_string(), response)),
                     StatusCode::OK,
                 ))
             } else {
                 warn!("❌ 客户连接失败: {}", response.message);
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::<()>::error(response.message, response.error_code)),
+                    warp::reply::json(&ApiResponse::<()>::error(response.message)),
                     StatusCode::BAD_REQUEST,
                 ))
             }
@@ -146,7 +146,6 @@ async fn handle_customer_connect(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "服务器内部错误".to_string(),
-                    Some("INTERNAL_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -169,13 +168,13 @@ async fn handle_customer_disconnect(
             if response.success {
                 info!("✅ 客户断开连接成功: {}", customer_id);
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::success(response)),
+                    warp::reply::json(&ApiResponse::success("客户断开连接成功".to_string(), response)),
                     StatusCode::OK,
                 ))
             } else {
                 warn!("❌ 客户断开连接失败: {}", response.message);
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::<()>::error(response.message, response.error_code)),
+                    warp::reply::json(&ApiResponse::<()>::error(response.message)),
                     StatusCode::BAD_REQUEST,
                 ))
             }
@@ -185,7 +184,6 @@ async fn handle_customer_disconnect(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "服务器内部错误".to_string(),
-                    Some("INTERNAL_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -202,12 +200,12 @@ async fn handle_customer_heartbeat(
         Ok(response) => {
             if response.success {
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::success(response)),
+                    warp::reply::json(&ApiResponse::success("客户心跳成功".to_string(), response)),
                     StatusCode::OK,
                 ))
             } else {
                 Ok(warp::reply::with_status(
-                    warp::reply::json(&ApiResponse::<()>::error(response.message, response.error_code)),
+                    warp::reply::json(&ApiResponse::<()>::error(response.message)),
                     StatusCode::BAD_REQUEST,
                 ))
             }
@@ -217,7 +215,6 @@ async fn handle_customer_heartbeat(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "服务器内部错误".to_string(),
-                    Some("INTERNAL_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -249,7 +246,7 @@ async fn handle_get_connected_customers(
                 .collect();
 
             Ok(warp::reply::with_status(
-                warp::reply::json(&ApiResponse::success(status_list)),
+                warp::reply::json(&ApiResponse::success("获取连接的客户列表成功".to_string(), status_list)),
                 StatusCode::OK,
             ))
         }
@@ -258,7 +255,6 @@ async fn handle_get_connected_customers(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "获取连接的客户列表失败".to_string(),
-                    Some("FETCH_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -284,7 +280,7 @@ async fn handle_get_customer_status(
             };
 
             Ok(warp::reply::with_status(
-                warp::reply::json(&ApiResponse::success(status_info)),
+                warp::reply::json(&ApiResponse::success("获取客户状态成功".to_string(), status_info)),
                 StatusCode::OK,
             ))
         }
@@ -293,7 +289,6 @@ async fn handle_get_customer_status(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "获取客户状态失败".to_string(),
-                    Some("FETCH_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -326,7 +321,7 @@ async fn handle_get_kefu_customers(
                 .collect();
 
             Ok(warp::reply::with_status(
-                warp::reply::json(&ApiResponse::success(status_list)),
+                warp::reply::json(&ApiResponse::success("获取客服的客户列表成功".to_string(), status_list)),
                 StatusCode::OK,
             ))
         }
@@ -335,7 +330,6 @@ async fn handle_get_kefu_customers(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "获取客服的客户列表失败".to_string(),
-                    Some("FETCH_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
@@ -350,7 +344,7 @@ async fn handle_get_connected_count(
     match customer_manager.get_connected_customer_count().await {
         Ok(count) => {
             Ok(warp::reply::with_status(
-                warp::reply::json(&ApiResponse::success(count)),
+                warp::reply::json(&ApiResponse::success("获取连接的客户数量成功".to_string(), count)),
                 StatusCode::OK,
             ))
         }
@@ -359,7 +353,6 @@ async fn handle_get_connected_count(
             Ok(warp::reply::with_status(
                 warp::reply::json(&ApiResponse::<()>::error(
                     "获取连接的客户数量失败".to_string(),
-                    Some("COUNT_ERROR".to_string()),
                 )),
                 StatusCode::INTERNAL_SERVER_ERROR,
             ))
