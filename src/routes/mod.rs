@@ -23,7 +23,7 @@ use crate::voice_message::VoiceMessageManager;
 use crate::storage::LocalStorage;
 use crate::ai::AIManager;
 use crate::handlers::ai::AIHandler;
-use crate::auth::{CustomerManager, CustomerApiRoutes};
+use crate::auth::{JwtAuthManager, CustomerManager, CustomerApiRoutes};
 use crate::redis_pool::RedisPoolManager;
 
 /// 路由构建器配置结构体
@@ -38,6 +38,7 @@ pub struct RouteBuilderConfig {
     #[allow(dead_code)]
     pub customer_manager: Arc<CustomerManager>,
     pub redis_pool: Arc<RedisPoolManager>,
+    pub jwt_auth_manager: Arc<JwtAuthManager>,
 }
 
 /// 构建所有路由
@@ -60,7 +61,7 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
         config.file_manager.clone(),
     );
     
-    let websocket_routes = websocket::build_websocket_routes(config.ws_manager.clone());
+    let websocket_routes = websocket::build_websocket_routes(config.ws_manager.clone(), config.jwt_auth_manager.clone());
     let frontend_routes = frontend::build_frontend_routes();
     
     // Swagger路由应该在最前面，避免被其他路由拦截
@@ -69,6 +70,9 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
     // AI路由
     let ai_handler = AIHandler::new(config.ai_manager.clone());
     let ai_routes = ai_handler.routes();
+    
+    // JWT认证路由
+    let jwt_auth_routes = crate::auth::jwt_routes::build_jwt_auth_routes(config.jwt_auth_manager.clone());
     
     // 客户管理API路由
     let customer_api_routes = CustomerApiRoutes::new(config.redis_pool.clone()).create_routes();
@@ -97,9 +101,11 @@ pub fn build_all_routes(config: RouteBuilderConfig) -> impl Filter<Extract = (im
         .or(favicon_route)
         // 2. Swagger路由应该在API路由之前
         .or(swagger_routes)
-        // 3. 认证路由
+        // 3. JWT认证路由
+        .or(jwt_auth_routes)
+        // 4. 认证路由
         .or(auth_routes)
-        // 4. 客户管理API路由
+        // 5. 客户管理API路由
         .or(customer_api_routes)
         // 5. AI路由
         .or(ai_routes)

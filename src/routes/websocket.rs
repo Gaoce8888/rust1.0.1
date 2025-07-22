@@ -3,21 +3,25 @@ use warp::Filter;
 use crate::websocket::WebSocketManager;
 use crate::types::websocket::WebSocketParams;
 use crate::auth::websocket::{parse_websocket_connection, validate_websocket_auth};
+use crate::auth::jwt_auth::JwtAuthManager;
 use crate::errors::InvalidParams;
 
 /// 构建WebSocket路由
 pub fn build_websocket_routes(
     ws_manager: Arc<WebSocketManager>,
+    jwt_auth_manager: Arc<JwtAuthManager>,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     
-    // WebSocket路由 - 简化版本
+    // WebSocket路由 - 集成JWT认证
     let ws_manager_clone = ws_manager.clone();
+    let jwt_auth_manager_clone = jwt_auth_manager.clone();
     warp::path("ws")
         .and(warp::ws())
         .and(warp::query::<WebSocketParams>())
         .and_then(move |ws: warp::ws::Ws, query: WebSocketParams| {
             let ws_manager = ws_manager_clone.clone();
-            async move { handle_websocket(ws, query, ws_manager).await }
+            let jwt_auth_manager = jwt_auth_manager_clone.clone();
+            async move { handle_websocket(ws, query, ws_manager, jwt_auth_manager).await }
         })
 }
 
@@ -26,6 +30,7 @@ async fn handle_websocket(
     ws: warp::ws::Ws,
     query: WebSocketParams,
     ws_manager: Arc<WebSocketManager>,
+    jwt_auth_manager: Arc<JwtAuthManager>,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     tracing::info!("WebSocket连接请求: {:?}", query);
 
@@ -36,7 +41,7 @@ async fn handle_websocket(
         }))?;
 
     // 验证连接认证
-    match validate_websocket_auth(&connection_info).await {
+    match validate_websocket_auth(&connection_info, &jwt_auth_manager).await {
         Ok(true) => {
             tracing::info!("WebSocket认证通过");
         }

@@ -11,7 +11,7 @@ use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
-use crate::auth::{CustomerManager, HeartbeatService, start_heartbeat_service_background};
+use crate::auth::{JwtAuthManager, CustomerManager, HeartbeatService, start_heartbeat_service_background};
 use crate::platform;
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
@@ -39,6 +39,7 @@ pub struct SystemComponents {
     pub voice_manager: Arc<VoiceMessageManager>,
     pub ws_manager: Arc<WebSocketManager>,
     pub ai_manager: Arc<AIManager>,
+    pub jwt_auth_manager: Arc<JwtAuthManager>,
     pub customer_manager: Arc<CustomerManager>,
     #[allow(dead_code)]
     pub heartbeat_service: Arc<HeartbeatService>,
@@ -169,6 +170,15 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     let ai_manager = Arc::new(AIManager::new());
     info!("AI管理器初始化成功");
 
+    // 初始化JWT认证管理器
+    let jwt_auth_manager = Arc::new(JwtAuthManager::new(redis_pool.clone()));
+    // 初始化默认用户
+    if let Err(e) = jwt_auth_manager.initialize_default_users().await {
+        error!("初始化默认用户失败: {:?}", e);
+        return Err(anyhow::anyhow!("初始化默认用户失败: {}", e));
+    }
+    info!("✅ JWT认证管理器初始化成功");
+
     // 初始化客户管理器
     let customer_manager = Arc::new(CustomerManager::new(redis_pool.clone()));
     info!("✅ 客户管理器初始化成功");
@@ -236,6 +246,7 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
         voice_manager,
         ws_manager,
         ai_manager,
+        jwt_auth_manager,
         customer_manager,
         heartbeat_service,
         // 企业级组件 - 暂时禁用以修复编译

@@ -22,6 +22,7 @@ pub async fn start_server(components: SystemComponents) -> Result<()> {
         ai_manager: components.ai_manager.clone(),
         customer_manager: components.customer_manager.clone(),
         redis_pool: components.redis_pool.clone(),
+        jwt_auth_manager: components.jwt_auth_manager.clone(),
     };
 
     // 构建路由
@@ -109,14 +110,23 @@ fn print_startup_info(config: &AppConfig) {
     info!("");
     info!("🔗 访问地址:");
     info!("   - 主页面: http://localhost:{}", config.server.port);
+    info!("   - 客服端: http://localhost:{}/kefu", config.server.port);
+    info!("   - 客户端: http://localhost:{}/kehu", config.server.port);
     info!("   - API文档: http://localhost:{}/swagger", config.server.port);
     info!("   - 客户连接: http://localhost:{}/customer/connect", config.server.port);
     info!("");
     info!("🎯 功能特性:");
+    info!("   - JWT认证登录系统");
+    info!("   - 防止重复登录");
+    info!("   - 实时状态更新");
+    info!("   - WebSocket连接管理");
     info!("   - 客户连接管理");
     info!("   - Redis缓存支持，实时状态同步");
     info!("   - 心跳检测和自动清理");
-    info!("   - WebSocket实时通信");
+    info!("");
+    info!("🔐 默认用户:");
+    info!("   - 管理员: admin / admin123");
+    info!("   - 客服: kefu1 / kefu123");
     info!("");
     info!("✅ 系统已准备就绪，等待连接...");
 }

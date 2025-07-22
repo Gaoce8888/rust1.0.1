@@ -1,6 +1,8 @@
 use crate::types::websocket::WebSocketParams;
 use crate::message::UserType;
 use crate::errors::log_websocket_param_error;
+use crate::auth::jwt_auth::JwtAuthManager;
+use std::sync::Arc;
 
 /// WebSocket连接信息
 pub struct WebSocketConnectionInfo {
@@ -9,6 +11,7 @@ pub struct WebSocketConnectionInfo {
     pub user_type: UserType,
     pub zhanghao: Option<String>,
     pub session_token: Option<String>,
+    pub jwt_token: Option<String>,
 }
 
 /// 验证WebSocket连接参数 - 修复版本
@@ -49,6 +52,7 @@ pub fn parse_websocket_connection(query: &WebSocketParams) -> Result<WebSocketCo
     
     let zhanghao = query.get("zhanghao").cloned();
     let session_token = query.get("session_token").cloned();
+    let jwt_token = query.get("jwt_token").cloned();
 
     // 解析用户类型 - 兼容多种类型名称
     let user_type = match user_type_str.to_lowercase().as_str() {
@@ -66,14 +70,37 @@ pub fn parse_websocket_connection(query: &WebSocketParams) -> Result<WebSocketCo
         user_type,
         zhanghao,
         session_token,
+        jwt_token,
     })
 }
 
-/// 验证WebSocket连接的认证 - 简化版本
+/// 验证WebSocket连接的认证
 pub async fn validate_websocket_auth(
     connection_info: &WebSocketConnectionInfo,
+    auth_manager: &Arc<JwtAuthManager>,
 ) -> Result<bool, String> {
-    // 简化认证：所有用户类型都允许连接
-    // 可以根据需要添加更严格的认证逻辑
-    Ok(true)
+    // 如果有JWT token，优先使用JWT认证
+    if let Some(token) = &connection_info.jwt_token {
+        match auth_manager.verify_token(token).await {
+            Ok(claims) => {
+                // 验证用户信息是否匹配
+                if claims.sub != connection_info.user_id || 
+                   claims.username != connection_info.user_name ||
+                   claims.user_type != connection_info.user_type.to_string() {
+                    return Err("用户信息不匹配".to_string());
+                }
+                Ok(true)
+            }
+            Err(e) => {
+                Err(format!("JWT认证失败: {}", e.message))
+            }
+        }
+    } else {
+        // 兼容旧版本，简单验证用户是否在线
+        if auth_manager.is_user_online(&connection_info.user_id).await {
+            Ok(true)
+        } else {
+            Err("用户不在线".to_string())
+        }
+    }
 } 
