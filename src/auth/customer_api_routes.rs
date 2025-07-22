@@ -28,8 +28,8 @@ pub struct CustomerApiRoutes {
 
 impl CustomerApiRoutes {
     /// 创建新的客户API路由管理器
-    pub fn new(redis_pool: Arc<RedisPoolManager>, kefu_auth_manager: Arc<crate::auth::KefuAuthManager>) -> Self {
-        let customer_manager = Arc::new(CustomerManager::new(redis_pool, kefu_auth_manager));
+    pub fn new(redis_pool: Arc<RedisPoolManager>) -> Self {
+        let customer_manager = Arc::new(CustomerManager::new(redis_pool));
         Self { customer_manager }
     }
 

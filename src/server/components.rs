@@ -11,7 +11,7 @@ use crate::user_manager::UserManager;
 use crate::voice_message::VoiceMessageManager;
 use crate::websocket::WebSocketManager;
 use crate::ai::AIManager;
-use crate::auth::{KefuAuthManager, CustomerManager, HeartbeatService, start_heartbeat_service_background};
+use crate::auth::{CustomerManager, HeartbeatService, start_heartbeat_service_background};
 use crate::platform;
 // Temporarily disabled enterprise modules for compilation
 // use crate::load_balancer::{LoadBalancer, LoadBalancerConfig, LoadBalancingStrategy};
@@ -39,7 +39,6 @@ pub struct SystemComponents {
     pub voice_manager: Arc<VoiceMessageManager>,
     pub ws_manager: Arc<WebSocketManager>,
     pub ai_manager: Arc<AIManager>,
-    pub kefu_auth_manager: Arc<KefuAuthManager>,
     pub customer_manager: Arc<CustomerManager>,
     #[allow(dead_code)]
     pub heartbeat_service: Arc<HeartbeatService>,
@@ -170,22 +169,12 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
     let ai_manager = Arc::new(AIManager::new());
     info!("AI管理器初始化成功");
 
-    // 初始化客服认证管理器
-    let kefu_auth_manager = Arc::new(KefuAuthManager::new(redis_pool.clone()));
-    
-    // 初始化默认客服账号
-    if let Err(e) = kefu_auth_manager.initialize_default_accounts().await {
-        error!("初始化默认客服账号失败: {:?}", e);
-        return Err(e);
-    }
-    info!("✅ 客服认证管理器初始化成功");
-
     // 初始化客户管理器
-    let customer_manager = Arc::new(CustomerManager::new(redis_pool.clone(), kefu_auth_manager.clone()));
+    let customer_manager = Arc::new(CustomerManager::new(redis_pool.clone()));
     info!("✅ 客户管理器初始化成功");
 
     // 初始化心跳检测服务
-    let heartbeat_service = Arc::new(HeartbeatService::new(redis_pool.clone(), kefu_auth_manager.clone()));
+    let heartbeat_service = Arc::new(HeartbeatService::new(redis_pool.clone(), customer_manager.clone()));
     info!("✅ 心跳检测服务初始化成功");
 
     // 企业级组件初始化 - 暂时禁用以修复编译
@@ -247,7 +236,6 @@ pub async fn initialize_system_components() -> Result<SystemComponents> {
         voice_manager,
         ws_manager,
         ai_manager,
-        kefu_auth_manager,
         customer_manager,
         heartbeat_service,
         // 企业级组件 - 暂时禁用以修复编译
@@ -269,7 +257,7 @@ pub async fn start_background_tasks(components: &SystemComponents) {
     // 启动心跳检测服务
     if let Err(e) = start_heartbeat_service_background(
         components.redis_pool.clone(),
-        components.kefu_auth_manager.clone(),
+        components.customer_manager.clone(),
     ).await {
         error!("💥 启动心跳检测服务失败: {}", e);
     }

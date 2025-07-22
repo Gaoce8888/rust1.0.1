@@ -20,7 +20,6 @@ pub async fn start_server(components: SystemComponents) -> Result<()> {
         voice_manager: components.voice_manager.clone(),
         storage: Arc::new(components.storage.clone()),
         ai_manager: components.ai_manager.clone(),
-        kefu_auth_manager: components.kefu_auth_manager.clone(),
         customer_manager: components.customer_manager.clone(),
         redis_pool: components.redis_pool.clone(),
     };
@@ -111,16 +110,13 @@ fn print_startup_info(config: &AppConfig) {
     info!("🔗 访问地址:");
     info!("   - 主页面: http://localhost:{}", config.server.port);
     info!("   - API文档: http://localhost:{}/swagger", config.server.port);
-    info!("   - 客服登录: http://localhost:{}/kefu/login", config.server.port);
     info!("   - 客户连接: http://localhost:{}/customer/connect", config.server.port);
     info!("");
-    info!("🎯 新功能:");
-    info!("   - 客服账号验证和在线状态管理");
+    info!("🎯 功能特性:");
+    info!("   - 客户连接管理");
     info!("   - Redis缓存支持，实时状态同步");
-    info!("   - 客户连接管理和客服分配");
     info!("   - 心跳检测和自动清理");
-    info!("   - 一个账号只能一个人登录");
-    info!("   - 客服下线后其他人可立即登录");
+    info!("   - WebSocket实时通信");
     info!("");
     info!("✅ 系统已准备就绪，等待连接...");
 }
